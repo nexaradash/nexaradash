@@ -481,7 +481,12 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
         <div class="ud" style="font-size:11px;margin-bottom:12px;">Upload filled template or any Excel/CSV with SKU and cost columns<br>Supports .xlsx, .xls and .csv files</div>
         <button class="btn bp bsm" onclick="event.stopPropagation();document.getElementById('bulk-fi').click()">Choose File</button>
         <input type="file" id="bulk-fi" style="display:none" accept=".xlsx,.xls,.csv" onchange="onBulkFile(event)">
-        <div class="un">Existing products are kept — duplicates are skipped automatically</div>
+        <div class="un" style="margin-top:12px;flex-direction:column;gap:8px;">
+          <label onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:11px;color:var(--tx3);">
+            <input type="checkbox" id="replace-all" style="accent-color:var(--red);width:14px;height:14px;">
+            <span><strong style="color:var(--red);">Replace All</strong> — clear existing products and import new ones</span>
+          </label>
+        </div>
       </div>
 
       <!-- Bulk preview -->
@@ -506,9 +511,10 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     <div class="tw">
       <div class="th">
         <div class="tt">Product Cost Master</div>
-        <div style="display:flex;gap:8px;align-items:center;">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <div class="tc" id="pc2">0 products</div>
-          <button class="btn bs bsm" onclick="expProdsCSV()">📊 Export Products</button>
+          <button class="btn bs bsm" onclick="expProdsCSV()">📊 Export</button>
+          <button class="btn bd bsm" onclick="clrAll()" style="display:flex;align-items:center;gap:5px;">🗑 Clear All</button>
         </div>
       </div>
       <div class="ts"><table><thead><tr><th>SKU</th><th>Product Name</th><th>Buying Price</th><th>Shipping</th><th>Temu Fee</th><th>Ad Spend</th><th>Unit Cost</th><th></th></tr></thead><tbody id="pb"></tbody></table></div>
@@ -852,14 +858,20 @@ function rndBulkPreview(){
 }
 
 function confirmBulk(){
-  const newProds=bulkPreview.filter(p=>!p.exists);
-  if(!newProds.length){notify('No new products to add — all already exist','inf');return;}
+  const replaceAll=document.getElementById('replace-all').checked;
+  const newProds=replaceAll?bulkPreview:bulkPreview.filter(p=>!p.exists);
+  if(!newProds.length){notify('No new products to add','inf');return;}
+  if(replaceAll){
+    if(!confirm('This will DELETE all '+prods.length+' existing products and replace with '+newProds.length+' new ones. Are you sure?'))return;
+    prods=[];
+  }
   newProds.forEach(p=>prods.push({sku:p.sku,name:p.name,cost:p.cost,ship:p.ship,fee:p.fee,ads:p.ads}));
   savP();rndProds();recalc();
   document.getElementById('bulk-preview').style.display='none';
   document.getElementById('bulk-fi').value='';
+  document.getElementById('replace-all').checked=false;
   bulkPreview=[];
-  notify('✓ '+newProds.length+' products imported successfully!','ok');
+  notify('✓ '+newProds.length+' products '+(replaceAll?'replaced':'imported')+' successfully!','ok');
   switchPTab('manual');
 }
 
@@ -1219,7 +1231,13 @@ function expCSV(){
   notify('CSV downloaded!','ok');
 }
 
-function clrAll(){if(confirm('Clear all products?')){prods=[];savP();rndProds();recalc();notify('Cleared','ok');}}
+function clrAll(){
+  if(!prods.length){notify('No products to clear','inf');return;}
+  if(confirm('Delete all '+prods.length+' products? This cannot be undone.')){
+    prods=[];savP();rndProds();recalc();
+    notify('All products cleared','ok');
+  }
+}
 </script>
 </body>
 </html>
