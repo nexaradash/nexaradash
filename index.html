@@ -432,21 +432,85 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 
   <!-- PRODUCTS -->
   <div class="pg" id="pg-products">
-    <div class="sh2"><div class="sh2-txt">Add Product / SKU</div><div class="sh2-line"></div></div>
-    <div class="pf">
-      <div class="fg">
-        <div class="fg3"><label class="fl">SKU / Product ID</label><input class="fi" id="p-sku" placeholder="e.g. TEM-001"></div>
-        <div class="fg3"><label class="fl">Product Name</label><input class="fi" id="p-name" placeholder="e.g. Wireless Earbuds"></div>
-        <div class="fg3"><label class="fl">Buying Price (£)</label><input class="fi" id="p-cost" type="number" step="0.01" placeholder="0.00"></div>
-        <div class="fg3"><label class="fl">Inbound Shipping / Unit (£)</label><input class="fi" id="p-ship" type="number" step="0.01" placeholder="0.00"></div>
-        <div class="fg3"><label class="fl">Temu Fee % (Commission)</label><input class="fi" id="p-fee" type="number" step="0.1" placeholder="e.g. 8"></div>
-        <div class="fg3"><label class="fl">Monthly Ad Spend (£)</label><input class="fi" id="p-ads" type="number" step="0.01" placeholder="0.00"></div>
-      </div>
-      <div style="display:flex;gap:8px;"><button class="btn bp" onclick="addProd()">+ Add Product</button><button class="btn bs" onclick="clrPF()">Clear</button></div>
+
+    <!-- PRODUCT SUB TABS -->
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;">
+      <div id="ptab-manual" onclick="switchPTab('manual')" style="padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid var(--blu2);color:var(--blu2);">✏️ Manual Entry</div>
+      <div id="ptab-bulk" onclick="switchPTab('bulk')" style="padding:9px 18px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--tx3);">📤 Bulk Upload</div>
     </div>
-    <div class="sh2"><div class="sh2-txt">Your Products</div><div class="sh2-line"></div></div>
+
+    <!-- MANUAL ENTRY -->
+    <div id="psec-manual">
+      <div class="sh2"><div class="sh2-txt">Add Product / SKU</div><div class="sh2-line"></div></div>
+      <div class="pf">
+        <div class="fg">
+          <div class="fg3"><label class="fl">SKU / Product ID</label><input class="fi" id="p-sku" placeholder="e.g. TEM-001"></div>
+          <div class="fg3"><label class="fl">Product Name</label><input class="fi" id="p-name" placeholder="e.g. Wireless Earbuds"></div>
+          <div class="fg3"><label class="fl">Buying Price (£)</label><input class="fi" id="p-cost" type="number" step="0.01" placeholder="0.00"></div>
+          <div class="fg3"><label class="fl">Inbound Shipping / Unit (£)</label><input class="fi" id="p-ship" type="number" step="0.01" placeholder="0.00"></div>
+          <div class="fg3"><label class="fl">Temu Fee % (Commission)</label><input class="fi" id="p-fee" type="number" step="0.1" placeholder="e.g. 8"></div>
+          <div class="fg3"><label class="fl">Monthly Ad Spend (£)</label><input class="fi" id="p-ads" type="number" step="0.01" placeholder="0.00"></div>
+        </div>
+        <div style="display:flex;gap:8px;"><button class="btn bp" onclick="addProd()">+ Add Product</button><button class="btn bs" onclick="clrPF()">Clear</button></div>
+      </div>
+    </div>
+
+    <!-- BULK UPLOAD -->
+    <div id="psec-bulk" style="display:none;">
+      <div class="sh2"><div class="sh2-txt">Bulk Upload Products</div><div class="sh2-line"></div></div>
+
+      <!-- Step 1 - Download template -->
+      <div class="pf" style="margin-bottom:14px;">
+        <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:200px;">
+            <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:4px;">Step 1 — Download Template</div>
+            <div style="font-size:12px;color:var(--tx3);line-height:1.6;">Download the Excel template below. Fill in your products — one row per SKU. Save and upload in Step 2.</div>
+            <div style="margin-top:10px;font-size:11px;color:var(--tx4);">Required columns: SKU, Product Name, Buying Price, Shipping, Temu Fee %, Ad Spend</div>
+          </div>
+          <button class="btn bg" onclick="dlTemplate()" style="flex-shrink:0;">📥 Download Template</button>
+        </div>
+      </div>
+
+      <!-- Step 2 - Upload -->
+      <div class="uz" id="bulk-uz" onclick="document.getElementById('bulk-fi').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="onBulkDrop(event)" style="padding:32px 24px;">
+        <div class="ui" style="font-size:28px;">📤</div>
+        <div class="ut" style="font-size:14px;">Step 2 — Drop Your Product List Here</div>
+        <div class="ud" style="font-size:11px;margin-bottom:12px;">Upload filled template or any Excel/CSV with SKU and cost columns<br>Supports .xlsx, .xls and .csv files</div>
+        <button class="btn bp bsm" onclick="event.stopPropagation();document.getElementById('bulk-fi').click()">Choose File</button>
+        <input type="file" id="bulk-fi" style="display:none" accept=".xlsx,.xls,.csv" onchange="onBulkFile(event)">
+        <div class="un">Existing products are kept — duplicates are skipped automatically</div>
+      </div>
+
+      <!-- Bulk preview -->
+      <div id="bulk-preview" style="display:none;">
+        <div class="al al-ok sh" id="bulk-ok"><span>✅</span><span id="bulk-ok-t"></span></div>
+        <div class="tw">
+          <div class="th">
+            <div class="tt">Preview — Products to Import</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div class="tc" id="bulk-cnt">0 rows</div>
+              <button class="btn bp bsm" onclick="confirmBulk()">✓ Confirm & Import All</button>
+              <button class="btn bs bsm" onclick="cancelBulk()">✗ Cancel</button>
+            </div>
+          </div>
+          <div class="ts"><table><thead><tr><th>SKU</th><th>Product Name</th><th>Buying Price</th><th>Shipping</th><th>Fee %</th><th>Ad Spend</th><th>Status</th></tr></thead><tbody id="bulk-body"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- YOUR PRODUCTS TABLE — always visible -->
+    <div class="sh2" style="margin-top:8px;"><div class="sh2-txt">Your Products</div><div class="sh2-line"></div></div>
     <div class="tw">
-      <div class="th"><div class="tt">Product Cost Master</div><div class="tc" id="pc2">0 products</div></div>
+      <div class="th">
+        <div class="tt">Product Cost Master</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="tc" id="pc2">0 products</div>
+          <button class="btn bs bsm" onclick="expProdsCSV()">📊 Export Products</button>
+        </div>
+      </div>
       <div class="ts"><table><thead><tr><th>SKU</th><th>Product Name</th><th>Buying Price</th><th>Shipping</th><th>Temu Fee</th><th>Ad Spend</th><th>Unit Cost</th><th></th></tr></thead><tbody id="pb"></tbody></table></div>
     </div>
   </div>
@@ -702,6 +766,120 @@ function addProd(){
 function delProd(i){prods.splice(i,1);savP();rndProds();recalc();notify('Product removed','ok');}
 function clrPF(){['p-sku','p-name','p-cost','p-ship','p-fee','p-ads'].forEach(id=>document.getElementById(id).value='');}
 function savP(){localStorage.setItem('nx_p',JSON.stringify(prods));}
+
+// ── PRODUCT SUB TABS ──
+function switchPTab(tab){
+  document.getElementById('psec-manual').style.display=tab==='manual'?'block':'none';
+  document.getElementById('psec-bulk').style.display=tab==='bulk'?'block':'none';
+  const mt=document.getElementById('ptab-manual'),bt=document.getElementById('ptab-bulk');
+  if(tab==='manual'){mt.style.borderBottomColor='var(--blu2)';mt.style.color='var(--blu2)';mt.style.fontWeight='600';bt.style.borderBottomColor='transparent';bt.style.color='var(--tx3)';bt.style.fontWeight='500';}
+  else{bt.style.borderBottomColor='var(--blu2)';bt.style.color='var(--blu2)';bt.style.fontWeight='600';mt.style.borderBottomColor='transparent';mt.style.color='var(--tx3)';mt.style.fontWeight='500';}
+}
+
+// ── DOWNLOAD TEMPLATE ──
+function dlTemplate(){
+  const rows=[
+    ['SKU','Product Name','Buying Price (GBP)','Inbound Shipping Per Unit (GBP)','Temu Fee %','Monthly Ad Spend (GBP)'],
+    ['TEM-001','Example Product 1','8.00','1.50','8','5.00'],
+    ['TEM-002','Example Product 2','4.00','1.00','8','3.00'],
+    ['TEM-003','Example Product 3','14.00','2.50','8','7.00'],
+  ];
+  const csv=rows.map(r=>r.map(v=>'"'+String(v)+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='Nexara-Product-Template.csv';a.click();
+  notify('Template downloaded — fill it in and upload below','inf');
+}
+
+// ── BULK UPLOAD ──
+let bulkPreview=[];
+function onBulkDrop(e){e.preventDefault();document.getElementById('bulk-uz').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)rdBulk(f);}
+function onBulkFile(e){const f=e.target.files[0];if(f)rdBulk(f);}
+function rdBulk(f){
+  if(!['xlsx','xls','csv'].includes(f.name.split('.').pop().toLowerCase())){notify('Use .xlsx, .xls or .csv','er');return;}
+  notify('Reading product file...','inf');
+  const r=new FileReader();
+  r.onload=e=>{try{
+    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const j=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+    if(j.length<2){notify('File appears empty','er');return;}
+    const hdrs=j[0].map(h=>String(h).toLowerCase().trim());
+    // Auto-detect columns
+    function findCol(keys){return hdrs.findIndex(h=>keys.some(k=>h.includes(k)));}
+    const sc=findCol(['sku','product id','item id']);
+    const nc=findCol(['product name','name','title','description']);
+    const cc=findCol(['buying price','cost','buy price','purchase price','unit price']);
+    const shc=findCol(['shipping','inbound ship','freight']);
+    const fc=findCol(['fee','commission','temu fee']);
+    const ac=findCol(['ad spend','ads','advertising','monthly ad']);
+    if(sc<0||nc<0){notify('Could not find SKU and Name columns. Use the template.','er');return;}
+    bulkPreview=[];
+    j.slice(1).forEach(row=>{
+      const sku=String(row[sc]||'').trim();
+      const name=String(row[nc]||'').trim();
+      if(!sku||!name)return;
+      const cost=cc>=0?parseFloat(row[cc])||0:0;
+      const ship=shc>=0?parseFloat(row[shc])||0:0;
+      const fee=fc>=0?parseFloat(row[fc])||0:0;
+      const ads=ac>=0?parseFloat(row[ac])||0:0;
+      const exists=prods.find(p=>p.sku.toLowerCase()===sku.toLowerCase());
+      bulkPreview.push({sku,name,cost,ship,fee,ads,exists:!!exists});
+    });
+    if(!bulkPreview.length){notify('No valid rows found','er');return;}
+    rndBulkPreview();
+    notify(bulkPreview.length+' products found — review and confirm','ok');
+  }catch(e){notify('Could not read file','er');}};
+  r.readAsArrayBuffer(f);
+}
+
+function rndBulkPreview(){
+  const b=document.getElementById('bulk-body');
+  document.getElementById('bulk-cnt').textContent=bulkPreview.length+' rows';
+  b.innerHTML=bulkPreview.map(p=>`<tr>
+    <td class="tsk">${p.sku}</td>
+    <td>${p.name}</td>
+    <td>£${p.cost.toFixed(2)}</td>
+    <td>£${p.ship.toFixed(2)}</td>
+    <td>${p.fee}%</td>
+    <td>£${p.ads.toFixed(2)}</td>
+    <td>${p.exists?'<span style="color:var(--amb);font-size:11px;font-weight:600;">⚠ Skip (exists)</span>':'<span style="color:var(--grn);font-size:11px;font-weight:600;">✓ New</span>'}</td>
+  </tr>`).join('');
+  const newCount=bulkPreview.filter(p=>!p.exists).length;
+  const skipCount=bulkPreview.filter(p=>p.exists).length;
+  document.getElementById('bulk-ok-t').textContent=newCount+' new products to import · '+skipCount+' duplicates will be skipped';
+  document.getElementById('bulk-preview').style.display='block';
+}
+
+function confirmBulk(){
+  const newProds=bulkPreview.filter(p=>!p.exists);
+  if(!newProds.length){notify('No new products to add — all already exist','inf');return;}
+  newProds.forEach(p=>prods.push({sku:p.sku,name:p.name,cost:p.cost,ship:p.ship,fee:p.fee,ads:p.ads}));
+  savP();rndProds();recalc();
+  document.getElementById('bulk-preview').style.display='none';
+  document.getElementById('bulk-fi').value='';
+  bulkPreview=[];
+  notify('✓ '+newProds.length+' products imported successfully!','ok');
+  switchPTab('manual');
+}
+
+function cancelBulk(){
+  bulkPreview=[];
+  document.getElementById('bulk-preview').style.display='none';
+  document.getElementById('bulk-fi').value='';
+  notify('Bulk import cancelled','inf');
+}
+
+// ── EXPORT PRODUCTS ──
+function expProdsCSV(){
+  if(!prods.length){notify('No products to export','er');return;}
+  const rows=[['SKU','Product Name','Buying Price (GBP)','Inbound Shipping Per Unit (GBP)','Temu Fee %','Monthly Ad Spend (GBP)']];
+  prods.forEach(p=>rows.push([p.sku,p.name,p.cost.toFixed(2),p.ship.toFixed(2),p.fee,p.ads.toFixed(2)]));
+  const csv=rows.map(r=>r.map(v=>'"'+String(v)+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='Nexara-Products-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+  notify('Products exported!','ok');
+}
 function rndProds(){
   const b=document.getElementById('pb');
   document.getElementById('pc2').textContent=prods.length+' products';
