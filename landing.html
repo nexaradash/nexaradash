@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexaraDash — Accurate P&L Analytics for Temu UK Sellers</title>
+<meta name="description" content="Know exactly what you make on every Temu product. Real-time P&L, HMRC VAT filing, and branded PDF reports built for UK sellers.">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  /* Dark palette */
+  --dk:#07111f;--dk2:#0b1a31;--dk3:#0f2248;--dk4:#152d60;
+  /* Blue */
+  --blu:#2563eb;--blu2:#3b82f6;--blu3:#60a5fa;--blu4:#93c5fd;
+  /* Green */
+  --grn:#059669;--grn2:#10b981;--grn3:#34d399;
+  /* Amber */
+  --amb:#d97706;--amb2:#f59e0b;--amb3:#fbbf24;
+  /* Red */
+  --red:#dc2626;--red2:#ef4444;
+  /* Purple */
+  --pur:#7c3aed;--pur2:#8b5cf6;
+  /* Light palette */
+  --lt:#f8faff;--lt2:#eef2ff;--lt3:#e0e7ff;--lt4:#ffffff;
+  /* Light text */
+  --lttx:#0f172a;--lttx2:#334155;--lttx3:#64748b;--lttx4:#94a3b8;
+  /* Dark text */
+  --dktx:rgba(255,255,255,0.95);--dktx2:rgba(255,255,255,0.65);--dktx3:rgba(255,255,255,0.38);
+  /* Borders */
+  --dkb:rgba(255,255,255,0.08);--dkb2:rgba(255,255,255,0.14);
+  --ltb:#e2e8f0;--ltb2:#cbd5e1;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--dk);color:var(--dktx);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:var(--dk2);}
+::-webkit-scrollbar-thumb{background:var(--blu);border-radius:3px;}
+
+/* ══ NAV ══ */
+nav{position:fixed;top:0;left:0;right:0;z-index:999;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 60px;background:rgba(7,17,31,0.88);backdrop-filter:blur(28px) saturate(180%);border-bottom:1px solid var(--dkb);}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-mark{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;box-shadow:0 4px 16px rgba(59,130,246,0.5),inset 0 1px 0 rgba(255,255,255,0.2);}
+.logo-word{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:-.025em;}
+.logo-word span{color:var(--blu3);}
+.nav-mid{display:flex;align-items:center;gap:36px;}
+.nav-mid a{font-size:14px;font-weight:500;color:var(--dktx2);text-decoration:none;transition:color .15s;letter-spacing:-.01em;}
+.nav-mid a:hover{color:#fff;}
+.nav-end{display:flex;align-items:center;gap:10px;}
+.nav-login{padding:8px 18px;border:1px solid var(--dkb2);border-radius:8px;font-size:13px;font-weight:500;color:var(--dktx2);background:transparent;text-decoration:none;transition:all .15s;font-family:'Inter',sans-serif;}
+.nav-login:hover{border-color:rgba(255,255,255,0.28);color:#fff;}
+.nav-cta{padding:8px 20px;background:var(--blu);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 4px 14px rgba(37,99,235,0.4);font-family:'Inter',sans-serif;}
+.nav-cta:hover{background:#1d4ed8;transform:translateY(-1px);}
+
+/* ══ HERO — DARK ══ */
+.hero{min-height:100vh;display:flex;align-items:center;padding:100px 60px 80px;background:var(--dk);position:relative;overflow:hidden;}
+.hero-noise{position:absolute;inset:0;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:180px;pointer-events:none;}
+.hero-glow1{position:absolute;top:-300px;left:-200px;width:900px;height:900px;background:radial-gradient(circle,rgba(37,99,235,0.16) 0%,transparent 65%);pointer-events:none;}
+.hero-glow2{position:absolute;bottom:-200px;right:-100px;width:700px;height:700px;background:radial-gradient(circle,rgba(16,185,129,0.07) 0%,transparent 65%);pointer-events:none;}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;}
+.hero-in{max-width:1280px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;position:relative;z-index:1;}
+
+/* Hero Left */
+.hero-l{animation:riseUp .9s cubic-bezier(.16,1,.3,1) both;}
+@keyframes riseUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:9px;background:rgba(37,99,235,0.1);border:1px solid rgba(59,130,246,0.25);border-radius:24px;padding:5px 14px 5px 7px;margin-bottom:28px;}
+.eyebrow-live{display:flex;align-items:center;gap:5px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.28);border-radius:20px;padding:3px 9px;font-size:10px;font-weight:700;color:var(--grn3);letter-spacing:.05em;text-transform:uppercase;}
+.eyebrow-dot{width:5px;height:5px;border-radius:50%;background:var(--grn2);animation:livepulse 2s infinite;}
+@keyframes livepulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.5)}50%{box-shadow:0 0 0 4px rgba(16,185,129,0)}}
+.eyebrow-txt{font-size:12px;font-weight:600;color:var(--blu4);letter-spacing:.01em;}
+.hero-h1{font-family:'Syne',sans-serif;letter-spacing:-.03em;line-height:1.04;margin-bottom:22px;}
+.h1-thin{display:block;font-size:36px;font-weight:500;color:rgba(255,255,255,0.38);line-height:1.1;}
+.h1-bold{display:block;font-size:52px;font-weight:800;color:#ffffff;line-height:1.02;}
+.h1-blue{display:block;font-size:52px;font-weight:800;color:var(--blu3);line-height:1.02;}
+.hero-desc{font-size:17px;color:var(--dktx2);line-height:1.72;margin-bottom:34px;max-width:470px;font-weight:400;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:36px;}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;font-size:13px;color:var(--dktx2);font-weight:500;transition:all .15s;}
+.chip:hover{background:rgba(255,255,255,0.08);color:#fff;}
+.hero-actions{display:flex;align-items:center;gap:14px;margin-bottom:22px;}
+.btn-hero-p{padding:15px 32px;background:var(--blu);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;text-decoration:none;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:-.02em;transition:all .2s;box-shadow:0 8px 28px rgba(37,99,235,0.42),inset 0 1px 0 rgba(255,255,255,0.12);display:inline-flex;align-items:center;gap:9px;}
+.btn-hero-p:hover{background:#1d4ed8;transform:translateY(-2px);box-shadow:0 14px 36px rgba(37,99,235,0.54);}
+.btn-hero-s{padding:15px 28px;background:transparent;color:var(--dktx2);border:1.5px solid var(--dkb2);border-radius:10px;font-size:15px;font-weight:500;text-decoration:none;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:-.02em;transition:all .2s;display:inline-flex;align-items:center;gap:8px;}
+.btn-hero-s:hover{border-color:rgba(255,255,255,0.32);color:#fff;}
+.hero-meta{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--dktx3);}
+.hm-check{color:var(--grn2);font-weight:700;}
+.hm-sep{width:3px;height:3px;border-radius:50%;background:var(--dktx3);}
+
+/* Hero Right — Mockup */
+.hero-r{animation:riseUp .9s .2s cubic-bezier(.16,1,.3,1) both;position:relative;}
+.mockup-outer{position:relative;}
+
+/* Price tag */
+.price-tag{position:absolute;top:-18px;right:-18px;z-index:10;background:linear-gradient(135deg,var(--amb2),var(--amb3));border-radius:14px;padding:14px 20px;text-align:center;box-shadow:0 14px 36px rgba(245,158,11,0.42),inset 0 1px 0 rgba(255,255,255,0.3);}
+.pt-from{font-size:9px;font-weight:700;color:rgba(0,0,0,0.5);text-transform:uppercase;letter-spacing:.13em;}
+.pt-price{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;color:#000;line-height:1.1;}
+.pt-mo{font-size:10px;font-weight:700;color:rgba(0,0,0,0.5);text-transform:uppercase;letter-spacing:.08em;}
+
+/* Floating stat */
+.stat-float{position:absolute;bottom:-20px;left:-20px;z-index:10;background:rgba(11,26,49,0.97);border:1px solid var(--dkb2);border-radius:12px;padding:14px 18px;backdrop-filter:blur(20px);box-shadow:0 16px 48px rgba(0,0,0,0.55);min-width:196px;}
+.sf-title{font-size:10px;font-weight:700;color:var(--dktx3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;}
+.sf-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.sf-row:last-child{margin-bottom:0;}
+.sf-lbl{font-size:12px;color:var(--dktx2);}
+.sf-val{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;}
+.sf-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(16,185,129,0.15);color:var(--grn3);border:1px solid rgba(16,185,129,0.2);}
+
+/* Main mockup */
+.dash-mockup{border:1px solid rgba(255,255,255,0.12);border-radius:16px;overflow:hidden;background:linear-gradient(155deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));box-shadow:0 40px 100px rgba(0,0,0,0.65),0 0 0 1px rgba(255,255,255,0.04),inset 0 1px 0 rgba(255,255,255,0.07);}
+.dm-bar{background:rgba(255,255,255,0.045);padding:10px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.dm-dots{display:flex;gap:6px;}
+.dm-dot{width:11px;height:11px;border-radius:50%;}
+.dm-url{flex:1;text-align:center;font-size:11px;color:var(--dktx3);background:rgba(255,255,255,0.05);border-radius:5px;padding:3px 0;}
+.dm-ssl{font-size:10px;color:var(--grn2);font-weight:600;}
+.dm-body{padding:18px;}
+.dm-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.dm-title{font-family:'Syne',sans-serif;font-size:13.5px;font-weight:700;color:#fff;}
+.dm-live{font-size:9px;font-weight:700;color:var(--grn3);background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.25);padding:3px 9px;border-radius:20px;display:flex;align-items:center;gap:5px;}
+.dm-live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--grn2);animation:livepulse 2s infinite;}
+.dm-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.dm-kpi{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:10px 11px;position:relative;overflow:hidden;}
+.dm-kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.dm-kpi.rv::after{background:linear-gradient(90deg,#2563eb,#60a5fa);}
+.dm-kpi.pf::after{background:linear-gradient(90deg,#059669,#10b981);}
+.dm-kpi.ct::after{background:linear-gradient(90deg,#ef4444,#f87171);}
+.dm-kpi.mg::after{background:linear-gradient(90deg,#f59e0b,#fbbf24);}
+.dm-kl{font-size:8px;color:var(--dktx3);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;}
+.dm-kv{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;line-height:1;}
+.dm-kv.pos{color:var(--grn2);}
+.dm-kv.neg{color:var(--red2);}
+.dm-ks{font-size:8px;color:var(--dktx3);margin-top:3px;}
+.dm-sec{font-size:9px;font-weight:700;color:var(--dktx3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.dm-sec::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.07);}
+.dm-rows{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.dm-row{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:7px;padding:8px 11px;}
+.dm-row-l .sku-id{font-size:10px;font-weight:700;color:var(--blu3);}
+.dm-row-l .sku-nm{font-size:10px;color:var(--dktx2);margin-top:1px;}
+.dm-row-r{text-align:right;}
+.sku-pf{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;}
+.sku-mg{font-size:9px;color:var(--dktx3);}
+.dm-chart{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:10px 10px 6px;}
+.dm-bars{display:flex;align-items:flex-end;gap:5px;height:42px;}
+.dm-b{flex:1;border-radius:3px 3px 0 0;}
+.dm-days{display:flex;justify-content:space-between;font-size:8px;color:var(--dktx3);margin-top:5px;padding:0 2px;}
+
+/* ══ TRUST BAR — DARK ══ */
+.trust-bar{background:rgba(255,255,255,0.03);border-top:1px solid var(--dkb);border-bottom:1px solid var(--dkb);padding:22px 60px;}
+.tb-in{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:0;}
+.tb-lbl{font-size:11px;font-weight:600;color:var(--dktx3);text-transform:uppercase;letter-spacing:.12em;padding-right:32px;border-right:1px solid var(--dkb);margin-right:32px;white-space:nowrap;}
+.tb-items{display:flex;align-items:center;gap:40px;flex:1;}
+.tb-item{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:500;color:var(--dktx2);}
+.tb-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.tb-icon.g{background:rgba(5,150,105,0.14);border:1px solid rgba(5,150,105,0.22);}
+.tb-icon.b{background:rgba(37,99,235,0.14);border:1px solid rgba(37,99,235,0.22);}
+.tb-icon.a{background:rgba(217,119,6,0.14);border:1px solid rgba(217,119,6,0.22);}
+.tb-icon.p{background:rgba(124,58,237,0.14);border:1px solid rgba(124,58,237,0.22);}
+
+/* ══ STATS — DARK ══ */
+.stats{background:var(--dk2);padding:64px 60px;border-bottom:1px solid var(--dkb);}
+.stats-in{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);}
+.stat{text-align:center;padding:32px 20px;border-right:1px solid var(--dkb);}
+.stat:last-child{border-right:none;}
+.stat-n{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;color:#fff;line-height:1;letter-spacing:-.04em;}
+.stat-n em{color:var(--blu3);font-style:normal;}
+.stat-l{font-size:14px;color:var(--dktx2);margin-top:8px;font-weight:500;}
+
+/* ══ FEATURES — LIGHT ══ */
+.features{background:var(--lt4);padding:110px 60px;}
+.feat-in{max-width:1280px;margin:0 auto;}
+.sec-label{font-size:11px;font-weight:700;color:var(--blu);text-transform:uppercase;letter-spacing:.16em;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.sec-label::before{content:'';width:28px;height:2px;background:linear-gradient(90deg,var(--blu),var(--blu2));border-radius:2px;}
+.sec-label.center{justify-content:center;}
+.sec-label.center::before{display:none;}
+.sec-h2{font-family:'Syne',sans-serif;font-size:46px;font-weight:800;letter-spacing:-.04em;line-height:1.02;margin-bottom:18px;color:var(--lttx);}
+.sec-h2 em{color:var(--blu);font-style:normal;}
+.sec-desc{font-size:17px;color:var(--lttx2);line-height:1.7;max-width:560px;margin-bottom:68px;font-weight:400;}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.fc{background:var(--lt);border:1px solid var(--ltb);border-radius:16px;padding:32px;transition:all .22s;position:relative;overflow:hidden;}
+.fc:hover{border-color:var(--ltb2);box-shadow:0 8px 40px rgba(37,99,235,0.08);transform:translateY(-2px);}
+.fc-top{position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0;}
+.fc-top.b{background:linear-gradient(90deg,var(--blu),var(--blu2));}
+.fc-top.g{background:linear-gradient(90deg,var(--grn),var(--grn2));}
+.fc-top.a{background:linear-gradient(90deg,var(--amb),var(--amb2));}
+.fc-top.p{background:linear-gradient(90deg,var(--pur),var(--pur2));}
+.fc-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px;}
+.fc-icon.b{background:#eff6ff;border:1px solid #bfdbfe;}
+.fc-icon.g{background:#ecfdf5;border:1px solid #a7f3d0;}
+.fc-icon.a{background:#fffbeb;border:1px solid #fde68a;}
+.fc-icon.p{background:#f5f3ff;border:1px solid #ddd6fe;}
+.fc-h{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--lttx);margin-bottom:10px;}
+.fc-p{font-size:14px;color:var(--lttx2);line-height:1.68;font-weight:400;}
+.fc-tag{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:16px;letter-spacing:.03em;}
+.fc-tag.b{background:#eff6ff;color:var(--blu);border:1px solid #bfdbfe;}
+.fc-tag.g{background:#ecfdf5;color:var(--grn);border:1px solid #a7f3d0;}
+.fc-tag.a{background:#fffbeb;color:var(--amb);border:1px solid #fde68a;}
+.fc-tag.p{background:#f5f3ff;color:var(--pur);border:1px solid #ddd6fe;}
+
+/* ══ HOW IT WORKS — LIGHT GREY ══ */
+.hiw{background:var(--lt);border-top:1px solid var(--ltb);padding:110px 60px;}
+.hiw-in{max-width:1280px;margin:0 auto;}
+.hiw-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:48px;margin-top:68px;position:relative;}
+.hiw-line{position:absolute;top:44px;left:calc(16.67% + 44px);right:calc(16.67% + 44px);height:1px;background:linear-gradient(90deg,var(--blu),var(--grn2));opacity:.2;}
+.hiw-step{text-align:center;}
+.hiw-num{width:88px;height:88px;border-radius:50%;background:#fff;border:2px solid var(--ltb2);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--blu);margin:0 auto 24px;box-shadow:0 4px 20px rgba(37,99,235,0.12),0 0 0 8px rgba(37,99,235,0.05);}
+.hiw-h{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--lttx);margin-bottom:12px;}
+.hiw-p{font-size:14px;color:var(--lttx2);line-height:1.72;max-width:260px;margin:0 auto;font-weight:400;}
+
+/* ══ PRICING — WHITE ══ */
+.pricing{background:var(--lt4);border-top:1px solid var(--ltb);padding:110px 60px;}
+.pricing-in{max-width:1240px;margin:0 auto;}
+.p-head{text-align:center;margin-bottom:56px;}
+
+/* Toggle */
+.p-toggle{display:inline-flex;align-items:center;gap:0;background:#f1f5f9;border:1px solid var(--ltb);border-radius:10px;padding:4px;margin-top:24px;}
+.ptb{padding:8px 20px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--lttx3);font-family:'Inter',sans-serif;border:none;background:transparent;}
+.ptb.act{background:#fff;color:var(--lttx);box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+.save-badge{display:inline-block;background:#dcfce7;color:#166534;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:8px;border:1px solid #bbf7d0;}
+
+/* Plan cards */
+.plans{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:48px;}
+.plan{border:1.5px solid var(--ltb);border-radius:16px;padding:28px;background:#fff;position:relative;transition:all .2s;overflow:hidden;}
+.plan:hover{border-color:var(--ltb2);box-shadow:0 8px 32px rgba(0,0,0,0.08);transform:translateY(-2px);}
+.plan.featured{border-color:var(--blu);background:linear-gradient(160deg,#eff6ff 0%,#fff 100%);box-shadow:0 0 0 1px rgba(37,99,235,0.15),0 16px 48px rgba(37,99,235,0.12);transform:scale(1.02);}
+.plan.featured:hover{transform:scale(1.02) translateY(-2px);}
+.plan-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0;}
+.plan-bar.s{background:linear-gradient(90deg,#94a3b8,#cbd5e1);}
+.plan-bar.p{background:linear-gradient(90deg,var(--blu),var(--grn2));}
+.plan-bar.b{background:linear-gradient(90deg,var(--pur),var(--pur2));}
+.plan-bar.a{background:linear-gradient(90deg,#0f172a,#334155);}
+.plan-pop{position:absolute;top:14px;right:14px;background:var(--amb2);color:#000;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.06em;}
+.plan-name{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;margin-bottom:6px;}
+.plan-name.s{color:#64748b;}
+.plan-name.p{color:var(--blu);}
+.plan-name.b{color:var(--pur);}
+.plan-name.a{color:#0f172a;}
+.plan-tagline{font-size:12.5px;color:var(--lttx3);margin-bottom:20px;line-height:1.5;}
+.plan-price{display:flex;align-items:flex-end;gap:2px;margin-bottom:5px;}
+.plan-sym{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--lttx2);padding-bottom:7px;}
+.plan-amt{font-family:'Syne',sans-serif;font-weight:800;color:var(--lttx);line-height:1;letter-spacing:-.04em;}
+.plan-amt.lg{font-size:52px;}
+.plan-amt.featured-lg{font-size:60px;color:var(--blu);}
+.plan-mo{font-size:14px;color:var(--lttx3);padding-bottom:9px;font-weight:500;}
+.plan-annual{font-size:11px;color:var(--lttx3);margin-bottom:20px;min-height:16px;}
+.plan-annual strong{color:var(--grn);}
+.plan-div{height:1px;background:var(--ltb);margin-bottom:18px;}
+.plan-feats{display:flex;flex-direction:column;gap:9px;margin-bottom:24px;}
+.plf{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--lttx2);}
+.plf-y{width:18px;height:18px;border-radius:50%;background:#ecfdf5;border:1px solid #a7f3d0;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--grn);flex-shrink:0;font-weight:700;}
+.plf-n{width:18px;height:18px;border-radius:50%;background:#f8fafc;border:1px solid #e2e8f0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#cbd5e1;flex-shrink:0;}
+.plf.dim{color:var(--lttx4);}
+.plan-btn{display:block;width:100%;padding:12px;border-radius:9px;font-size:14px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;transition:all .18s;font-family:'Inter',sans-serif;border:none;}
+.plan-btn.s-btn{background:#f1f5f9;color:var(--lttx2);border:1px solid var(--ltb);}
+.plan-btn.s-btn:hover{background:#e2e8f0;color:var(--lttx);}
+.plan-btn.p-btn{background:var(--blu);color:#fff;box-shadow:0 6px 20px rgba(37,99,235,0.35);}
+.plan-btn.p-btn:hover{background:#1d4ed8;transform:translateY(-1px);}
+.plan-btn.b-btn{background:#f5f3ff;color:var(--pur);border:1px solid #ddd6fe;}
+.plan-btn.b-btn:hover{background:#ede9fe;}
+.plan-btn.a-btn{background:var(--lttx);color:#fff;}
+.plan-btn.a-btn:hover{background:#1e293b;}
+.plan-note{font-size:11px;color:var(--lttx4);text-align:center;margin-top:8px;}
+
+/* Comparison table */
+.comp-table{border:1px solid var(--ltb);border-radius:14px;overflow:hidden;}
+.ct-head{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 1fr;background:var(--lt);border-bottom:1px solid var(--ltb);}
+.ct-h{padding:14px 18px;font-size:11px;font-weight:700;color:var(--lttx3);text-transform:uppercase;letter-spacing:.1em;}
+.ct-h.feat-h-col{color:var(--blu);background:rgba(37,99,235,0.04);}
+.ct-row{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 1fr;border-bottom:1px solid var(--ltb);}
+.ct-row:last-child{border-bottom:none;}
+.ct-row:hover{background:rgba(37,99,235,0.02);}
+.ct-c{padding:13px 18px;font-size:13.5px;color:var(--lttx2);display:flex;align-items:center;}
+.ct-c.feat-name{font-weight:500;color:var(--lttx);}
+.ct-c.yes{color:var(--grn);font-size:16px;font-weight:700;}
+.ct-c.no{color:var(--lttx4);font-size:14px;}
+.ct-c.val{font-weight:600;color:var(--lttx);}
+.ct-c.feat-col{background:rgba(37,99,235,0.035);}
+.ct-c.feat-val{background:rgba(37,99,235,0.035);color:var(--blu);font-weight:700;}
+
+/* ══ TESTIMONIALS — DARK ══ */
+.testi{background:var(--dk2);border-top:1px solid var(--dkb);padding:110px 60px;}
+.testi-in{max-width:1280px;margin:0 auto;}
+.t-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:64px;}
+.t-card{background:rgba(255,255,255,0.04);border:1px solid var(--dkb);border-radius:16px;padding:32px;transition:all .22s;position:relative;overflow:hidden;}
+.t-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blu),var(--grn2));opacity:0;transition:opacity .2s;}
+.t-card:hover{background:rgba(255,255,255,0.06);border-color:var(--dkb2);}
+.t-card:hover::before{opacity:1;}
+.t-stars{color:var(--amb2);font-size:15px;letter-spacing:3px;margin-bottom:16px;}
+.t-q{font-size:15px;color:var(--dktx2);line-height:1.74;margin-bottom:24px;font-style:italic;font-weight:400;}
+.t-auth{display:flex;align-items:center;gap:12px;padding-top:18px;border-top:1px solid var(--dkb);}
+.t-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;}
+.t-name{font-size:14px;font-weight:700;color:#fff;}
+.t-role{font-size:12px;color:var(--dktx3);margin-top:2px;}
+
+/* ══ FINAL CTA — DARK ══ */
+.final-cta{background:var(--dk);border-top:1px solid var(--dkb);padding:110px 60px;position:relative;overflow:hidden;}
+.fcta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(37,99,235,0.14) 0%,transparent 65%);pointer-events:none;}
+.fcta-topline{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,var(--blu) 30%,var(--grn2) 70%,transparent 100%);}
+.fcta-in{max-width:720px;margin:0 auto;text-align:center;position:relative;z-index:1;}
+.fcta-h{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;letter-spacing:-.04em;line-height:1.02;margin-bottom:20px;}
+.fcta-h em{color:var(--blu3);font-style:normal;}
+.fcta-p{font-size:18px;color:var(--dktx2);line-height:1.68;margin-bottom:44px;font-weight:400;}
+.fcta-btns{display:flex;justify-content:center;gap:14px;}
+.fcta-note{display:flex;justify-content:center;gap:20px;margin-top:22px;font-size:12.5px;color:var(--dktx3);}
+.fcta-note span::before{content:'✓ ';color:var(--grn2);font-weight:700;}
+
+/* ══ FOOTER ══ */
+footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 60px;}
+.ft-in{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;}
+.ft-logo{display:flex;align-items:center;gap:10px;}
+.ft-links{display:flex;gap:28px;}
+.ft-links a{font-size:13px;color:var(--dktx3);text-decoration:none;transition:color .15s;}
+.ft-links a:hover{color:var(--dktx2);}
+.ft-copy{font-size:12px;color:var(--dktx3);}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:1100px){
+  .hero-in{grid-template-columns:1fr;}.hero-r{display:none;}
+  .plans{grid-template-columns:repeat(2,1fr);}
+  .plan.featured{transform:none;}
+  .ct-head,.ct-row{grid-template-columns:1.8fr 1fr 1fr 1fr 1fr;}
+  .t-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:768px){
+  nav{padding:0 20px;}.nav-mid{display:none;}
+  .hero,.trust-bar,.stats,.features,.hiw,.pricing,.testi,.final-cta{padding:80px 20px;}
+  .h1-thin{font-size:24px;}.h1-bold,.h1-blue{font-size:38px;}
+  .hero-desc{font-size:15px;}
+  .stats-in{grid-template-columns:repeat(2,1fr);}
+  .stat{border-right:none;padding:20px;}
+  .sec-h2{font-size:32px;}
+  .feat-grid,.hiw-steps,.t-grid{grid-template-columns:1fr;}
+  .hiw-line{display:none;}
+  .plans{grid-template-columns:1fr;}
+  .plan.featured{transform:none;}
+  .ct-head,.ct-row{grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;}
+  .ct-c{padding:10px 10px;font-size:12px;}
+  .fcta-h{font-size:34px;}
+  footer{padding:32px 20px;}.ft-in{flex-direction:column;align-items:flex-start;}
+  .tb-in{flex-wrap:wrap;gap:14px;}.tb-lbl{border-right:none;margin-right:0;padding-right:0;}
+  .tb-items{flex-wrap:wrap;gap:14px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-mark">N</div>
+    <div class="logo-word">Nexara<span>Dash</span></div>
+  </a>
+  <div class="nav-mid">
+    <a href="#features">Features</a>
+    <a href="#how-it-works">How it works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="mailto:info@nexaradash.com">Contact</a>
+  </div>
+  <div class="nav-end">
+    <a href="https://nexaradash.com" class="nav-login">Log in</a>
+    <a href="https://nexaradash.com" class="nav-cta">Start Free Trial</a>
+  </div>
+</nav>
+
+<!-- HERO — DARK -->
+<section class="hero">
+  <div class="hero-noise"></div>
+  <div class="hero-glow1"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-in">
+
+    <div class="hero-l">
+      <div class="hero-eyebrow">
+        <div class="eyebrow-live"><div class="eyebrow-dot"></div>LIVE</div>
+        <div class="eyebrow-txt">Built exclusively for Temu UK Sellers</div>
+      </div>
+      <div class="hero-h1">
+        <span class="h1-thin">Accurate</span>
+        <span class="h1-bold">profit analytics</span>
+        <span class="h1-blue">for Temu UK sellers</span>
+      </div>
+      <p class="hero-desc">Know exactly what you make on every product. Real-time P&L, HMRC VAT filing, and branded PDF reports — all in one powerful dashboard.</p>
+      <div class="hero-chips">
+        <div class="chip">📊 P&L Dashboard</div>
+        <div class="chip">🏛 HMRC VAT Filing</div>
+        <div class="chip">📦 SKU Tracking</div>
+        <div class="chip">📄 PDF Reports</div>
+        <div class="chip">☁️ Cloud Sync</div>
+        <div class="chip">🇬🇧 UK GBP £</div>
+      </div>
+      <div class="hero-actions">
+        <a href="https://nexaradash.com" class="btn-hero-p">🚀 Start Free Trial</a>
+        <a href="https://nexaradash.com" class="btn-hero-s">▶ View Demo</a>
+      </div>
+      <div class="hero-meta">
+        <span class="hm-check">✓</span> 14-day free trial
+        <div class="hm-sep"></div>
+        <span class="hm-check">✓</span> No credit card required
+        <div class="hm-sep"></div>
+        <span class="hm-check">✓</span> Cancel anytime
+      </div>
+    </div>
+
+    <div class="hero-r">
+      <div class="mockup-outer">
+        <div class="price-tag">
+          <div class="pt-from">Starting at</div>
+          <div class="pt-price">£9</div>
+          <div class="pt-mo">Monthly</div>
+        </div>
+        <div class="stat-float">
+          <div class="sf-title">This Month</div>
+          <div class="sf-row">
+            <div class="sf-lbl">Net Profit</div>
+            <div style="display:flex;align-items:center;gap:7px;">
+              <div class="sf-val" style="color:#10b981;">£1,204</div>
+              <div class="sf-badge">+18.3%</div>
+            </div>
+          </div>
+          <div class="sf-row">
+            <div class="sf-lbl">Orders</div>
+            <div class="sf-val" style="color:#fff;">248</div>
+          </div>
+          <div class="sf-row">
+            <div class="sf-lbl">Top SKU</div>
+            <div class="sf-val" style="color:#60a5fa;font-size:11px;">SKU-UK-0042</div>
+          </div>
+        </div>
+        <div class="dash-mockup">
+          <div class="dm-bar">
+            <div class="dm-dots">
+              <div class="dm-dot" style="background:#ef4444;"></div>
+              <div class="dm-dot" style="background:#f59e0b;"></div>
+              <div class="dm-dot" style="background:#10b981;"></div>
+            </div>
+            <div class="dm-url">nexaradash.com</div>
+            <div class="dm-ssl">🔒 secure</div>
+          </div>
+          <div class="dm-body">
+            <div class="dm-hdr">
+              <div class="dm-title">Profit & Loss Dashboard</div>
+              <div class="dm-live">Live</div>
+            </div>
+            <div class="dm-kpis">
+              <div class="dm-kpi rv"><div class="dm-kl">Revenue</div><div class="dm-kv">£4,832</div><div class="dm-ks">+12.4% vs last mo</div></div>
+              <div class="dm-kpi pf"><div class="dm-kl">Net Profit</div><div class="dm-kv pos">£1,204</div><div class="dm-ks">After deductions</div></div>
+              <div class="dm-kpi ct"><div class="dm-kl">Total Costs</div><div class="dm-kv neg">£3,628</div><div class="dm-ks">COGS+Fees+Ads</div></div>
+              <div class="dm-kpi mg"><div class="dm-kl">Margin</div><div class="dm-kv pos">24.9%</div><div class="dm-ks">Net/Revenue</div></div>
+            </div>
+            <div class="dm-sec">Top SKUs by Profit</div>
+            <div class="dm-rows">
+              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">SKU-UK-0042</div><div class="sku-nm">Wireless Earbuds Pro</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#10b981;">£482.30</div><div class="sku-mg">38.2% margin</div></div></div>
+              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">SKU-UK-0018</div><div class="sku-nm">Phone Stand Adjustable</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#10b981;">£316.80</div><div class="sku-mg">42.1% margin</div></div></div>
+              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">SKU-UK-0091</div><div class="sku-nm">LED Desk Lamp USB</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#f59e0b;">£98.40</div><div class="sku-mg">18.6% margin</div></div></div>
+            </div>
+            <div class="dm-chart">
+              <div class="dm-bars">
+                <div class="dm-b" style="height:38%;background:rgba(37,99,235,0.5);"></div>
+                <div class="dm-b" style="height:55%;background:rgba(37,99,235,0.55);"></div>
+                <div class="dm-b" style="height:42%;background:rgba(37,99,235,0.5);"></div>
+                <div class="dm-b" style="height:72%;background:rgba(37,99,235,0.6);"></div>
+                <div class="dm-b" style="height:60%;background:rgba(37,99,235,0.55);"></div>
+                <div class="dm-b" style="height:90%;background:rgba(16,185,129,0.7);"></div>
+                <div class="dm-b" style="height:74%;background:rgba(16,185,129,0.6);"></div>
+              </div>
+              <div class="dm-days"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- TRUST BAR — DARK -->
+<div class="trust-bar">
+  <div class="tb-in">
+    <div class="tb-lbl">Built for</div>
+    <div class="tb-items">
+      <div class="tb-item"><div class="tb-icon g">🇬🇧</div>UK Temu Sellers</div>
+      <div class="tb-item"><div class="tb-icon g">🔒</div>GDPR Compliant</div>
+      <div class="tb-item"><div class="tb-icon a">🏛</div>HMRC VAT Ready</div>
+      <div class="tb-item"><div class="tb-icon b">☁️</div>Cloud Backed</div>
+      <div class="tb-item"><div class="tb-icon p">📊</div>Real-time Data</div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS — DARK -->
+<div class="stats">
+  <div class="stats-in">
+    <div class="stat"><div class="stat-n">9<em>+</em></div><div class="stat-l">Analytics Charts</div></div>
+    <div class="stat"><div class="stat-n"><em>£</em>0</div><div class="stat-l">Hidden Fees</div></div>
+    <div class="stat"><div class="stat-n">5<em>min</em></div><div class="stat-l">Setup Time</div></div>
+    <div class="stat"><div class="stat-n">100<em>%</em></div><div class="stat-l">Temu UK Focused</div></div>
+  </div>
+</div>
+
+<!-- FEATURES — LIGHT WHITE -->
+<section class="features" id="features">
+  <div class="feat-in">
+    <div class="sec-label">Features</div>
+    <h2 class="sec-h2">Everything you need to<br><em>run a profitable Temu business</em></h2>
+    <p class="sec-desc">Built from the ground up for Temu UK sellers. No Amazon bloat — just clean, accurate profit data that helps you make better decisions every day.</p>
+    <div class="feat-grid">
+      <div class="fc"><div class="fc-top b"></div><div class="fc-icon b">📊</div><div class="fc-h">Real-time P&L Dashboard</div><div class="fc-p">See total revenue, net profit, costs and margin the moment you upload your settlement file. No manual calculations — ever.</div><div class="fc-tag b">Core Feature</div></div>
+      <div class="fc"><div class="fc-top g"></div><div class="fc-icon g">📦</div><div class="fc-h">SKU-Level Profit Tracking</div><div class="fc-p">Know exactly which products make money and which lose it. COGS, platform fees, shipping and ad spend broken down per SKU with full margin and ROI.</div><div class="fc-tag g">Analytics</div></div>
+      <div class="fc"><div class="fc-top p"></div><div class="fc-icon p">🏛</div><div class="fc-h">HMRC VAT Filing</div><div class="fc-p">All 9 VAT return boxes calculated automatically. Box 1 output tax, Box 4 input tax, Box 5 net VAT payable — send straight to your accountant.</div><div class="fc-tag p">HMRC Ready</div></div>
+      <div class="fc"><div class="fc-top a"></div><div class="fc-icon a">📄</div><div class="fc-h">Branded PDF Reports</div><div class="fc-p">Generate professional, accountant-ready P&L and VAT reports with your company name and branding. One click — done.</div><div class="fc-tag a">Export</div></div>
+      <div class="fc"><div class="fc-top b"></div><div class="fc-icon b">📈</div><div class="fc-h">9 Charts & Trends</div><div class="fc-p">Revenue trends, margin per SKU, cost breakdown, ROI analysis, monthly comparison, refund rates — all visualised in real time with beautiful charts.</div><div class="fc-tag b">Visualisation</div></div>
+      <div class="fc"><div class="fc-top g"></div><div class="fc-icon g">☁️</div><div class="fc-h">Secure Cloud Sync</div><div class="fc-p">Your data is encrypted and stored securely. Access your dashboard from any device, any browser — always up to date, always safe.</div><div class="fc-tag g">Cloud</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS — LIGHT GREY -->
+<section class="hiw" id="how-it-works">
+  <div class="hiw-in">
+    <div class="sec-label">How it works</div>
+    <h2 class="sec-h2">Up and running in<br><em>under 5 minutes</em></h2>
+    <div class="hiw-steps">
+      <div class="hiw-line"></div>
+      <div class="hiw-step">
+        <div class="hiw-num">1</div>
+        <div class="hiw-h">Add Your Products</div>
+        <div class="hiw-p">Enter each SKU with your buying price, shipping cost per unit, and Temu commission %. One-time setup — takes minutes.</div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-num">2</div>
+        <div class="hiw-h">Import Settlement File</div>
+        <div class="hiw-p">Download your Settlement report from Temu Seller Central and upload it. NexaraDash maps all columns and calculates everything automatically.</div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-num">3</div>
+        <div class="hiw-h">View P&L & VAT</div>
+        <div class="hiw-p">See your true profit, costs, margins and VAT liability instantly. Export professional branded PDFs for your accountant in one click.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING — LIGHT WHITE -->
+<section class="pricing" id="pricing">
+  <div class="pricing-in">
+    <div class="p-head">
+      <div class="sec-label center">Pricing</div>
+      <h2 class="sec-h2" style="text-align:center;">Simple, honest pricing</h2>
+      <p style="font-size:16px;color:var(--lttx2);text-align:center;line-height:1.65;max-width:480px;margin:0 auto;">Choose the plan that fits your business. Upgrade or cancel anytime — no contracts.</p>
+      <div class="p-toggle">
+        <button class="ptb act" id="btn-mo" onclick="setToggle('mo')">Pay monthly</button>
+        <button class="ptb" id="btn-yr" onclick="setToggle('yr')">Pay annually <span class="save-badge">Save 20%</span></button>
+      </div>
+    </div>
+
+    <div class="plans">
+      <!-- STARTER -->
+      <div class="plan">
+        <div class="plan-bar s"></div>
+        <div class="plan-name s">Starter</div>
+        <div class="plan-tagline">New sellers getting started with profit tracking.</div>
+        <div class="plan-price"><div class="plan-sym">£</div><div class="plan-amt lg" id="s-price">9</div><div class="plan-mo">/mo</div></div>
+        <div class="plan-annual" id="s-annual">&nbsp;</div>
+        <div class="plan-div"></div>
+        <div class="plan-feats">
+          <div class="plf"><div class="plf-y">✓</div>P&L Dashboard</div>
+          <div class="plf"><div class="plf-y">✓</div>Up to 25 SKUs</div>
+          <div class="plf"><div class="plf-y">✓</div>Settlement Import</div>
+          <div class="plf"><div class="plf-y">✓</div>4 Basic Charts</div>
+          <div class="plf"><div class="plf-y">✓</div>CSV Export</div>
+          <div class="plf dim"><div class="plf-n">—</div>HMRC VAT Filing</div>
+          <div class="plf dim"><div class="plf-n">—</div>PDF Reports</div>
+        </div>
+        <a href="https://nexaradash.com" class="plan-btn s-btn">Start Free Trial</a>
+        <div class="plan-note">14 days free · no credit card</div>
+      </div>
+
+      <!-- PRO FEATURED -->
+      <div class="plan featured">
+        <div class="plan-bar p"></div>
+        <div class="plan-pop">Most Popular</div>
+        <div class="plan-name p">Pro</div>
+        <div class="plan-tagline">Growing sellers who need full analytics & VAT.</div>
+        <div class="plan-price"><div class="plan-sym">£</div><div class="plan-amt featured-lg" id="p-price">19</div><div class="plan-mo">/mo</div></div>
+        <div class="plan-annual" id="p-annual">&nbsp;</div>
+        <div class="plan-div"></div>
+        <div class="plan-feats">
+          <div class="plf"><div class="plf-y">✓</div>Full P&L Dashboard</div>
+          <div class="plf"><div class="plf-y">✓</div>Unlimited SKUs</div>
+          <div class="plf"><div class="plf-y">✓</div>Settlement Import</div>
+          <div class="plf"><div class="plf-y">✓</div>9 Charts & Analytics</div>
+          <div class="plf"><div class="plf-y">✓</div>HMRC VAT Filing</div>
+          <div class="plf"><div class="plf-y">✓</div>Branded PDF Reports</div>
+          <div class="plf"><div class="plf-y">✓</div>Priority Support</div>
+        </div>
+        <a href="https://nexaradash.com" class="plan-btn p-btn">Start Free Trial</a>
+        <div class="plan-note">14 days free · no credit card</div>
+      </div>
+
+      <!-- BUSINESS -->
+      <div class="plan">
+        <div class="plan-bar b"></div>
+        <div class="plan-name b">Business</div>
+        <div class="plan-tagline">Established sellers with high volume & reporting needs.</div>
+        <div class="plan-price"><div class="plan-sym">£</div><div class="plan-amt lg" id="b-price">39</div><div class="plan-mo">/mo</div></div>
+        <div class="plan-annual" id="b-annual">&nbsp;</div>
+        <div class="plan-div"></div>
+        <div class="plan-feats">
+          <div class="plf"><div class="plf-y">✓</div>Everything in Pro</div>
+          <div class="plf"><div class="plf-y">✓</div>3 User Accounts</div>
+          <div class="plf"><div class="plf-y">✓</div>Advanced Reports</div>
+          <div class="plf"><div class="plf-y">✓</div>Multi-period Analysis</div>
+          <div class="plf"><div class="plf-y">✓</div>Scheduled PDF Reports</div>
+          <div class="plf"><div class="plf-y">✓</div>Dedicated Support</div>
+          <div class="plf"><div class="plf-y">✓</div>Custom Branding</div>
+        </div>
+        <a href="https://nexaradash.com" class="plan-btn b-btn">Start Free Trial</a>
+        <div class="plan-note">14 days free · no credit card</div>
+      </div>
+
+      <!-- AGENCY -->
+      <div class="plan">
+        <div class="plan-bar a"></div>
+        <div class="plan-name a">Agency</div>
+        <div class="plan-tagline">Accountants managing multiple Temu seller clients.</div>
+        <div class="plan-price"><div class="plan-sym">£</div><div class="plan-amt lg" id="a-price">79</div><div class="plan-mo">/mo</div></div>
+        <div class="plan-annual" id="a-annual">&nbsp;</div>
+        <div class="plan-div"></div>
+        <div class="plan-feats">
+          <div class="plf"><div class="plf-y">✓</div>Everything in Business</div>
+          <div class="plf"><div class="plf-y">✓</div>Up to 10 Client Accounts</div>
+          <div class="plf"><div class="plf-y">✓</div>Isolated Client Data</div>
+          <div class="plf"><div class="plf-y">✓</div>White Label Option</div>
+          <div class="plf"><div class="plf-y">✓</div>Admin Dashboard</div>
+          <div class="plf"><div class="plf-y">✓</div>Bulk Client Reports</div>
+          <div class="plf"><div class="plf-y">✓</div>Phone + Email Support</div>
+        </div>
+        <a href="mailto:info@nexaradash.com" class="plan-btn a-btn">Contact Us</a>
+        <div class="plan-note">Custom onboarding included</div>
+      </div>
+    </div>
+
+    <!-- COMPARISON TABLE -->
+    <div class="comp-table">
+      <div class="ct-head">
+        <div class="ct-h">Feature</div>
+        <div class="ct-h">Starter</div>
+        <div class="ct-h feat-h-col">Pro ⭐</div>
+        <div class="ct-h">Business</div>
+        <div class="ct-h">Agency</div>
+      </div>
+      <div class="ct-row"><div class="ct-c feat-name">SKU Limit</div><div class="ct-c val">25</div><div class="ct-c feat-val">Unlimited</div><div class="ct-c val">Unlimited</div><div class="ct-c val">Unlimited</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">P&L Dashboard</div><div class="ct-c yes">✓</div><div class="ct-c yes feat-col">✓</div><div class="ct-c yes">✓</div><div class="ct-c yes">✓</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">Charts</div><div class="ct-c val">4</div><div class="ct-c feat-val">9</div><div class="ct-c val">9</div><div class="ct-c val">9</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">HMRC VAT Filing</div><div class="ct-c no">—</div><div class="ct-c yes feat-col">✓</div><div class="ct-c yes">✓</div><div class="ct-c yes">✓</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">Branded PDF Reports</div><div class="ct-c no">—</div><div class="ct-c yes feat-col">✓</div><div class="ct-c yes">✓</div><div class="ct-c yes">✓</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">User Accounts</div><div class="ct-c val">1</div><div class="ct-c feat-val">1</div><div class="ct-c val">3</div><div class="ct-c val">10+</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">White Label</div><div class="ct-c no">—</div><div class="ct-c no feat-col">—</div><div class="ct-c no">—</div><div class="ct-c yes">✓</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">Support</div><div class="ct-c val">Email</div><div class="ct-c feat-val">Priority Email</div><div class="ct-c val">Dedicated</div><div class="ct-c val">Phone + Email</div></div>
+      <div class="ct-row"><div class="ct-c feat-name" style="font-weight:700;">Price / month</div><div class="ct-c val">£9</div><div class="ct-c feat-val" style="font-size:17px;font-family:'Syne',sans-serif;font-weight:800;">£19</div><div class="ct-c val">£39</div><div class="ct-c val">£79</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS — DARK -->
+<section class="testi">
+  <div class="testi-in">
+    <div class="sec-label">Testimonials</div>
+    <h2 class="sec-h2" style="color:#fff;">Temu sellers love <em style="color:var(--blu3);">NexaraDash</em></h2>
+    <div class="t-grid">
+      <div class="t-card">
+        <div class="t-stars">★★★★★</div>
+        <div class="t-q">"Finally a dashboard built specifically for Temu. I can see exactly which products are profitable and which ones I need to drop. Saved me hours every single week."</div>
+        <div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#2563eb,#3b82f6);">AK</div><div><div class="t-name">Ahmed K.</div><div class="t-role">Temu UK Seller · 200+ SKUs</div></div></div>
+      </div>
+      <div class="t-card">
+        <div class="t-stars">★★★★★</div>
+        <div class="t-q">"The VAT filing feature alone is worth the subscription. My accountant used to spend hours on this — now I just export the PDF and send it over. Done in seconds."</div>
+        <div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#059669,#10b981);">SR</div><div><div class="t-name">Sarah R.</div><div class="t-role">Temu UK Seller · Fashion & Home</div></div></div>
+      </div>
+      <div class="t-card">
+        <div class="t-stars">★★★★★</div>
+        <div class="t-q">"I had no idea some of my best-selling products were actually losing money after fees and shipping. NexaraDash showed me the truth in 5 minutes."</div>
+        <div class="t-auth"><div class="t-av" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);">MP</div><div><div class="t-name">Mohammed P.</div><div class="t-role">Temu UK Seller · Electronics</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA — DARK -->
+<section class="final-cta">
+  <div class="fcta-glow"></div>
+  <div class="fcta-topline"></div>
+  <div class="fcta-in">
+    <h2 class="fcta-h">Ready to know your<br><em>true Temu profit?</em></h2>
+    <p class="fcta-p">Join Temu UK sellers using NexaraDash to track their P&L, file VAT, and grow their business with confidence. Start your free trial today.</p>
+    <div class="fcta-btns">
+      <a href="https://nexaradash.com" class="btn-hero-p">🚀 Start Free Trial — 14 Days Free</a>
+    </div>
+    <div class="fcta-note">
+      <span>No credit card required</span>
+      <span>Cancel anytime</span>
+      <span>Instant access</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-in">
+    <div class="ft-logo">
+      <div class="logo-mark">N</div>
+      <div class="logo-word">Nexara<span>Dash</span></div>
+    </div>
+    <div class="ft-links">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="mailto:info@nexaradash.com">Contact</a>
+      <a href="https://nexaradash.com">Dashboard Login</a>
+    </div>
+    <div class="ft-copy">© 2026 NexaraDash · info@nexaradash.com · Built for Temu UK Sellers</div>
+  </div>
+</footer>
+
+<script>
+// Monthly/Annual toggle
+const prices = {
+  mo: {s:9, p:19, b:39, a:79},
+  yr: {s:7, p:15, b:31, a:63}
+};
+const annualNote = {
+  mo: {s:'', p:'', b:'', a:''},
+  yr: {
+    s:'<strong>£84/year</strong> — save £24',
+    p:'<strong>£180/year</strong> — save £48',
+    b:'<strong>£372/year</strong> — save £96',
+    a:'<strong>£756/year</strong> — save £192'
+  }
+};
+function setToggle(mode){
+  document.getElementById('btn-mo').classList.toggle('act', mode==='mo');
+  document.getElementById('btn-yr').classList.toggle('act', mode==='yr');
+  ['s','p','b','a'].forEach(k=>{
+    document.getElementById(k+'-price').textContent = prices[mode][k];
+    document.getElementById(k+'-annual').innerHTML = annualNote[mode][k] || '&nbsp;';
+  });
+}
+</script>
+</body>
+</html>
