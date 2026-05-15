@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Temu P&L — Amicable Technologies Limited</title>
+<title>Temu P&L Dashboard · NexaraDash</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
@@ -348,7 +348,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
       <div class="auth-sent-t">Check your inbox</div>
       <div class="auth-sent-p">Magic link sent to <strong id="auth-sent-email"></strong><br>Click the link in the email to sign in.</div>
     </div>
-    <div class="auth-footer">Temu P&L Dashboard · Amicable Technologies Limited · GBP £</div>
+    <div class="auth-footer">Temu P&L Dashboard · <span data-company>NexaraDash</span> · GBP £</div>
   </div>
 </div>
 
@@ -363,7 +363,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
       <div><div class="nx-name">NexaraDash</div><div class="nx-tag">nexaradash.com</div></div>
     </div>
     <div class="cl-card">
-      <div class="cl-name">Amicable Technologies Limited</div>
+      <div class="cl-name" data-company>NexaraDash</div>
       <div class="cl-sub">Temu Seller · United Kingdom · GBP £</div>
     </div>
   </div>
@@ -417,7 +417,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     <div class="hl">
       <div class="ht">Profit & Loss Dashboard</div>
       <div class="hdv"></div>
-      <div class="hs">Amicable Technologies Limited · GBP £</div>
+      <div class="hs"><span data-company>NexaraDash</span> · GBP £</div>
     </div>
     <div class="hr2">
       <div class="dc"><div class="pw-dot"></div><span id="ldate"></span></div>
@@ -698,7 +698,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     <div class="sh2"><div class="sh2-txt">Export Options</div><div class="sh2-line"></div></div>
     <div class="xc">
       <div style="font-size:16px;font-weight:700;color:var(--tx);margin-bottom:5px;">📄 Professional P&L Report</div>
-      <div style="font-size:12px;color:var(--tx3);margin-bottom:18px;line-height:1.65;">Generate a fully branded, accountant-ready PDF for Amicable Technologies Limited including full P&L, SKU breakdown, and VAT summary.</div>
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:18px;line-height:1.65;">Generate a fully branded, accountant-ready PDF for <span data-company>NexaraDash</span> including full P&L, SKU breakdown, and VAT summary.</div>
       <div class="xf">
         <div class="xfi"><div class="xfi-i">🏢</div><div class="xfi-t">Company Branded</div><div class="xfi-d">Header with company name and date</div></div>
         <div class="xfi"><div class="xfi-i">📊</div><div class="xfi-t">Full P&L Table</div><div class="xfi-d">Revenue, costs, profit per SKU</div></div>
@@ -714,7 +714,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:24px;box-shadow:var(--shadow);">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
         <div style="width:36px;height:36px;border-radius:8px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;">N</div>
-        <div><div style="font-size:16px;font-weight:800;color:var(--tx);">Amicable Technologies Limited</div><div style="font-size:10px;color:var(--tx3);">Temu P&L Report · Powered by NexaraDash · nexaradash.com</div></div>
+        <div><div style="font-size:16px;font-weight:800;color:var(--tx);" data-company>NexaraDash</div><div style="font-size:10px;color:var(--tx3);">Temu P&L Report · Powered by NexaraDash · nexaradash.com</div></div>
       </div>
       <div style="font-size:10px;color:var(--tx4);margin-bottom:18px;padding-top:8px;border-top:1px solid var(--border);" id="xd"></div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;">
@@ -732,7 +732,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     <div class="sh2"><div class="sh2-txt">Company Settings</div><div class="sh2-line"></div></div>
     <div class="pf">
       <div class="fg">
-        <div class="fg3"><label class="fl">Client Company</label><input class="fi" value="Amicable Technologies Limited"></div>
+        <div class="fg3"><label class="fl">Client Company</label><input class="fi" id="client-company-input" value="NexaraDash"></div>
         <div class="fg3"><label class="fl">Agency / Platform</label><input class="fi" value="NexaraDash"></div>
         <div class="fg3"><label class="fl">Currency</label><input class="fi" value="GBP £" readonly></div>
       </div>
@@ -763,7 +763,7 @@ const SB_URL='https://kedzsuclnczlqftakolc.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZHpzdWNsbmN6bHFmdGFrb2xjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjE2MTQsImV4cCI6MjA5NDQzNzYxNH0.tcP_gsRdkJL7e2rWvlChtwTjD8xVWSE9DOHEGuaObAI';
 const {createClient}=supabase;
 const sb=createClient(SB_URL,SB_KEY);
-let currentUser=null,tenantId=null;
+let currentUser=null,tenantId=null,companyName='NexaraDash';
 
 // ══ AUTH FUNCTIONS ══
 async function sendMagicLink(){
@@ -791,7 +791,18 @@ async function signOut(){
 
 async function getProfile(){
   const{data}=await sb.from('profiles').select('tenant_id').single();
-  if(data)tenantId=data.tenant_id;
+  if(data){
+    tenantId=data.tenant_id;
+    const{data:tenant}=await sb.from('tenants').select('company_name').eq('id',tenantId).single();
+    if(tenant&&tenant.company_name)companyName=tenant.company_name;
+    applyCompanyName();
+  }
+}
+
+function applyCompanyName(){
+  document.querySelectorAll('[data-company]').forEach(el=>el.textContent=companyName);
+  const inp=document.getElementById('client-company-input');
+  if(inp)inp.value=companyName;
 }
 
 // ══ SUPABASE STORAGE (replaces IndexedDB) ══
@@ -1361,7 +1372,7 @@ function expVATPDF(){
 
   // Header
   doc.setFillColor(15,32,68);doc.rect(0,0,210,44,'F');
-  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text('Amicable Technologies Limited',14,17);
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text(companyName,14,17);
   doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(200,210,230);
   doc.text('VAT Return Summary · '+quarter+' · Generated by NexaraDash',14,25);
   doc.text('Report Date: '+today,14,32);
@@ -1520,7 +1531,7 @@ function expPDF(){
   const f=n=>'GBP '+n.toFixed(2),today=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
 
   doc.setFillColor(15,32,68);doc.rect(0,0,210,44,'F');
-  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text('Amicable Technologies Limited',14,17);
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text(companyName,14,17);
   doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(180,200,230);
   doc.text('Temu P&L Report · Generated by NexaraDash · nexaradash.com · info@nexaradash.com',14,25);
   doc.text('Report Date: '+today+' · Orders: '+od,14,32);
