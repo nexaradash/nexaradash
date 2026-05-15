@@ -8,6 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   /* Navy sidebar palette */
@@ -301,13 +302,55 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 .em-i{font-size:36px;margin-bottom:10px;opacity:.5;}
 .em-t{font-size:13px;color:var(--tx3);}
 
-/* ══ MOBILE ══ */
+/* ══ AUTH SCREEN ══ */
+#auth-screen{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;}
+#auth-screen.hide{display:none;}
+.auth-box{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,0.3);}
+.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+.auth-mark{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;box-shadow:0 4px 12px rgba(59,130,246,0.4);}
+.auth-title{font-size:20px;font-weight:800;color:var(--tx);}
+.auth-sub{font-size:11px;color:var(--tx3);margin-top:1px;}
+.auth-h{font-size:15px;font-weight:700;color:var(--tx);margin-bottom:6px;}
+.auth-p{font-size:12px;color:var(--tx3);margin-bottom:22px;line-height:1.6;}
+.auth-inp{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;font-family:var(--fd);color:var(--tx);margin-bottom:12px;transition:border-color .15s;}
+.auth-inp:focus{outline:none;border-color:var(--blu2);box-shadow:0 0 0 3px rgba(37,99,235,0.08);}
+.auth-btn{width:100%;padding:11px;background:var(--blu2);color:#fff;border:none;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fd);transition:all .15s;}
+.auth-btn:hover{background:var(--blu);transform:translateY(-1px);}
+.auth-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.auth-sent{display:none;text-align:center;padding:16px 0;}
+.auth-sent-icon{font-size:40px;margin-bottom:12px;}
+.auth-sent-t{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:6px;}
+.auth-sent-p{font-size:12px;color:var(--tx3);line-height:1.6;}
+.auth-footer{margin-top:20px;font-size:10px;color:var(--tx4);text-align:center;}
+
 .mob{display:none;position:fixed;top:10px;left:10px;z-index:200;background:var(--navy);border:none;border-radius:var(--r);padding:8px 11px;cursor:pointer;color:#fff;font-size:15px;align-items:center;box-shadow:var(--shadow2);}
 @media(max-width:1100px){.kg{grid-template-columns:repeat(3,1fr);}.vat-grid{grid-template-columns:repeat(2,1fr);}.cg{grid-template-columns:1fr;}.cc.full{grid-column:auto;}}
 @media(max-width:768px){.sb{transform:translateX(-100%);}.sb.mop{transform:translateX(0);}.mn{margin-left:0!important;}.mob{display:flex;}.kg,.vat-grid{grid-template-columns:1fr 1fr;}.sg,.stg,.xf,.fg,.vat-settings,.vf-grid{grid-template-columns:1fr;}.mpg{grid-template-columns:1fr;}.pg{padding:16px;}}
 </style>
 </head>
 <body>
+
+<!-- ══ AUTH SCREEN ══ -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-mark">N</div>
+      <div><div class="auth-title">NexaraDash</div><div class="auth-sub">nexaradash.com</div></div>
+    </div>
+    <div id="auth-form-wrap">
+      <div class="auth-h">Sign in to your dashboard</div>
+      <div class="auth-p">Enter your email and we'll send you a magic link — no password needed.</div>
+      <input class="auth-inp" type="email" id="auth-email" placeholder="you@company.com" autocomplete="email">
+      <button class="auth-btn" id="auth-submit" onclick="sendMagicLink()">Send Magic Link</button>
+    </div>
+    <div class="auth-sent" id="auth-sent">
+      <div class="auth-sent-icon">📬</div>
+      <div class="auth-sent-t">Check your inbox</div>
+      <div class="auth-sent-p">Magic link sent to <strong id="auth-sent-email"></strong><br>Click the link in the email to sign in.</div>
+    </div>
+    <div class="auth-footer">Temu P&L Dashboard · Amicable Technologies Limited · GBP £</div>
+  </div>
+</div>
 
 <button class="mob" onclick="document.querySelector('.sb').classList.toggle('mop')">☰</button>
 
@@ -380,6 +423,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
       <div class="dc"><div class="pw-dot"></div><span id="ldate"></span></div>
       <div id="save-badge" class="save-badge">💾 Auto-saved</div>
       <button class="btn bd bsm" onclick="clrEverything()" title="Clear all products and import data" style="font-size:10px;padding:4px 10px;">🗑 Clear All</button>
+      <button class="btn bd bsm" onclick="signOut()" title="Sign out" style="font-size:10px;padding:4px 10px;">⎋ Sign Out</button>
       <div class="gbadge">● Live</div>
     </div>
   </header>
@@ -714,52 +758,88 @@ let prods=[];
 let raws=[],hdrs=[],pnl={},mAds=0,mOth=0,fMode='all',dFrom=null,dTo=null;
 let CH={};
 
-// ══ IndexedDB PERSISTENCE ENGINE ══
-const DB_NAME='nexara_temu_v1',DB_VER=1;
-let db=null;
-function openDB(){
-  return new Promise((res,rej)=>{
-    const req=indexedDB.open(DB_NAME,DB_VER);
-    req.onupgradeneeded=e=>{
-      const d=e.target.result;
-      if(!d.objectStoreNames.contains('products'))d.createObjectStore('products',{keyPath:'sku'});
-      if(!d.objectStoreNames.contains('pnl_data'))d.createObjectStore('pnl_data',{keyPath:'id'});
-      if(!d.objectStoreNames.contains('settings'))d.createObjectStore('settings',{keyPath:'key'});
-    };
-    req.onsuccess=e=>{db=e.target.result;res(db);};
-    req.onerror=()=>rej(req.error);
-  });
-}
-function dbPut(store,val){return new Promise((res,rej)=>{const tx=db.transaction(store,'readwrite');const s=tx.objectStore(store);const r=s.put(val);r.onsuccess=()=>res();r.onerror=()=>rej(r.error);});}
-function dbGetAll(store){return new Promise((res,rej)=>{const tx=db.transaction(store,'readonly');const s=tx.objectStore(store);const r=s.getAll();r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
-function dbDel(store,key){return new Promise((res,rej)=>{const tx=db.transaction(store,'readwrite');const s=tx.objectStore(store);const r=s.delete(key);r.onsuccess=()=>res();r.onerror=()=>rej(r.error);});}
-function dbClear(store){return new Promise((res,rej)=>{const tx=db.transaction(store,'readwrite');const s=tx.objectStore(store);const r=s.clear();r.onsuccess=()=>res();r.onerror=()=>rej(r.error);});}
+// ══ SUPABASE INIT ══
+const SB_URL='https://kedzsuclnczlqftakolc.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZHpzdWNsbmN6bHFmdGFrb2xjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjE2MTQsImV4cCI6MjA5NDQzNzYxNH0.tcP_gsRdkJL7e2rWvlChtwTjD8xVWSE9DOHEGuaObAI';
+const {createClient}=supabase;
+const sb=createClient(SB_URL,SB_KEY);
+let currentUser=null,tenantId=null;
 
-async function savP(){
-  if(!db)return;
-  await dbClear('products');
-  for(const p of prods)await dbPut('products',p);
-  showSaveBadge();
+// ══ AUTH FUNCTIONS ══
+async function sendMagicLink(){
+  const email=document.getElementById('auth-email').value.trim();
+  if(!email||!email.includes('@')){notify('Enter a valid email','er');return;}
+  const btn=document.getElementById('auth-submit');
+  btn.disabled=true;btn.textContent='Sending...';
+  const{error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:'https://nexaradash.com'}});
+  if(error){btn.disabled=false;btn.textContent='Send Magic Link';notify('Error: '+error.message,'er');return;}
+  document.getElementById('auth-form-wrap').style.display='none';
+  document.getElementById('auth-sent-email').textContent=email;
+  document.getElementById('auth-sent').style.display='block';
 }
+
+async function signOut(){
+  await sb.auth.signOut();
+  currentUser=null;tenantId=null;prods=[];pnl={};raws=[];hdrs=[];
+  document.getElementById('auth-screen').classList.remove('hide');
+  document.getElementById('auth-form-wrap').style.display='block';
+  document.getElementById('auth-sent').style.display='none';
+  document.getElementById('auth-email').value='';
+  document.getElementById('auth-submit').disabled=false;
+  document.getElementById('auth-submit').textContent='Send Magic Link';
+}
+
+async function getProfile(){
+  const{data}=await sb.from('profiles').select('tenant_id').single();
+  if(data)tenantId=data.tenant_id;
+}
+
+// ══ SUPABASE STORAGE (replaces IndexedDB) ══
+async function savP(){
+  if(!tenantId)return;
+  // Upsert all products for this tenant
+  await sb.from('products').delete().eq('tenant_id',tenantId);
+  if(!prods.length){showSaveBadge();return;}
+  const rows=prods.map(p=>({tenant_id:tenantId,sku:p.sku,name:p.name||p.sku,cost:p.cost||0,ship:p.ship||0,ads:p.ads||0,commission:p.fee||0}));
+  const{error}=await sb.from('products').insert(rows);
+  if(!error)showSaveBadge();
+}
+
 async function loadP(){
-  if(!db)return;
-  prods=await dbGetAll('products');
+  if(!tenantId)return;
+  const{data}=await sb.from('products').select('*').eq('tenant_id',tenantId);
+  if(data){prods=data.map(p=>({sku:p.sku,name:p.name,cost:p.cost,ship:p.ship,ads:p.ads,fee:p.commission}));}
   rndProds();
 }
+
 async function savePNL(){
-  if(!db||!Object.keys(pnl).length)return;
-  await dbPut('pnl_data',{id:'pnl',data:pnl,hdrs,raws_count:raws.length,saved:Date.now()});
+  if(!tenantId||!Object.keys(pnl).length)return;
+  const payload={tenant_id:tenantId,sku:'__snapshot__',order_date:null,qty:0,revenue:0,fees:0,returns:0,settlement_ref:JSON.stringify({pnl,hdrs,saved:Date.now()})};
+  await sb.from('pnl_data').delete().eq('tenant_id',tenantId).eq('sku','__snapshot__');
+  await sb.from('pnl_data').insert([payload]);
   showSaveBadge();
 }
+
 async function loadPNL(){
-  if(!db)return;
-  const all=await dbGetAll('pnl_data');
-  const stored=all.find(r=>r.id==='pnl');
-  if(stored&&stored.data&&Object.keys(stored.data).length){
-    pnl=stored.data;
-    recalc();
-    notify('✓ Previous session restored — '+Object.keys(pnl).length+' SKUs loaded','ok');
+  if(!tenantId)return;
+  const{data}=await sb.from('pnl_data').select('*').eq('tenant_id',tenantId).eq('sku','__snapshot__').single();
+  if(data&&data.settlement_ref){
+    try{
+      const stored=JSON.parse(data.settlement_ref);
+      if(stored.pnl&&Object.keys(stored.pnl).length){
+        pnl=stored.pnl;hdrs=stored.hdrs||[];
+        recalc();
+        notify('✓ Cloud data restored — '+Object.keys(pnl).length+' SKUs loaded','ok');
+      }
+    }catch(e){}
   }
+}
+
+// dbClear shim for clrEverything compatibility
+async function dbClear(store){
+  if(!tenantId)return;
+  if(store==='products'){await sb.from('products').delete().eq('tenant_id',tenantId);}
+  if(store==='pnl_data'){await sb.from('pnl_data').delete().eq('tenant_id',tenantId);}
 }
 
 function showSaveBadge(){
@@ -776,15 +856,31 @@ Chart.defaults.color='#94a3b8';
 Chart.defaults.borderColor='rgba(226,231,240,1)';
 Chart.defaults.font.family="'Inter',sans-serif";
 
-// Boot: open DB, load products + saved PNL
-openDB().then(async()=>{
-  await loadP();
-  await loadPNL();
-}).catch(()=>{
-  // Fallback to localStorage if IDB fails
-  prods=JSON.parse(localStorage.getItem('nx_p')||'[]');
-  rndProds();
-});
+// ══ BOOT — Auth gate ══
+(async()=>{
+  // Handle magic link token in URL hash
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){
+    currentUser=session.user;
+    await getProfile();
+    document.getElementById('auth-screen').classList.add('hide');
+    await loadP();
+    await loadPNL();
+  }
+  // Listen for auth state changes (magic link click)
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    if(event==='SIGNED_IN'&&session){
+      currentUser=session.user;
+      await getProfile();
+      document.getElementById('auth-screen').classList.add('hide');
+      await loadP();
+      await loadPNL();
+    }
+    if(event==='SIGNED_OUT'){
+      document.getElementById('auth-screen').classList.remove('hide');
+    }
+  });
+})();
 
 function toggleSB(){document.getElementById('sb').classList.toggle('col');document.getElementById('mn').classList.toggle('exp');}
 
@@ -1482,7 +1578,8 @@ function clrAll(){
 async function clrEverything(){
   if(!confirm('Clear ALL data — products, import and P&L? This cannot be undone.'))return;
   prods=[];raws=[];hdrs=[];pnl={};mAds=0;mOth=0;
-  if(db){await dbClear('products').catch(()=>{});await dbClear('pnl_data').catch(()=>{});}
+  await dbClear('products').catch(()=>{});
+  await dbClear('pnl_data').catch(()=>{});
   localStorage.removeItem('nx_p');
   rndProds();recalc();
   document.getElementById('mpr').classList.remove('sh');
@@ -1492,14 +1589,14 @@ async function clrEverything(){
   notify('All data cleared','ok');
 }
 
-// Also clear PNL data from IDB on reset
+// Also clear PNL data on reset
 function resetUp(){
   raws=[];hdrs=[];pnl={};
   document.getElementById('mpr').classList.remove('sh');
   document.getElementById('imp-ok').classList.remove('sh');
   document.getElementById('imp-tw').style.display='none';
   document.getElementById('fi2').value='';
-  if(db){dbClear('pnl_data').catch(()=>{});}
+  dbClear('pnl_data').catch(()=>{});
   recalc();notify('Import reset','inf');
 }
 </script>
