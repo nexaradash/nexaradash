@@ -317,7 +317,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
   <div class="sb-top">
     <div class="nx-logo">
       <div class="nx-mark">N</div>
-      <div><div class="nx-name">Nexara</div><div class="nx-tag">Intelligence Platform</div></div>
+      <div><div class="nx-name">NexaraDash</div><div class="nx-tag">nexaradash.com</div></div>
     </div>
     <div class="cl-card">
       <div class="cl-name">Amicable Technologies Limited</div>
@@ -364,7 +364,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     </div>
   </nav>
   <div class="sb-bot">
-    <div class="pw"><div class="pw-dot"></div><span>Nexara</span><span class="pwt"> · nexara.io</span></div>
+    <div class="pw"><div class="pw-dot"></div><span>NexaraDash</span><span class="pwt"> · nexaradash.com</span></div>
   </div>
 </aside>
 
@@ -670,7 +670,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:24px;box-shadow:var(--shadow);">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
         <div style="width:36px;height:36px;border-radius:8px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;">N</div>
-        <div><div style="font-size:16px;font-weight:800;color:var(--tx);">Amicable Technologies Limited</div><div style="font-size:10px;color:var(--tx3);">Temu P&L Report · Powered by Nexara · nexara.io</div></div>
+        <div><div style="font-size:16px;font-weight:800;color:var(--tx);">Amicable Technologies Limited</div><div style="font-size:10px;color:var(--tx3);">Temu P&L Report · Powered by NexaraDash · nexaradash.com</div></div>
       </div>
       <div style="font-size:10px;color:var(--tx4);margin-bottom:18px;padding-top:8px;border-top:1px solid var(--border);" id="xd"></div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;">
@@ -679,7 +679,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
         <div style="background:var(--redl);border:1px solid var(--redbl);border-radius:var(--r);padding:13px;text-align:center;"><div style="font-size:9px;color:var(--red);font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Total Costs</div><div style="font-size:17px;font-weight:800;color:var(--red);" id="xp-ct">£0.00</div></div>
         <div style="background:var(--ambl);border:1px solid var(--ambbl);border-radius:var(--r);padding:13px;text-align:center;"><div style="font-size:9px;color:var(--amb);font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Margin</div><div style="font-size:17px;font-weight:800;color:var(--amb);" id="xp-mg">0.0%</div></div>
       </div>
-      <div style="font-size:10px;color:var(--tx4);text-align:right;">Powered by Nexara · nexara.io</div>
+      <div style="font-size:10px;color:var(--tx4);text-align:right;">Powered by NexaraDash · nexaradash.com · info@nexaradash.com</div>
     </div>
   </div>
 
@@ -689,7 +689,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     <div class="pf">
       <div class="fg">
         <div class="fg3"><label class="fl">Client Company</label><input class="fi" value="Amicable Technologies Limited"></div>
-        <div class="fg3"><label class="fl">Agency / Platform</label><input class="fi" value="Nexara"></div>
+        <div class="fg3"><label class="fl">Agency / Platform</label><input class="fi" value="NexaraDash"></div>
         <div class="fg3"><label class="fl">Currency</label><input class="fi" value="GBP £" readonly></div>
       </div>
       <button class="btn bp" onclick="notify('Settings saved','ok')">Save Settings</button>
@@ -874,7 +874,7 @@ function dlTemplate(){
   const csv=rows.map(r=>r.map(v=>'"'+String(v)+'"').join(',')).join('\n');
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download='Nexara-Product-Template.csv';a.click();
+  a.download='NexaraDash-Product-Template.csv';a.click();
   notify('Template downloaded — fill it in and upload below','inf');
 }
 
@@ -970,7 +970,7 @@ function expProdsCSV(){
   prods.forEach(p=>rows.push([p.sku,p.name,p.cost.toFixed(2),p.ship.toFixed(2),p.fee,p.ads.toFixed(2)]));
   const csv=rows.map(r=>r.map(v=>'"'+String(v)+'"').join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download='Nexara-Products-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+  a.download='NexaraDash-Products-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
   notify('Products exported!','ok');
 }
 function rndProds(){
@@ -1267,9 +1267,9 @@ function expVATPDF(){
   doc.setFillColor(15,32,68);doc.rect(0,0,210,44,'F');
   doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text('Amicable Technologies Limited',14,17);
   doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(200,210,230);
-  doc.text('VAT Return Summary · '+quarter+' · Generated by Nexara',14,25);
+  doc.text('VAT Return Summary · '+quarter+' · Generated by NexaraDash',14,25);
   doc.text('Report Date: '+today,14,32);
-  doc.setTextColor(160,190,220);doc.text('nexara.io',196,32,'right');
+  doc.setTextColor(160,190,220);doc.text('nexaradash.com',196,32,'right');
 
   // VAT boxes
   let y=52;
@@ -1322,7 +1322,7 @@ function expVATPDF(){
 
   // Footer
   const pg=doc.internal.getNumberOfPages();
-  for(let i=1;i<=pg;i++){doc.setPage(i);doc.setFillColor(15,32,68);doc.rect(0,286,210,12,'F');doc.setFontSize(7);doc.setTextColor(160,190,220);doc.text('Powered by Nexara · nexara.io · Confidential',14,293);doc.text('Page '+i+' of '+pg,196,293,'right');}
+  for(let i=1;i<=pg;i++){doc.setPage(i);doc.setFillColor(15,32,68);doc.rect(0,286,210,12,'F');doc.setFontSize(7);doc.setTextColor(160,190,220);doc.text('Powered by NexaraDash · nexaradash.com · info@nexaradash.com · Confidential',14,293);doc.text('Page '+i+' of '+pg,196,293,'right');}
   doc.save('AmicableTech-VAT-Return-'+new Date().toISOString().split('T')[0]+'.pdf');
   notify('VAT Report downloaded!','vt');
 }
@@ -1426,7 +1426,7 @@ function expPDF(){
   doc.setFillColor(15,32,68);doc.rect(0,0,210,44,'F');
   doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text('Amicable Technologies Limited',14,17);
   doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(180,200,230);
-  doc.text('Temu P&L Report · Generated by Nexara · nexara.io',14,25);
+  doc.text('Temu P&L Report · Generated by NexaraDash · nexaradash.com · info@nexaradash.com',14,25);
   doc.text('Report Date: '+today+' · Orders: '+od,14,32);
 
   const kpis=[[f(rv),'REVENUE',[37,99,235]],[f(np),'NET PROFIT',np>=0?[5,150,105]:[220,38,38]],[f(tc),'TOTAL COSTS',[220,38,38]],[mg.toFixed(1)+'%','MARGIN',[217,119,6]]];
@@ -1455,7 +1455,7 @@ function expPDF(){
   });
 
   const pg=doc.internal.getNumberOfPages();
-  for(let i=1;i<=pg;i++){doc.setPage(i);doc.setFillColor(15,32,68);doc.rect(0,286,210,12,'F');doc.setFontSize(7);doc.setTextColor(160,180,220);doc.text('Powered by Nexara · nexara.io · Confidential',14,293);doc.text('Page '+i+' of '+pg,196,293,'right');}
+  for(let i=1;i<=pg;i++){doc.setPage(i);doc.setFillColor(15,32,68);doc.rect(0,286,210,12,'F');doc.setFontSize(7);doc.setTextColor(160,180,220);doc.text('Powered by NexaraDash · nexaradash.com · info@nexaradash.com · Confidential',14,293);doc.text('Page '+i+' of '+pg,196,293,'right');}
   doc.save('AmicableTech-PnL-'+new Date().toISOString().split('T')[0]+'.pdf');
   notify('PDF downloaded!','ok');
 }
