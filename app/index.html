@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Temu P&L Dashboard · NexaraDash</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232563eb'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Inter,sans-serif' font-weight='700' font-size='18' fill='white'>N</text></svg>">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -771,7 +772,7 @@ async function sendMagicLink(){
   if(!email||!email.includes('@')){notify('Enter a valid email','er');return;}
   const btn=document.getElementById('auth-submit');
   btn.disabled=true;btn.textContent='Sending...';
-  const{error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:'https://nexaradash.com'}});
+  const{error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:'https://nexaradash.com/app'}});
   if(error){btn.disabled=false;btn.textContent='Send Magic Link';notify('Error: '+error.message,'er');return;}
   document.getElementById('auth-form-wrap').style.display='none';
   document.getElementById('auth-sent-email').textContent=email;
