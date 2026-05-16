@@ -134,9 +134,12 @@ body{font-family:'Inter',sans-serif;background:#07111f;min-height:100vh;display:
 
 <script>
 const SB_URL='https://kedzsuclnczlqftakolc.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZHpzdWNsbmN6bHFmdGFrb2xjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjE2MTQsImV4cCI6MjA5NDQzNzYxNH0.tcP_gsRdkJL7e2rWvlChtwTjD8xVWSE9DOHEGuaObAI';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ0.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZHpzdWNsbmN6bHFmdGFrb2xjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjE2MTQsImV4cCI6MjA5NDQzNzYxNH0.tcP_gsRdkJL7e2rWvlChtwTjD8xVWSE9DOHEGuaObAI';
 const{createClient}=supabase;
 const sb=createClient(SB_URL,SB_KEY);
+
+// ── BroadcastChannel — signal all open dashboard tabs ──
+const bc = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('nexaradash_auth') : null;
 
 function show(id){
   document.querySelectorAll('.state').forEach(s=>s.classList.remove('active'));
@@ -153,7 +156,9 @@ function show(id){
   const refreshToken=params.get('refresh_token');
 
   if(type==='recovery'&&accessToken){
-    // Set the session from the URL tokens
+    // Signal all open dashboard tabs that recovery is in progress
+    if(bc) bc.postMessage('PASSWORD_RECOVERY_STARTED');
+
     const{error}=await sb.auth.setSession({access_token:accessToken,refresh_token:refreshToken||''});
     if(error){
       console.error('Session error:',error);
@@ -163,7 +168,6 @@ function show(id){
     show('form');
     setTimeout(()=>document.getElementById('pw1').focus(),100);
   } else {
-    // No valid recovery token — show error
     show('error');
   }
 })();
@@ -222,7 +226,9 @@ async function submit(){
 
   // ── Success ──
   show('success');
-  // Sign out cleanly then redirect to /app for fresh login
+  // Signal all open dashboard tabs that reset is complete
+  if(bc) bc.postMessage('PASSWORD_RESET_COMPLETE');
+  // Sign out cleanly — user must log in fresh with new password
   await sb.auth.signOut();
   let n=3;
   const cd=document.getElementById('countdown');
