@@ -993,6 +993,51 @@ Chart.defaults.font.family="'Inter',sans-serif";
 
 // ══ BOOT — Auth gate ══
 (async()=>{
+
+  // ── BroadcastChannel: cross-tab communication ──
+  // When reset-password page is active, it broadcasts to all open dashboard tabs
+  // Dashboard tabs listen and lock themselves to prevent auto-loading
+  const bc = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('nexaradash_auth') : null;
+  let recoveryInProgress = false;
+
+  if(bc){
+    bc.onmessage = (e) => {
+      if(e.data === 'PASSWORD_RECOVERY_STARTED'){
+        // Another tab (reset-password) is handling recovery — lock this tab
+        recoveryInProgress = true;
+        document.getElementById('auth-screen').classList.add('show');
+        document.getElementById('auth-form-wrap').style.display = 'none';
+        document.getElementById('auth-forgot-wrap').style.display = 'none';
+        // Show a clean "reset in progress" message
+        const wrap = document.getElementById('auth-form-wrap');
+        const lockDiv = document.createElement('div');
+        lockDiv.id = 'auth-lock-msg';
+        lockDiv.innerHTML = `
+          <div style="text-align:center;padding:20px 0;">
+            <div style="font-size:36px;margin-bottom:14px;">🔐</div>
+            <div style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:8px;">Password reset in progress</div>
+            <div style="font-size:13px;color:#64748b;line-height:1.6;">Please complete the password reset in the other tab, then log in again here.</div>
+          </div>`;
+        lockDiv.style.display = 'block';
+        wrap.parentNode.insertBefore(lockDiv, wrap);
+      }
+      if(e.data === 'PASSWORD_RESET_COMPLETE'){
+        // Reset done — refresh this tab cleanly to login screen
+        recoveryInProgress = false;
+        window.location.reload();
+      }
+    };
+  }
+
+  // ── Check for PASSWORD_RECOVERY in current URL hash (shouldn't happen on /app but guard anyway) ──
+  const urlHash = new URLSearchParams(window.location.hash.replace('#',''));
+  if(urlHash.get('type') === 'recovery'){
+    // Someone navigated directly to /app with a recovery token — redirect to reset-password page
+    window.location.href = '/reset-password' + window.location.hash;
+    return;
+  }
+
+  // ── Normal session check ──
   const{data:{session}}=await sb.auth.getSession();
   if(session){
     currentUser=session.user;
@@ -1002,7 +1047,17 @@ Chart.defaults.font.family="'Inter',sans-serif";
   } else {
     document.getElementById('auth-screen').classList.add('show');
   }
+
   sb.auth.onAuthStateChange(async(event,session)=>{
+    // ── Block dashboard if recovery is in progress ──
+    if(event==='PASSWORD_RECOVERY'){
+      recoveryInProgress = true;
+      // Redirect to reset-password page — this tab shouldn't handle recovery
+      window.location.href = '/reset-password' + window.location.hash;
+      return;
+    }
+    if(recoveryInProgress) return; // ignore all events during recovery
+
     if(event==='SIGNED_IN'&&session){
       currentUser=session.user;
       document.getElementById('auth-screen').classList.remove('show');
@@ -1011,7 +1066,12 @@ Chart.defaults.font.family="'Inter',sans-serif";
       await loadPNL();
     }
     if(event==='SIGNED_OUT'){
+      currentUser=null;tenantId=null;prods=[];pnl={};raws=[];hdrs=[];
       document.getElementById('auth-screen').classList.add('show');
+      document.getElementById('auth-form-wrap').style.display='block';
+      document.getElementById('auth-forgot-wrap').style.display='none';
+      const lock=document.getElementById('auth-lock-msg');
+      if(lock)lock.remove();
     }
   });
 })();
