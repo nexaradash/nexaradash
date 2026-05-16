@@ -366,7 +366,23 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
       <button class="auth-btn" id="auth-reset-submit" onclick="sendReset()">Send Reset Link</button>
       <div style="text-align:center;margin-top:12px;"><button class="auth-forgot" onclick="showLogin()">← Back to login</button></div>
     </div>
-    <div class="auth-footer">Temu P&L Dashboard · <span data-company>NexaraDash</span></div>
+    <div id="auth-newpw-wrap" style="display:none;">
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="width:52px;height:52px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px;">🔑</div>
+        <div class="auth-h" style="margin-bottom:4px;">Set your new password</div>
+        <div class="auth-p">Choose a strong password for your account.</div>
+      </div>
+      <div id="auth-newpw-err" class="auth-err"></div>
+      <label class="auth-label">New Password</label>
+      <input class="auth-inp" type="password" id="auth-newpw" placeholder="Minimum 8 characters" autocomplete="new-password">
+      <label class="auth-label">Confirm Password</label>
+      <input class="auth-inp" type="password" id="auth-newpw2" placeholder="Repeat your new password" autocomplete="new-password" onkeydown="if(event.key==='Enter')setNewPassword()">
+      <div style="background:#f0fdf4;border:1px solid #a7f3d0;border-radius:8px;padding:10px 12px;font-size:11.5px;color:#059669;margin-bottom:14px;">
+        ✓ Minimum 8 characters &nbsp;·&nbsp; ✓ Mix letters and numbers for best security
+      </div>
+      <button class="auth-btn" id="auth-newpw-btn" onclick="setNewPassword()" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);">Set New Password</button>
+    </div>
+    <div class="auth-footer">P&L Dashboard · <span data-company>NexaraDash</span></div>
   </div>
 </div>
 
@@ -892,6 +908,46 @@ async function sendReset(){
   msg.style.display='block';
 }
 
+async function setNewPassword(){
+  const pw=document.getElementById('auth-newpw').value;
+  const pw2=document.getElementById('auth-newpw2').value;
+  const errEl=document.getElementById('auth-newpw-err');
+  const btn=document.getElementById('auth-newpw-btn');
+  errEl.style.display='none';
+  // Validation
+  if(!pw||pw.length<8){
+    errEl.textContent='Password must be at least 8 characters.';
+    errEl.style.display='block';
+    return;
+  }
+  if(pw!==pw2){
+    errEl.textContent='Passwords do not match. Please try again.';
+    errEl.style.display='block';
+    document.getElementById('auth-newpw2').focus();
+    return;
+  }
+  btn.disabled=true;btn.textContent='Saving...';
+  const{error}=await sb.auth.updateUser({password:pw});
+  btn.disabled=false;btn.textContent='Set New Password';
+  if(error){
+    errEl.textContent=error.message;
+    errEl.style.display='block';
+    return;
+  }
+  // Success — sign them in and go to dashboard
+  notify('✓ Password updated successfully!','ok');
+  document.getElementById('auth-newpw-wrap').style.display='none';
+  document.getElementById('auth-screen').classList.remove('show');
+  // Load their profile and data
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){
+    currentUser=session.user;
+    await getProfile();
+    await loadP();
+    await loadPNL();
+  }
+}
+
 async function signOut(){
   await sb.auth.signOut();
   currentUser=null;tenantId=null;prods=[];pnl={};raws=[];hdrs=[];
@@ -1003,7 +1059,19 @@ Chart.defaults.font.family="'Inter',sans-serif";
     document.getElementById('auth-screen').classList.add('show');
   }
   sb.auth.onAuthStateChange(async(event,session)=>{
+    // ── Password reset link clicked ──
+    if(event==='PASSWORD_RECOVERY'){
+      document.getElementById('auth-screen').classList.add('show');
+      document.getElementById('auth-form-wrap').style.display='none';
+      document.getElementById('auth-forgot-wrap').style.display='none';
+      document.getElementById('auth-newpw-wrap').style.display='block';
+      document.getElementById('auth-err').style.display='none';
+      document.getElementById('auth-newpw').focus();
+      return;
+    }
     if(event==='SIGNED_IN'&&session){
+      // Only proceed to dashboard if NOT in password recovery flow
+      if(document.getElementById('auth-newpw-wrap').style.display==='block') return;
       currentUser=session.user;
       document.getElementById('auth-screen').classList.remove('show');
       await getProfile();
