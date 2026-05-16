@@ -304,24 +304,28 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 .em-t{font-size:13px;color:var(--tx3);}
 
 /* ══ AUTH SCREEN ══ */
-#auth-screen{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;}
-#auth-screen.hide{display:none;}
+#auth-screen{position:fixed;inset:0;background:var(--navy);display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;}
+#auth-screen.show{display:flex;}
 .auth-box{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,0.3);}
 .auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
 .auth-mark{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;box-shadow:0 4px 12px rgba(59,130,246,0.4);}
 .auth-title{font-size:20px;font-weight:800;color:var(--tx);}
 .auth-sub{font-size:11px;color:var(--tx3);margin-top:1px;}
-.auth-h{font-size:15px;font-weight:700;color:var(--tx);margin-bottom:6px;}
-.auth-p{font-size:12px;color:var(--tx3);margin-bottom:22px;line-height:1.6;}
-.auth-inp{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;font-family:var(--fd);color:var(--tx);margin-bottom:12px;transition:border-color .15s;}
+.auth-h{font-size:16px;font-weight:700;color:var(--tx);margin-bottom:6px;}
+.auth-p{font-size:12px;color:var(--tx3);margin-bottom:20px;line-height:1.6;}
+.auth-label{font-size:12px;font-weight:600;color:var(--tx3);margin-bottom:4px;display:block;}
+.auth-inp{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;font-family:var(--fd);color:var(--tx);margin-bottom:14px;transition:border-color .15s;box-sizing:border-box;}
 .auth-inp:focus{outline:none;border-color:var(--blu2);box-shadow:0 0 0 3px rgba(37,99,235,0.08);}
-.auth-btn{width:100%;padding:11px;background:var(--blu2);color:#fff;border:none;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--fd);transition:all .15s;}
-.auth-btn:hover{background:var(--blu);transform:translateY(-1px);}
+.auth-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.auth-check{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx3);cursor:pointer;}
+.auth-check input{cursor:pointer;}
+.auth-forgot{font-size:12px;color:var(--blu2);cursor:pointer;background:none;border:none;font-family:var(--fd);padding:0;}
+.auth-forgot:hover{text-decoration:underline;}
+.auth-btn{width:100%;padding:12px;background:#f5a623;color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--fd);transition:all .15s;}
+.auth-btn:hover{background:#e09510;transform:translateY(-1px);}
 .auth-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
-.auth-sent{display:none;text-align:center;padding:16px 0;}
-.auth-sent-icon{font-size:40px;margin-bottom:12px;}
-.auth-sent-t{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:6px;}
-.auth-sent-p{font-size:12px;color:var(--tx3);line-height:1.6;}
+.auth-err{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 12px;font-size:12px;color:#dc2626;margin-bottom:12px;display:none;}
+.auth-reset-msg{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 12px;font-size:12px;color:#16a34a;margin-bottom:12px;display:none;}
 .auth-footer{margin-top:20px;font-size:10px;color:var(--tx4);text-align:center;}
 
 .mob{display:none;position:fixed;top:10px;left:10px;z-index:200;background:var(--navy);border:none;border-radius:var(--r);padding:8px 11px;cursor:pointer;color:#fff;font-size:15px;align-items:center;box-shadow:var(--shadow2);}
@@ -338,16 +342,29 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
       <div class="auth-mark">N</div>
       <div><div class="auth-title">NexaraDash</div><div class="auth-sub">nexaradash.com</div></div>
     </div>
+    <div id="auth-err" class="auth-err"></div>
+    <div id="auth-reset-msg" class="auth-reset-msg"></div>
     <div id="auth-form-wrap">
-      <div class="auth-h">Sign in to your dashboard</div>
-      <div class="auth-p">Enter your email and we'll send you a magic link — no password needed.</div>
+      <div class="auth-h">Sign in to your account</div>
+      <div class="auth-p">Enter your credentials to access your dashboard.</div>
+      <label class="auth-label">E-mail</label>
       <input class="auth-inp" type="email" id="auth-email" placeholder="you@company.com" autocomplete="email">
-      <button class="auth-btn" id="auth-submit" onclick="sendMagicLink()">Send Magic Link</button>
+      <label class="auth-label">Password</label>
+      <input class="auth-inp" type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')signIn()">
+      <div class="auth-row">
+        <label class="auth-check"><input type="checkbox" id="auth-remember"> Keep me logged in</label>
+        <button class="auth-forgot" onclick="showForgot()">Forgot password?</button>
+      </div>
+      <button class="auth-btn" id="auth-submit" onclick="signIn()">Continue</button>
+      <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--tx3);">Need access? <a href="mailto:info@nexaradash.com" style="color:var(--blu2);text-decoration:none;font-weight:600;">Contact info@nexaradash.com</a></div>
     </div>
-    <div class="auth-sent" id="auth-sent">
-      <div class="auth-sent-icon">📬</div>
-      <div class="auth-sent-t">Check your inbox</div>
-      <div class="auth-sent-p">Magic link sent to <strong id="auth-sent-email"></strong><br>Click the link in the email to sign in.</div>
+    <div id="auth-forgot-wrap" style="display:none;">
+      <div class="auth-h">Reset your password</div>
+      <div class="auth-p">Enter your email and we'll send you a reset link.</div>
+      <label class="auth-label">E-mail</label>
+      <input class="auth-inp" type="email" id="auth-reset-email" placeholder="you@company.com">
+      <button class="auth-btn" id="auth-reset-submit" onclick="sendReset()">Send Reset Link</button>
+      <div style="text-align:center;margin-top:12px;"><button class="auth-forgot" onclick="showLogin()">← Back to login</button></div>
     </div>
     <div class="auth-footer">Temu P&L Dashboard · <span data-company>NexaraDash</span> · GBP £</div>
   </div>
@@ -767,27 +784,48 @@ const sb=createClient(SB_URL,SB_KEY);
 let currentUser=null,tenantId=null,companyName='NexaraDash';
 
 // ══ AUTH FUNCTIONS ══
-async function sendMagicLink(){
+function showAuthErr(msg){const el=document.getElementById('auth-err');el.textContent=msg;el.style.display='block';}
+function hideAuthErr(){const el=document.getElementById('auth-err');if(el)el.style.display='none';}
+function showForgot(){document.getElementById('auth-form-wrap').style.display='none';document.getElementById('auth-forgot-wrap').style.display='block';hideAuthErr();}
+function showLogin(){document.getElementById('auth-forgot-wrap').style.display='none';document.getElementById('auth-form-wrap').style.display='block';hideAuthErr();document.getElementById('auth-reset-msg').style.display='none';}
+
+async function signIn(){
   const email=document.getElementById('auth-email').value.trim();
-  if(!email||!email.includes('@')){notify('Enter a valid email','er');return;}
+  const password=document.getElementById('auth-password').value;
+  if(!email||!email.includes('@')){showAuthErr('Please enter a valid email.');return;}
+  if(!password||password.length<6){showAuthErr('Password must be at least 6 characters.');return;}
   const btn=document.getElementById('auth-submit');
+  btn.disabled=true;btn.textContent='Signing in...';
+  hideAuthErr();
+  const{error}=await sb.auth.signInWithPassword({email,password});
+  if(error){btn.disabled=false;btn.textContent='Continue';showAuthErr(error.message);return;}
+}
+
+async function sendReset(){
+  const email=document.getElementById('auth-reset-email').value.trim();
+  if(!email||!email.includes('@')){showAuthErr('Please enter a valid email.');return;}
+  const btn=document.getElementById('auth-reset-submit');
   btn.disabled=true;btn.textContent='Sending...';
-  const{error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:'https://nexaradash.com/app'}});
-  if(error){btn.disabled=false;btn.textContent='Send Magic Link';notify('Error: '+error.message,'er');return;}
-  document.getElementById('auth-form-wrap').style.display='none';
-  document.getElementById('auth-sent-email').textContent=email;
-  document.getElementById('auth-sent').style.display='block';
+  hideAuthErr();
+  const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://nexaradash.com/app'});
+  btn.disabled=false;btn.textContent='Send Reset Link';
+  if(error){showAuthErr(error.message);return;}
+  const msg=document.getElementById('auth-reset-msg');
+  msg.textContent='Reset link sent! Check your inbox.';
+  msg.style.display='block';
 }
 
 async function signOut(){
   await sb.auth.signOut();
   currentUser=null;tenantId=null;prods=[];pnl={};raws=[];hdrs=[];
-  document.getElementById('auth-screen').classList.remove('hide');
+  document.getElementById('auth-screen').classList.add('show');
   document.getElementById('auth-form-wrap').style.display='block';
-  document.getElementById('auth-sent').style.display='none';
+  document.getElementById('auth-forgot-wrap').style.display='none';
   document.getElementById('auth-email').value='';
+  document.getElementById('auth-password').value='';
   document.getElementById('auth-submit').disabled=false;
-  document.getElementById('auth-submit').textContent='Send Magic Link';
+  document.getElementById('auth-submit').textContent='Continue';
+  hideAuthErr();
 }
 
 async function getProfile(){
@@ -870,26 +908,25 @@ Chart.defaults.font.family="'Inter',sans-serif";
 
 // ══ BOOT — Auth gate ══
 (async()=>{
-  // Handle magic link token in URL hash
   const{data:{session}}=await sb.auth.getSession();
   if(session){
     currentUser=session.user;
     await getProfile();
-    document.getElementById('auth-screen').classList.add('hide');
     await loadP();
     await loadPNL();
+  } else {
+    document.getElementById('auth-screen').classList.add('show');
   }
-  // Listen for auth state changes (magic link click)
   sb.auth.onAuthStateChange(async(event,session)=>{
     if(event==='SIGNED_IN'&&session){
       currentUser=session.user;
+      document.getElementById('auth-screen').classList.remove('show');
       await getProfile();
-      document.getElementById('auth-screen').classList.add('hide');
       await loadP();
       await loadPNL();
     }
     if(event==='SIGNED_OUT'){
-      document.getElementById('auth-screen').classList.remove('hide');
+      document.getElementById('auth-screen').classList.add('show');
     }
   });
 })();
@@ -1431,7 +1468,7 @@ function expVATPDF(){
   // Footer
   const pg=doc.internal.getNumberOfPages();
   for(let i=1;i<=pg;i++){doc.setPage(i);doc.setFillColor(15,32,68);doc.rect(0,286,210,12,'F');doc.setFontSize(7);doc.setTextColor(160,190,220);doc.text('Powered by NexaraDash · nexaradash.com · info@nexaradash.com · Confidential',14,293);doc.text('Page '+i+' of '+pg,196,293,'right');}
-  doc.save('AmicableTech-VAT-Return-'+new Date().toISOString().split('T')[0]+'.pdf');
+  doc.save((companyName.replace(/[^a-zA-Z0-9]/g,'')||'NexaraDash')+'-VAT-Return-'+new Date().toISOString().split('T')[0]+'.pdf');
   notify('VAT Report downloaded!','vt');
 }
 
@@ -1564,7 +1601,7 @@ function expPDF(){
 
   const pg=doc.internal.getNumberOfPages();
   for(let i=1;i<=pg;i++){doc.setPage(i);doc.setFillColor(15,32,68);doc.rect(0,286,210,12,'F');doc.setFontSize(7);doc.setTextColor(160,180,220);doc.text('Powered by NexaraDash · nexaradash.com · info@nexaradash.com · Confidential',14,293);doc.text('Page '+i+' of '+pg,196,293,'right');}
-  doc.save('AmicableTech-PnL-'+new Date().toISOString().split('T')[0]+'.pdf');
+  doc.save((companyName.replace(/[^a-zA-Z0-9]/g,'')||'NexaraDash')+'-PnL-'+new Date().toISOString().split('T')[0]+'.pdf');
   notify('PDF downloaded!','ok');
 }
 
@@ -1575,7 +1612,7 @@ function expCSV(){
   skus.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const c=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0,np=d.revenue-d.fees-d.returns-c-s-a,mg=d.revenue>0?(np/d.revenue*100):0;rows.push([d.sku,p?p.name:'Unknown',d.qty,d.revenue.toFixed(2),d.fees.toFixed(2),d.returns.toFixed(2),c.toFixed(2),s.toFixed(2),a.toFixed(2),np.toFixed(2),mg.toFixed(1)+'%']);});
   const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download='AmicableTech-PnL-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+  a.download=(companyName.replace(/[^a-zA-Z0-9]/g,'')||'NexaraDash')+'-PnL-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
   notify('CSV downloaded!','ok');
 }
 
