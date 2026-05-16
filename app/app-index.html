@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P&L Dashboard · NexaraDash</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232563eb'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Inter,sans-serif' font-weight='700' font-size='18' fill='white'>N</text></svg>">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  /* Navy sidebar palette */
+  --navy:#0f2044;--navy2:#162a56;--navy3:#1d3568;--navy4:#1a3060;
+  --navyrim:rgba(255,255,255,0.08);--navyrim2:rgba(255,255,255,0.14);
+  --navytx:#ffffff;--navytx2:rgba(255,255,255,0.65);--navytx3:rgba(255,255,255,0.35);
+  /* White content palette */
+  --bg:#f4f6fb;--bg2:#ffffff;--bg3:#eef1f8;
+  --border:#e2e7f0;--border2:#c8d0e7;--border3:#a0aec8;
+  /* Accent colours */
+  --blu:#1a56db;--blu2:#2563eb;--blu3:#3b82f6;--blul:#eff6ff;--blubl:#bfdbfe;
+  --grn:#059669;--grn2:#10b981;--grnl:#ecfdf5;--grnbl:#a7f3d0;
+  --red:#dc2626;--red2:#ef4444;--redl:#fef2f2;--redbl:#fecaca;
+  --amb:#d97706;--amb2:#f59e0b;--ambl:#fffbeb;--ambbl:#fde68a;
+  --vat:#7c3aed;--vat2:#8b5cf6;--vatl:#f5f3ff;--vatbl:#ddd6fe;
+  /* Text */
+  --tx:#0f1729;--tx2:#374365;--tx3:#64748b;--tx4:#94a3b8;
+  /* Layout */
+  --sw:260px;--swc:64px;--hh:60px;
+  --fd:'Inter',sans-serif;--fs:'Inter',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+  --shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);
+  --shadow2:0 4px 16px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
+  --shadow3:0 8px 32px rgba(0,0,0,0.1),0 2px 8px rgba(0,0,0,0.06);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh;display:flex;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:var(--bg3);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+/* ══ SIDEBAR ══ */
+.sb{width:var(--sw);min-height:100vh;background:var(--navy);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:width .25s cubic-bezier(.4,0,.2,1);overflow:hidden;box-shadow:4px 0 24px rgba(15,32,68,0.25);}
+.sb.col{width:var(--swc);}
+.sb-tog{position:absolute;top:22px;right:-13px;width:26px;height:26px;border-radius:50%;background:var(--blu2);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;font-size:10px;color:#fff;transition:transform .25s;box-shadow:0 2px 8px rgba(37,99,235,0.4);}
+.sb.col .sb-tog{transform:rotate(180deg);}
+.sb-top{padding:20px 18px 16px;border-bottom:1px solid var(--navyrim);white-space:nowrap;overflow:hidden;}
+.nx-logo{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.nx-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 4px 12px rgba(59,130,246,0.4);}
+.nx-name{font-size:13px;font-weight:700;color:var(--navytx);}
+.nx-tag{font-size:9px;color:var(--navytx3);letter-spacing:.08em;text-transform:uppercase;margin-top:1px;}
+.cl-card{background:rgba(255,255,255,0.07);border:1px solid var(--navyrim);border-radius:var(--r);padding:10px 12px;}
+.cl-name{font-size:12px;font-weight:600;color:var(--navytx);line-height:1.3;}
+.cl-sub{font-size:9px;color:var(--navytx3);margin-top:2px;letter-spacing:.04em;text-transform:uppercase;}
+
+.nav{flex:1;padding:10px 10px;overflow-y:auto;overflow-x:hidden;}
+.nl{font-size:9px;font-weight:600;color:var(--navytx3);letter-spacing:.14em;text-transform:uppercase;padding:0 8px;margin:14px 0 4px;}
+.sb.col .nl{opacity:0;}
+.ni{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r);cursor:pointer;color:var(--navytx2);font-size:12.5px;font-weight:500;transition:all .15s;margin-bottom:1px;white-space:nowrap;overflow:hidden;position:relative;}
+.ni:hover{background:rgba(255,255,255,0.08);color:var(--navytx);}
+.ni.act{background:rgba(255,255,255,0.12);color:#fff;font-weight:600;}
+.ni.act::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--blu3);border-radius:0 3px 3px 0;}
+.nic{width:16px;height:16px;flex-shrink:0;opacity:.6;}
+.ni.act .nic,.ni:hover .nic{opacity:1;}
+.ntx{flex:1;}
+.sb.col .ntx,.sb.col .nbg{opacity:0;pointer-events:none;}
+.nbg{font-size:8px;font-weight:600;padding:2px 7px;border-radius:20px;flex-shrink:0;}
+.ng{background:rgba(16,185,129,0.2);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);}
+.na{background:rgba(59,130,246,0.2);color:#93c5fd;border:1px solid rgba(59,130,246,0.3);}
+.nv{background:rgba(124,58,237,0.2);color:#c4b5fd;border:1px solid rgba(124,58,237,0.3);}
+.sb.col .ni:hover::after{content:attr(data-tip);position:absolute;left:54px;top:50%;transform:translateY(-50%);background:var(--navy2);color:#fff;font-size:12px;padding:5px 11px;border-radius:var(--r);border:1px solid var(--navyrim2);white-space:nowrap;pointer-events:none;z-index:999;box-shadow:var(--shadow3);}
+.sb-bot{padding:14px 18px;border-top:1px solid var(--navyrim);}
+.pw{font-size:10px;color:var(--navytx3);display:flex;align-items:center;gap:6px;}
+.pw-dot{width:6px;height:6px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;animation:pl 2s infinite;}
+@keyframes pl{0%,100%{opacity:1}50%{opacity:.4}}
+.pw span{color:rgba(255,255,255,0.6);font-weight:500;}
+.sb.col .pw .pwt{opacity:0;}
+
+/* ══ MAIN ══ */
+.mn{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;transition:margin-left .25s cubic-bezier(.4,0,.2,1);}
+.mn.exp{margin-left:var(--swc);}
+
+/* ══ HEADER ══ */
+.hdr{height:var(--hh);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow);}
+.hl{display:flex;align-items:center;gap:14px;}
+.ht{font-size:15px;font-weight:700;color:var(--tx);letter-spacing:-.01em;}
+.hdv{width:1px;height:16px;background:var(--border2);}
+.hs{font-size:11px;color:var(--tx3);}
+.hr2{display:flex;align-items:center;gap:10px;}
+.dc{font-size:11px;color:var(--tx2);background:var(--bg3);border:1px solid var(--border);padding:5px 12px;border-radius:6px;display:flex;align-items:center;gap:6px;font-weight:500;}
+.gbadge{font-size:10px;font-weight:600;color:var(--grn);background:var(--grnl);border:1px solid var(--grnbl);padding:4px 10px;border-radius:6px;letter-spacing:.02em;}
+
+/* ══ TABS ══ */
+.tabs{display:flex;padding:0 24px;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:var(--hh);z-index:40;overflow-x:auto;gap:0;}
+.tab{padding:12px 16px;font-size:12px;font-weight:500;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
+.tab:hover{color:var(--tx2);}
+.tab.act{color:var(--blu2);border-bottom-color:var(--blu2);font-weight:600;}
+
+/* ══ PAGE ══ */
+.pg{flex:1;padding:24px;display:none;}
+.pg.act{display:block;animation:fu .2s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ FILTER BAR ══ */
+.fbar{display:flex;align-items:center;gap:6px;margin-bottom:20px;flex-wrap:wrap;background:var(--bg2);padding:10px 14px;border-radius:var(--r2);border:1px solid var(--border);box-shadow:var(--shadow);}
+.fb2{font-size:11px;font-weight:500;padding:5px 12px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--tx3);transition:all .15s;font-family:var(--fd);}
+.fb2:hover{border-color:var(--blu3);color:var(--blu2);}
+.fb2.act{background:var(--blul);border-color:var(--blubl);color:var(--blu2);font-weight:600;}
+.fs2{width:1px;height:18px;background:var(--border);}
+.fdt{background:var(--bg2);border:1px solid var(--border);color:var(--tx2);padding:5px 9px;border-radius:6px;font-size:11px;font-family:var(--fd);}
+.fdt:focus{outline:none;border-color:var(--blu3);}
+.flb{font-size:11px;color:var(--tx3);font-weight:500;}
+
+/* ══ KPI CARDS ══ */
+.kg{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px;}
+.kc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;height:126px;position:relative;overflow:hidden;box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s;}
+.kc:hover{box-shadow:var(--shadow2);transform:translateY(-1px);}
+.kc-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r2) var(--r2) 0 0;}
+.rv .kc-accent{background:linear-gradient(90deg,var(--blu2),var(--blu3));}
+.pf .kc-accent{background:linear-gradient(90deg,var(--grn),var(--grn2));}
+.ct .kc-accent{background:linear-gradient(90deg,var(--red),var(--red2));}
+.mg .kc-accent{background:linear-gradient(90deg,var(--amb),var(--amb2));}
+.rf .kc-accent{background:linear-gradient(90deg,var(--red),var(--red2));}
+.kc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:4px;}
+.kl{font-size:10px;font-weight:600;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;}
+.ki2{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.rv .ki2{background:var(--blul);}
+.pf .ki2{background:var(--grnl);}
+.ct .ki2{background:var(--redl);}
+.mg .ki2{background:var(--ambl);}
+.rf .ki2{background:var(--redl);}
+.kv{font-size:26px;font-weight:800;color:var(--tx);letter-spacing:-.02em;margin-bottom:4px;font-variant-numeric:tabular-nums;line-height:1.1;}
+.kv.pos{color:var(--grn);}
+.kv.neg{color:var(--red);}
+.ks{font-size:10px;color:var(--tx4);}
+
+/* ══ SECTION ══ */
+.sh2{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.sh2-txt{font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;}
+.sh2-line{flex:1;height:1px;background:var(--border);}
+
+/* ══ SUMMARY CARDS ══ */
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+.sc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px;box-shadow:var(--shadow);}
+.sc-t{font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.sr{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bg3);font-size:12px;}
+.sr:last-child{border-bottom:none;}
+.sr .lb{color:var(--tx2);}.sr .vl{color:var(--tx);font-weight:600;}
+.sr.tot{margin-top:4px;padding-top:8px;border-top:2px solid var(--border);border-bottom:none;}
+.sr.tot .lb{color:var(--grn);font-weight:700;font-size:12.5px;}
+.sr.tot .vl{color:var(--grn);font-weight:700;font-size:13px;}
+.sr.neg .vl{color:var(--red);}
+
+/* ══ VAT CARD ══ */
+.vat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.vc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;height:126px;position:relative;overflow:hidden;box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s;}
+.vc:hover{box-shadow:var(--shadow2);transform:translateY(-1px);}
+.vc-accent{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--vat),var(--vat2));border-radius:var(--r2) var(--r2) 0 0;}
+.vc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:4px;}
+.vc-lbl{font-size:10px;font-weight:600;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;}
+.vc-icon{width:30px;height:30px;border-radius:8px;background:var(--vatl);display:flex;align-items:center;justify-content:center;font-size:14px;}
+.vc-val{font-size:24px;font-weight:800;color:var(--vat);letter-spacing:-.02em;margin-bottom:4px;font-variant-numeric:tabular-nums;line-height:1.1;}
+.vc-sub{font-size:10px;color:var(--tx4);}
+.vat-section{background:var(--vatl);border:1px solid var(--vatbl);border-radius:var(--r2);padding:20px;margin-bottom:20px;}
+.vat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.vat-title{font-size:14px;font-weight:700;color:var(--vat);display:flex;align-items:center;gap:8px;}
+.vat-badge{font-size:10px;font-weight:600;color:var(--vat);background:rgba(124,58,237,0.1);border:1px solid var(--vatbl);padding:3px 9px;border-radius:20px;}
+.vat-table{background:var(--bg2);border:1px solid var(--vatbl);border-radius:var(--r);overflow:hidden;}
+.vtr{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:0;font-size:12px;}
+.vtr.head{background:var(--vatl);font-size:10px;font-weight:700;color:var(--vat);letter-spacing:.06em;text-transform:uppercase;}
+.vtc{padding:10px 14px;border-bottom:1px solid var(--bg3);}
+.vtr:last-child .vtc{border-bottom:none;}
+.vtr:not(.head):hover .vtc{background:var(--vatl);}
+.vat-settings{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.vat-filing{background:var(--bg2);border:2px solid var(--vat);border-radius:var(--r2);padding:18px;margin-top:14px;}
+.vf-title{font-size:13px;font-weight:700;color:var(--vat);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.vf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.vf-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--vatl);border-radius:var(--r);font-size:12px;}
+.vf-row.payable{background:var(--vat);color:#fff;font-weight:700;font-size:13px;}
+.vf-row.payable .vf-lbl,.vf-row.payable .vf-val{color:#fff;}
+.vf-lbl{color:var(--tx2);font-weight:500;}
+.vf-val{font-weight:700;color:var(--tx);}
+
+/* ══ TABLE ══ */
+.tw{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:20px;box-shadow:var(--shadow);}
+.th{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;background:var(--bg2);}
+.tt{font-size:13px;font-weight:700;color:var(--tx);}
+.tc{font-size:10px;color:var(--tx3);background:var(--bg3);padding:3px 10px;border-radius:20px;border:1px solid var(--border);font-weight:500;}
+.ts{overflow-x:auto;max-height:420px;overflow-y:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{padding:9px 14px;text-align:left;font-size:9px;font-weight:700;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--bg3);white-space:nowrap;}
+td{padding:9px 14px;border-bottom:1px solid var(--bg3);color:var(--tx2);white-space:nowrap;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--blul);color:var(--tx);}
+.tsk{color:var(--blu2);font-weight:600;}
+.tp{color:var(--grn);font-weight:600;}.tn2{color:var(--red);font-weight:600;}
+.tw2{color:var(--amb);}
+.tnm{color:var(--tx2);font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;}
+.rk{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;}
+.r1{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;}
+.r2{background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;}
+.r3{background:#fff7ed;color:#9a3412;border:1px solid #fdba74;}
+.rn{background:var(--bg3);color:var(--tx3);border:1px solid var(--border);}
+
+/* ══ FORM ══ */
+.pf{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:20px;box-shadow:var(--shadow);}
+.fg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
+.fg3{display:flex;flex-direction:column;gap:5px;}
+.fl{font-size:10px;font-weight:600;color:var(--tx2);letter-spacing:.04em;text-transform:uppercase;}
+.fi{background:var(--bg2);border:1.5px solid var(--border);color:var(--tx);padding:9px 13px;border-radius:var(--r);font-size:13px;font-family:var(--fd);width:100%;transition:border-color .15s,box-shadow .15s;}
+.fi:focus{outline:none;border-color:var(--blu2);box-shadow:0 0 0 3px rgba(37,99,235,0.08);}
+.fi::placeholder{color:var(--tx4);}
+select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;}
+
+/* ══ BUTTONS ══ */
+.btn{padding:9px 20px;border-radius:var(--r);font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--fd);transition:all .15s;border:none;display:inline-flex;align-items:center;gap:7px;letter-spacing:.01em;}
+.bp{background:var(--blu2);color:#fff;box-shadow:0 2px 6px rgba(37,99,235,0.25);}
+.bp:hover{background:var(--blu);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.35);}
+.bs{background:var(--bg2);color:var(--tx2);border:1.5px solid var(--border);}
+.bs:hover{border-color:var(--border3);color:var(--tx);}
+.bd{background:var(--redl);color:var(--red);border:1px solid var(--redbl);}
+.bd:hover{background:var(--red);color:#fff;}
+.bg{background:var(--grnl);color:var(--grn);border:1.5px solid var(--grnbl);}
+.bg:hover{background:var(--grn);color:#fff;transform:translateY(-1px);box-shadow:0 4px 12px rgba(5,150,105,0.3);}
+.bv{background:var(--vatl);color:var(--vat);border:1.5px solid var(--vatbl);}
+.bv:hover{background:var(--vat);color:#fff;transform:translateY(-1px);}
+.bsm{padding:5px 12px;font-size:11px;}
+
+/* ══ UPLOAD ══ */
+.uz{border:2px dashed var(--border2);border-radius:var(--r2);padding:40px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg2);margin-bottom:20px;box-shadow:var(--shadow);}
+.uz:hover,.uz.drag{border-color:var(--blu2);background:var(--blul);}
+.ui{font-size:36px;margin-bottom:10px;}
+.ut{font-size:16px;font-weight:700;color:var(--tx);margin-bottom:6px;letter-spacing:-.01em;}
+.ud{font-size:12px;color:var(--tx3);margin-bottom:16px;line-height:1.6;}
+.un{font-size:10px;color:var(--tx4);margin-top:10px;display:flex;align-items:center;justify-content:center;gap:5px;}
+
+/* ══ MAPPER ══ */
+.mpr{background:var(--blul);border:1.5px solid var(--blubl);border-radius:var(--r2);padding:20px;margin-bottom:20px;display:none;}
+.mpr.sh{display:block;}
+.mpg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.mr2{display:flex;flex-direction:column;gap:5px;}
+.ml{font-size:9px;font-weight:700;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.at{color:var(--grn);font-size:8px;background:var(--grnl);border:1px solid var(--grnbl);padding:1px 6px;border-radius:4px;font-weight:700;}
+
+/* ══ ALERTS ══ */
+.al{border-radius:var(--r);padding:11px 15px;display:none;align-items:center;gap:10px;margin-bottom:14px;font-size:12px;font-weight:500;}
+.al.sh{display:flex;}
+.al-ok{background:var(--grnl);border:1px solid var(--grnbl);color:var(--grn);}
+.al-w{background:var(--ambl);border:1px solid var(--ambbl);color:var(--amb);}
+
+/* ══ CHARTS ══ */
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px;}
+.cc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px;box-shadow:var(--shadow);}
+.cc.full{grid-column:1/-1;}
+.ctt{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:2px;}
+.cst{font-size:11px;color:var(--tx3);margin-bottom:14px;}
+.cw{position:relative;height:220px;}
+.cw.tl{height:280px;}
+
+/* ══ STEPS ══ */
+.stg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+.stp{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px;position:relative;overflow:hidden;box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s;}
+.stp:hover{box-shadow:var(--shadow2);transform:translateY(-2px);}
+.stp::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
+.stp:nth-child(1)::after{background:var(--blu2);}
+.stp:nth-child(2)::after{background:var(--grn);}
+.stp:nth-child(3)::after{background:var(--amb);}
+.stn{font-family:'Inter',sans-serif;font-style:normal;font-weight:800;font-size:32px;color:var(--border2);margin-bottom:10px;line-height:1;letter-spacing:-.04em;}
+.stt{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:5px;}
+.std{font-size:11.5px;color:var(--tx3);line-height:1.55;}
+
+/* ══ EXPORT ══ */
+.xc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:22px;margin-bottom:20px;box-shadow:var(--shadow);}
+.xf{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+.xfi{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;}
+.xfi-i{font-size:20px;margin-bottom:6px;}
+.xfi-t{font-size:11px;font-weight:600;color:var(--tx);margin-bottom:3px;}
+.xfi-d{font-size:10px;color:var(--tx3);}
+
+/* ══ COGS EDIT ══ */
+.cogs-missing{color:var(--amb)!important;cursor:pointer;background:var(--ambl);border-radius:4px;padding:2px 6px!important;}
+.cogs-cell:hover{background:var(--blul)!important;border-radius:4px;}
+.cogs-cell{cursor:pointer;transition:background .15s;}
+
+/* ══ SAVE BADGE ══ */
+.save-badge{font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;border:1px solid var(--grnbl);background:var(--grnl);color:var(--grn);transition:all .4s;}
+.sw2{background:var(--ambl);border:1px solid var(--ambbl);border-radius:var(--r);padding:10px 14px;font-size:11.5px;color:var(--amb);margin-bottom:14px;display:none;font-weight:500;}
+.sw2.sh{display:block;}
+
+/* ══ NOTIF ══ */
+.nf{position:fixed;bottom:20px;right:20px;border-radius:var(--r2);padding:12px 18px;font-size:12.5px;z-index:1000;transform:translateY(60px);opacity:0;transition:all .25s cubic-bezier(.4,0,.2,1);max-width:300px;display:flex;align-items:center;gap:9px;font-weight:600;box-shadow:var(--shadow3);}
+.nf.sh{transform:translateY(0);opacity:1;}
+.nf.ok{background:var(--grnl);border:1.5px solid var(--grnbl);color:var(--grn);}
+.nf.er{background:var(--redl);border:1.5px solid var(--redbl);color:var(--red);}
+.nf.inf{background:var(--blul);border:1.5px solid var(--blubl);color:var(--blu2);}
+.nf.vt{background:var(--vatl);border:1.5px solid var(--vatbl);color:var(--vat);}
+
+/* ══ EMPTY ══ */
+.em{text-align:center;padding:48px 20px;color:var(--tx4);}
+.em-i{font-size:36px;margin-bottom:10px;opacity:.5;}
+.em-t{font-size:13px;color:var(--tx3);}
+
+/* ══ AUTH SCREEN ══ */
+#auth-screen{position:fixed;inset:0;background:var(--navy);display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;}
+#auth-screen.show{display:flex;}
+.auth-box{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,0.3);}
+.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+.auth-mark{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;box-shadow:0 4px 12px rgba(59,130,246,0.4);}
+.auth-title{font-size:20px;font-weight:800;color:var(--tx);}
+.auth-sub{font-size:11px;color:var(--tx3);margin-top:1px;}
+.auth-h{font-size:16px;font-weight:700;color:var(--tx);margin-bottom:6px;}
+.auth-p{font-size:12px;color:var(--tx3);margin-bottom:20px;line-height:1.6;}
+.auth-label{font-size:12px;font-weight:600;color:var(--tx3);margin-bottom:4px;display:block;}
+.auth-inp{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;font-family:var(--fd);color:var(--tx);margin-bottom:14px;transition:border-color .15s;box-sizing:border-box;}
+.auth-inp:focus{outline:none;border-color:var(--blu2);box-shadow:0 0 0 3px rgba(37,99,235,0.08);}
+.auth-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.auth-check{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx3);cursor:pointer;}
+.auth-check input{cursor:pointer;}
+.auth-forgot{font-size:12px;color:var(--blu2);cursor:pointer;background:none;border:none;font-family:var(--fd);padding:0;}
+.auth-forgot:hover{text-decoration:underline;}
+.auth-btn{width:100%;padding:12px;background:#f5a623;color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--fd);transition:all .15s;}
+.auth-btn:hover{background:#e09510;transform:translateY(-1px);}
+.auth-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.auth-err{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 12px;font-size:12px;color:#dc2626;margin-bottom:12px;display:none;}
+.auth-reset-msg{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 12px;font-size:12px;color:#16a34a;margin-bottom:12px;display:none;}
+.auth-footer{margin-top:20px;font-size:10px;color:var(--tx4);text-align:center;}
+
+.mob{display:none;position:fixed;top:10px;left:10px;z-index:200;background:var(--navy);border:none;border-radius:var(--r);padding:8px 11px;cursor:pointer;color:#fff;font-size:15px;align-items:center;box-shadow:var(--shadow2);}
+@media(max-width:1100px){.kg{grid-template-columns:repeat(3,1fr);}.vat-grid{grid-template-columns:repeat(2,1fr);}.cg{grid-template-columns:1fr;}.cc.full{grid-column:auto;}}
+@media(max-width:768px){.sb{transform:translateX(-100%);}.sb.mop{transform:translateX(0);}.mn{margin-left:0!important;}.mob{display:flex;}.kg,.vat-grid{grid-template-columns:1fr 1fr;}.sg,.stg,.xf,.fg,.vat-settings,.vf-grid{grid-template-columns:1fr;}.mpg{grid-template-columns:1fr;}.pg{padding:16px;}}
+</style>
+</head>
+<body>
+
+<!-- ══ AUTH SCREEN ══ -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-mark">N</div>
+      <div><div class="auth-title">NexaraDash</div><div class="auth-sub">nexaradash.com</div></div>
+    </div>
+    <div id="auth-err" class="auth-err"></div>
+    <div id="auth-reset-msg" class="auth-reset-msg"></div>
+    <div id="auth-form-wrap">
+      <div class="auth-h">Sign in to your account</div>
+      <div class="auth-p">Enter your credentials to access your dashboard.</div>
+      <label class="auth-label">E-mail</label>
+      <input class="auth-inp" type="email" id="auth-email" placeholder="you@company.com" autocomplete="email">
+      <label class="auth-label">Password</label>
+      <input class="auth-inp" type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')signIn()">
+      <div class="auth-row">
+        <label class="auth-check"><input type="checkbox" id="auth-remember"> Keep me logged in</label>
+        <button class="auth-forgot" onclick="showForgot()">Forgot password?</button>
+      </div>
+      <button class="auth-btn" id="auth-submit" onclick="signIn()">Continue</button>
+      <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--tx3);">Need access? <a href="mailto:info@nexaradash.com" style="color:var(--blu2);text-decoration:none;font-weight:600;">Contact info@nexaradash.com</a></div>
+    </div>
+    <div id="auth-forgot-wrap" style="display:none;">
+      <div class="auth-h">Reset your password</div>
+      <div class="auth-p">Enter your email and we'll send you a reset link.</div>
+      <label class="auth-label">E-mail</label>
+      <input class="auth-inp" type="email" id="auth-reset-email" placeholder="you@company.com">
+      <button class="auth-btn" id="auth-reset-submit" onclick="sendReset()">Send Reset Link</button>
+      <div style="text-align:center;margin-top:12px;"><button class="auth-forgot" onclick="showLogin()">← Back to login</button></div>
+    </div>
+    <div class="auth-footer">Temu P&L Dashboard · <span data-company>NexaraDash</span></div>
+  </div>
+</div>
+
+<button class="mob" onclick="document.querySelector('.sb').classList.toggle('mop')">☰</button>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sb" id="sb">
+  <div class="sb-tog" onclick="toggleSB()" title="Collapse">◀</div>
+  <div class="sb-top">
+    <div class="nx-logo">
+      <div class="nx-mark">N</div>
+      <div><div class="nx-name">NexaraDash</div><div class="nx-tag">nexaradash.com</div></div>
+    </div>
+    <div class="cl-card">
+      <div class="cl-name" data-company>NexaraDash</div>
+      <div class="cl-sub">Temu Seller · Worldwide</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="nl">Overview</div>
+    <div class="ni act" data-tip="Dashboard" onclick="goTab('dashboard',this)">
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      <span class="ntx">Dashboard</span><span class="nbg ng">Live</span>
+    </div>
+    <div class="nl">Data</div>
+    <div class="ni" data-tip="Products" onclick="goTab('products',this)">
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      <span class="ntx">Products & Costs</span><span class="nbg ng">✓</span>
+    </div>
+    <div class="ni" data-tip="Import" onclick="goTab('import',this)">
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span class="ntx">Import Sales</span><span class="nbg ng">✓</span>
+    </div>
+    <div class="nl">Analytics</div>
+    <div class="ni" data-tip="P&L" onclick="goTab('report',this)">
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span class="ntx">P&L Report</span><span class="nbg ng">✓</span>
+    </div>
+    <div class="ni" data-tip="VAT" onclick="goTab('vat',this)">
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span class="ntx">Tax Filing</span><span class="nbg nv">New</span>
+    </div>
+    <div class="ni" data-tip="Charts" onclick="goTab('charts',this)">
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span class="ntx">Charts & Trends</span><span class="nbg na">✓</span>
+    </div>
+    <div class="nl">Export</div>
+    <div class="ni" data-tip="Export" onclick="goTab('export',this)">
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span class="ntx">Export PDF / CSV</span><span class="nbg na">✓</span>
+    </div>
+    <div class="nl">System</div>
+    <div class="ni" data-tip="Settings" onclick="goTab('settings',this)">
+      <svg class="nic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span class="ntx">Settings</span>
+    </div>
+  </nav>
+  <div class="sb-bot">
+    <div class="pw"><div class="pw-dot"></div><span>NexaraDash</span><span class="pwt"> · nexaradash.com</span></div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div class="mn" id="mn">
+  <header class="hdr">
+    <div class="hl">
+      <div class="ht">Profit & Loss Dashboard</div>
+      <div class="hdv"></div>
+      <div class="hs"><span data-company>NexaraDash</span></div>
+    </div>
+    <div class="hr2">
+      <div class="dc"><div class="pw-dot"></div><span id="ldate"></span></div>
+      <div id="save-badge" class="save-badge">💾 Auto-saved</div>
+      <button class="btn bd bsm" onclick="clrEverything()" title="Clear all products and import data" style="font-size:10px;padding:4px 10px;">🗑 Clear All</button>
+      <button class="btn bd bsm" onclick="signOut()" title="Sign out" style="font-size:10px;padding:4px 10px;">⎋ Sign Out</button>
+      <div class="gbadge">● Live</div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab act" onclick="goTab('dashboard',null,this)">📊 Dashboard</div>
+    <div class="tab" onclick="goTab('products',null,this)">📦 Products</div>
+    <div class="tab" onclick="goTab('import',null,this)">📂 Import</div>
+    <div class="tab" onclick="goTab('report',null,this)">📈 P&L Report</div>
+    <div class="tab" onclick="goTab('vat',null,this)">📋 Tax Filing</div>
+    <div class="tab" onclick="goTab('charts',null,this)">📉 Charts</div>
+    <div class="tab" onclick="goTab('export',null,this)">📤 Export</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="pg act" id="pg-dashboard">
+    <div class="fbar">
+      <span class="flb">Period:</span>
+      <button class="fb2 act" onclick="setF('all',this)">All Time</button>
+      <button class="fb2" onclick="setF('today',this)">Today</button>
+      <button class="fb2" onclick="setF('7d',this)">Last 7 Days</button>
+      <button class="fb2" onclick="setF('30d',this)">This Month</button>
+      <div class="fs2"></div>
+      <span class="flb">From:</span><input type="date" class="fdt" id="df" onchange="setF('custom',null)">
+      <span class="flb">To:</span><input type="date" class="fdt" id="dt2" onchange="setF('custom',null)">
+    </div>
+    <div class="kg">
+      <div class="kc rv"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Total Revenue</div><div class="ki2">💰</div></div><div class="kv" id="k-rv">£0.00</div><div class="ks" id="k-rv-s">0 orders processed</div></div>
+      <div class="kc pf"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Net Profit</div><div class="ki2">📈</div></div><div class="kv" id="k-pf">£0.00</div><div class="ks">After all deductions</div></div>
+      <div class="kc ct"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Total Costs</div><div class="ki2">📦</div></div><div class="kv" id="k-ct">£0.00</div><div class="ks">COGS + Fees + Ads</div></div>
+      <div class="kc mg"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Net Margin</div><div class="ki2">🎯</div></div><div class="kv" id="k-mg">0.0%</div><div class="ks">Net Profit / Revenue</div></div>
+      <div class="kc rf"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Refunds</div><div class="ki2">↩️</div></div><div class="kv" id="k-rf">£0.00</div><div class="ks" id="k-rf-s">0.0% refund rate</div></div>
+    </div>
+    <div class="sg">
+      <div class="sc"><div class="sc-t">💷 Revenue Breakdown</div>
+        <div class="sr"><span class="lb">Gross Revenue</span><span class="vl" id="sr-rv">£0.00</span></div>
+        <div class="sr neg"><span class="lb">— Temu Platform Fees</span><span class="vl" id="sr-fe">£0.00</span></div>
+        <div class="sr neg"><span class="lb">— Returns / Refunds</span><span class="vl" id="sr-rt">£0.00</span></div>
+        <div class="sr tot"><span class="lb">= Net Revenue</span><span class="vl" id="sr-nr">£0.00</span></div>
+      </div>
+      <div class="sc"><div class="sc-t">📦 Cost Breakdown</div>
+        <div class="sr neg"><span class="lb">Product Cost (COGS)</span><span class="vl" id="sr-cg">£0.00</span></div>
+        <div class="sr neg"><span class="lb">Inbound Shipping</span><span class="vl" id="sr-sh">£0.00</span></div>
+        <div class="sr neg"><span class="lb">Ad Spend</span><span class="vl" id="sr-ad">£0.00</span></div>
+        <div class="sr tot"><span class="lb">= Total Costs</span><span class="vl" id="sr-tc">£0.00</span></div>
+      </div>
+      <div class="sc"><div class="sc-t">📊 Profitability</div>
+        <div class="sr"><span class="lb">Orders Processed</span><span class="vl" id="sr-od">0</span></div>
+        <div class="sr"><span class="lb">Products Matched</span><span class="vl" id="sr-pm">0 / 0</span></div>
+        <div class="sr"><span class="lb">Gross Margin %</span><span class="vl" id="sr-gm">0.0%</span></div>
+        <div class="sr tot"><span class="lb">= Net Profit</span><span class="vl" id="sr-np">£0.00</span></div>
+      </div>
+    </div>
+    <div class="sh2"><div class="sh2-txt">How To Get Started</div><div class="sh2-line"></div></div>
+    <div class="stg">
+      <div class="stp"><div class="stn">01</div><div class="stt">Add Your Products</div><div class="std">Go to the Products tab. Enter each SKU with buying price, shipping cost per unit, and Temu commission %.</div></div>
+      <div class="stp"><div class="stn">02</div><div class="stt">Import Settlement File</div><div class="std">Download your Settlement file from Temu Seller Central and upload it in the Import tab.</div></div>
+      <div class="stp"><div class="stn">03</div><div class="stt">View P&L & VAT</div><div class="std">Dashboard calculates revenue, costs, net profit, and tax liability instantly in your local currency.</div></div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div class="pg" id="pg-products">
+
+    <!-- PRODUCT SUB TABS -->
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;">
+      <div id="ptab-manual" onclick="switchPTab('manual')" style="padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid var(--blu2);color:var(--blu2);">✏️ Manual Entry</div>
+      <div id="ptab-bulk" onclick="switchPTab('bulk')" style="padding:9px 18px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--tx3);">📤 Bulk Upload</div>
+    </div>
+
+    <!-- MANUAL ENTRY -->
+    <div id="psec-manual">
+      <div class="sh2"><div class="sh2-txt">Add Product / SKU</div><div class="sh2-line"></div></div>
+      <div class="pf">
+        <div class="fg">
+          <div class="fg3"><label class="fl">SKU / Product ID</label><input class="fi" id="p-sku" placeholder="e.g. TEM-001"></div>
+          <div class="fg3"><label class="fl">Product Name</label><input class="fi" id="p-name" placeholder="e.g. Wireless Earbuds"></div>
+          <div class="fg3"><label class="fl">Buying Price (£)</label><input class="fi" id="p-cost" type="number" step="0.01" placeholder="0.00"></div>
+          <div class="fg3"><label class="fl">Inbound Shipping / Unit (£)</label><input class="fi" id="p-ship" type="number" step="0.01" placeholder="0.00"></div>
+          <div class="fg3"><label class="fl">Temu Fee % (Commission)</label><input class="fi" id="p-fee" type="number" step="0.1" placeholder="e.g. 8"></div>
+          <div class="fg3"><label class="fl">Monthly Ad Spend (£)</label><input class="fi" id="p-ads" type="number" step="0.01" placeholder="0.00"></div>
+        </div>
+        <div style="display:flex;gap:8px;"><button class="btn bp" onclick="addProd()">+ Add Product</button><button class="btn bs" onclick="clrPF()">Clear</button></div>
+      </div>
+    </div>
+
+    <!-- BULK UPLOAD -->
+    <div id="psec-bulk" style="display:none;">
+      <div class="sh2"><div class="sh2-txt">Bulk Upload Products</div><div class="sh2-line"></div></div>
+
+      <!-- Step 1 - Download template -->
+      <div class="pf" style="margin-bottom:14px;">
+        <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:200px;">
+            <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:4px;">Step 1 — Download Template</div>
+            <div style="font-size:12px;color:var(--tx3);line-height:1.6;">Download the Excel template below. Fill in your products — one row per SKU. Save and upload in Step 2.</div>
+            <div style="margin-top:10px;font-size:11px;color:var(--tx4);">Required columns: SKU, Product Name, Buying Price, Shipping, Temu Fee %, Ad Spend</div>
+          </div>
+          <button class="btn bg" onclick="dlTemplate()" style="flex-shrink:0;">📥 Download Template</button>
+        </div>
+      </div>
+
+      <!-- Step 2 - Upload -->
+      <div class="uz" id="bulk-uz" onclick="document.getElementById('bulk-fi').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="onBulkDrop(event)" style="padding:32px 24px;">
+        <div class="ui" style="font-size:28px;">📤</div>
+        <div class="ut" style="font-size:14px;">Step 2 — Drop Your Product List Here</div>
+        <div class="ud" style="font-size:11px;margin-bottom:12px;">Upload filled template or any Excel/CSV with SKU and cost columns<br>Supports .xlsx, .xls and .csv files</div>
+        <button class="btn bp bsm" onclick="event.stopPropagation();document.getElementById('bulk-fi').click()">Choose File</button>
+        <input type="file" id="bulk-fi" style="display:none" accept=".xlsx,.xls,.csv" onchange="onBulkFile(event)">
+        <div class="un" style="margin-top:12px;flex-direction:column;gap:8px;">
+          <label onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:11px;color:var(--tx3);">
+            <input type="checkbox" id="replace-all" style="accent-color:var(--red);width:14px;height:14px;">
+            <span><strong style="color:var(--red);">Replace All</strong> — clear existing products and import new ones</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Bulk preview -->
+      <div id="bulk-preview" style="display:none;">
+        <div class="al al-ok sh" id="bulk-ok"><span>✅</span><span id="bulk-ok-t"></span></div>
+        <div class="tw">
+          <div class="th">
+            <div class="tt">Preview — Products to Import</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div class="tc" id="bulk-cnt">0 rows</div>
+              <button class="btn bp bsm" onclick="confirmBulk()">✓ Confirm & Import All</button>
+              <button class="btn bs bsm" onclick="cancelBulk()">✗ Cancel</button>
+            </div>
+          </div>
+          <div class="ts"><table><thead><tr><th>SKU</th><th>Product Name</th><th>Buying Price</th><th>Shipping</th><th>Fee %</th><th>Ad Spend</th><th>Status</th></tr></thead><tbody id="bulk-body"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- YOUR PRODUCTS TABLE — always visible -->
+    <div class="sh2" style="margin-top:8px;"><div class="sh2-txt">Your Products</div><div class="sh2-line"></div></div>
+    <div class="tw">
+      <div class="th">
+        <div class="tt">Product Cost Master</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <div class="tc" id="pc2">0 products</div>
+          <button class="btn bs bsm" onclick="expProdsCSV()">📊 Export</button>
+          <button class="btn bd bsm" onclick="clrAll()" style="display:flex;align-items:center;gap:5px;">🗑 Clear All</button>
+        </div>
+      </div>
+      <div class="ts"><table><thead><tr><th>SKU</th><th>Product Name</th><th>Buying Price</th><th>Shipping</th><th>Temu Fee</th><th>Ad Spend</th><th>Unit Cost</th><th></th></tr></thead><tbody id="pb"></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- IMPORT -->
+  <div class="pg" id="pg-import">
+    <div class="sh2"><div class="sh2-txt">Upload Settlement File</div><div class="sh2-line"></div></div>
+    <div class="uz" id="uz" onclick="document.getElementById('fi2').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="onDrop(event)">
+      <div class="ui">📂</div>
+      <div class="ut">Drop Your Temu Settlement File Here</div>
+      <div class="ud">Temu Seller Central → Finance → Settlement Management → Export<br>Supports .xlsx, .xls and .csv files</div>
+      <button class="btn bp" onclick="event.stopPropagation();document.getElementById('fi2').click()">Choose File</button>
+      <input type="file" id="fi2" style="display:none" accept=".xlsx,.xls,.csv" onchange="onFil(event)">
+      <div class="un">🔒 Processed entirely in your browser — your data never leaves your device</div>
+    </div>
+    <div class="mpr" id="mpr">
+      <div class="tt" style="margin-bottom:5px;color:var(--blu2);">🔗 Map Your Columns</div>
+      <div style="font-size:12px;color:var(--tx2);">Match your Temu export columns to the fields below. <span style="color:var(--grn);font-weight:600;">✓ AUTO</span> = detected automatically.</div>
+      <div class="mpg" id="mpg"></div>
+      <div style="display:flex;gap:8px;margin-top:16px;"><button class="btn bp" onclick="procMap()">✓ Process & Calculate P&L</button><button class="btn bs" onclick="resetUp()">✗ Reset</button></div>
+    </div>
+    <div class="al al-ok" id="imp-ok"><span>✅</span><span id="imp-ok-t"></span></div>
+    <div class="tw" id="imp-tw" style="display:none;">
+      <div class="th"><div class="tt">Imported Orders Preview</div><div class="tc" id="imp-cnt">0 rows</div></div>
+      <div class="ts"><table><thead><tr id="imp-th"></tr></thead><tbody id="imp-tb"></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- P&L REPORT -->
+  <div class="pg" id="pg-report">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+      <div class="sh2" style="margin-bottom:0;flex:1;"><div class="sh2-txt">SKU Profitability Report</div><div class="sh2-line"></div></div>
+      <button class="btn bg bsm" onclick="goTab('export')">📤 Export PDF</button>
+    </div>
+    <div class="sw2" id="sw2"></div>
+    <div class="tw">
+      <div class="th"><div class="tt">P&L by Product</div><div class="tc" id="sk-cnt">0 SKUs</div></div>
+      <div class="ts"><table><thead><tr><th>#</th><th>SKU</th><th>Product</th><th>Units</th><th>Revenue</th><th>COGS ✏️</th><th>Temu Fees</th><th>Temu Ship</th><th>Inbound Ship</th><th>Ad Spend</th><th>Returns</th><th>Net Profit</th><th>Margin</th></tr></thead><tbody id="sk-b"></tbody></table></div>
+    </div>
+    <div class="sh2"><div class="sh2-txt">Manual Adjustments</div><div class="sh2-line"></div></div>
+    <div class="pf">
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:13px;">Add extra costs not captured in your Temu export:</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:flex-end;">
+        <div class="fg3"><label class="fl">Extra Ad Spend (£)</label><input class="fi" id="man-ads" type="number" step="0.01" placeholder="0.00"></div>
+        <div class="fg3"><label class="fl">Other Costs (£)</label><input class="fi" id="man-oth" type="number" step="0.01" placeholder="0.00"></div>
+        <button class="btn bp" onclick="applyMan()">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VAT FILING -->
+  <div class="pg" id="pg-vat">
+    <div class="sh2"><div class="sh2-txt">Tax Settings</div><div class="sh2-line"></div></div>
+    <div class="pf">
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:14px;line-height:1.6;">Configure your tax settings. Standard VAT/GST rate is <strong>20%</strong> for UK (10% AU, varies by US state). The dashboard calculates your tax liability for quarterly returns.</div>
+      <div class="vat-settings">
+        <div class="fg3"><label class="fl">VAT Rate on Sales (%)</label><input class="fi" id="vat-rate" type="number" step="0.1" value="20" placeholder="20"></div>
+        <div class="fg3"><label class="fl">VAT Rate on Purchases (%)</label><input class="fi" id="vat-rate-in" type="number" step="0.1" value="20" placeholder="20"></div>
+        <div class="fg3"><label class="fl">VAT Quarter</label>
+          <select class="fi" id="vat-quarter">
+            <option>Q1 — Jan, Feb, Mar</option>
+            <option>Q2 — Apr, May, Jun</option>
+            <option selected>Q3 — Jul, Aug, Sep</option>
+            <option>Q4 — Oct, Nov, Dec</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn bv" onclick="calcVAT()">📋 Calculate Tax</button></button>
+    </div>
+
+    <div class="sh2"><div class="sh2-txt">Tax Summary</div><div class="sh2-line"></div></div>
+    <div class="vat-grid">
+      <div class="vc"><div class="vc-accent"></div><div class="vc-top"><div class="vc-lbl">Output VAT</div><div class="vc-icon">📤</div></div><div class="vc-val" id="vat-out">£0.00</div><div class="vc-sub">VAT collected on sales</div></div>
+      <div class="vc"><div class="vc-accent"></div><div class="vc-top"><div class="vc-lbl">Input VAT</div><div class="vc-icon">📥</div></div><div class="vc-val" id="vat-in">£0.00</div><div class="vc-sub">VAT paid on purchases</div></div>
+      <div class="vc"><div class="vc-accent"></div><div class="vc-top"><div class="vc-lbl">VAT Payable</div><div class="vc-icon">🏛</div></div><div class="vc-val" id="vat-pay">£0.00</div><div class="vc-sub">Amount due to tax authority</div></div>
+      <div class="vc"><div class="vc-accent"></div><div class="vc-top"><div class="vc-lbl">Net Sales ex-VAT</div><div class="vc-icon">💷</div></div><div class="vc-val" id="vat-net">£0.00</div><div class="vc-sub">Revenue excluding VAT</div></div>
+    </div>
+
+    <div class="vat-section">
+      <div class="vat-header">
+        <div class="vat-title">📋 Tax Return Summary <span class="vat-badge">Quarterly Filing</span></div>
+        <button class="btn bv bsm" onclick="expVATPDF()">📄 Download Tax Report</button>
+      </div>
+      <div class="vat-filing">
+        <div class="vf-title">📋 Tax Return — Box Reference Guide</div>
+        <div class="vf-grid">
+          <div class="vf-row"><span class="vf-lbl">Box 1 — VAT on Sales (Output)</span><span class="vf-val" id="box1">£0.00</span></div>
+          <div class="vf-row"><span class="vf-lbl">Box 4 — VAT Reclaimed (Input)</span><span class="vf-val" id="box4">£0.00</span></div>
+          <div class="vf-row"><span class="vf-lbl">Box 6 — Net Sales (ex-VAT)</span><span class="vf-val" id="box6">£0.00</span></div>
+          <div class="vf-row"><span class="vf-lbl">Box 7 — Net Purchases (ex-VAT)</span><span class="vf-val" id="box7">£0.00</span></div>
+          <div class="vf-row payable"><span class="vf-lbl">Box 5 — Net VAT / Tax Payable</span><span class="vf-val" id="box5">£0.00</span></div>
+          <div class="vf-row" style="background:var(--grnl);"><span class="vf-lbl" style="color:var(--grn);">Effective VAT Rate</span><span class="vf-val" style="color:var(--grn);" id="vat-eff">0.0%</span></div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;">
+        <div class="sh2"><div class="sh2-txt">VAT by SKU</div><div class="sh2-line"></div></div>
+        <div class="vat-table">
+          <div class="vtr head"><div class="vtc">Product / SKU</div><div class="vtc">Gross Revenue</div><div class="vtc">VAT Element</div><div class="vtc">Net ex-VAT</div></div>
+          <div id="vat-rows"><div class="vtr"><div class="vtc" colspan="4" style="color:var(--tx3);font-size:12px;">Import sales data and click Calculate VAT to see breakdown</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="pg" id="pg-charts">
+    <div class="sh2"><div class="sh2-txt">Visual Analytics</div><div class="sh2-line"></div></div>
+    <div class="cg">
+      <div class="cc"><div class="ctt">Revenue vs Costs vs Profit</div><div class="cst">Overall financial breakdown</div><div class="cw"><canvas id="ch-ov"></canvas></div></div>
+      <div class="cc"><div class="ctt">Net Profit by SKU</div><div class="cst">Which products make the most money</div><div class="cw"><canvas id="ch-sk"></canvas></div></div>
+      <div class="cc"><div class="ctt">Cost Breakdown</div><div class="cst">Where your money goes</div><div class="cw"><canvas id="ch-cs"></canvas></div></div>
+      <div class="cc"><div class="ctt">Margin % by SKU</div><div class="cst">Profitability percentage per product</div><div class="cw"><canvas id="ch-mg"></canvas></div></div>
+      <div class="cc full"><div class="ctt">Daily Revenue Trend</div><div class="cst">Sales performance over time</div><div class="cw tl"><canvas id="ch-tr"></canvas></div></div>
+      <div class="cc full"><div class="ctt">Monthly Revenue vs Profit</div><div class="cst">Month-by-month trend</div><div class="cw tl"><canvas id="ch-mo"></canvas></div></div>
+      <div class="cc"><div class="ctt">Top SKUs by Units Sold</div><div class="cst">Highest volume products</div><div class="cw"><canvas id="ch-un"></canvas></div></div>
+      <div class="cc"><div class="ctt">Refund Rate per SKU (%)</div><div class="cst">Returns as % of revenue</div><div class="cw"><canvas id="ch-rf"></canvas></div></div>
+      <div class="cc full"><div class="ctt">ROI per SKU (%)</div><div class="cst">Return on cost invested</div><div class="cw tl"><canvas id="ch-roi"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- EXPORT -->
+  <div class="pg" id="pg-export">
+    <div class="sh2"><div class="sh2-txt">Export Options</div><div class="sh2-line"></div></div>
+    <div class="xc">
+      <div style="font-size:16px;font-weight:700;color:var(--tx);margin-bottom:5px;">📄 Professional P&L Report</div>
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:18px;line-height:1.65;">Generate a fully branded, accountant-ready PDF for <span data-company>NexaraDash</span> including full P&L, SKU breakdown, and VAT summary.</div>
+      <div class="xf">
+        <div class="xfi"><div class="xfi-i">🏢</div><div class="xfi-t">Company Branded</div><div class="xfi-d">Header with company name and date</div></div>
+        <div class="xfi"><div class="xfi-i">📊</div><div class="xfi-t">Full P&L Table</div><div class="xfi-d">Revenue, costs, profit per SKU</div></div>
+        <div class="xfi"><div class="xfi-i">🏛</div><div class="xfi-t">Tax Summary</div><div class="xfi-d">Tax authority box references</div></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn bp" onclick="expPDF()">📄 Download PDF Report</button>
+        <button class="btn bs" onclick="expCSV()">📊 Download CSV</button>
+        <button class="btn bv" onclick="expVATPDF()">📋 Download Tax Report</button>
+      </div>
+    </div>
+    <div class="sh2"><div class="sh2-txt">PDF Preview</div><div class="sh2-line"></div></div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:24px;box-shadow:var(--shadow);">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
+        <div style="width:36px;height:36px;border-radius:8px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;">N</div>
+        <div><div style="font-size:16px;font-weight:800;color:var(--tx);" data-company>NexaraDash</div><div style="font-size:10px;color:var(--tx3);">Temu P&L Report · Powered by NexaraDash · nexaradash.com</div></div>
+      </div>
+      <div style="font-size:10px;color:var(--tx4);margin-bottom:18px;padding-top:8px;border-top:1px solid var(--border);" id="xd"></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;">
+        <div style="background:var(--blul);border:1px solid var(--blubl);border-radius:var(--r);padding:13px;text-align:center;"><div style="font-size:9px;color:var(--blu2);font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Revenue</div><div style="font-size:17px;font-weight:800;color:var(--tx);" id="xp-rv">£0.00</div></div>
+        <div style="background:var(--grnl);border:1px solid var(--grnbl);border-radius:var(--r);padding:13px;text-align:center;"><div style="font-size:9px;color:var(--grn);font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Net Profit</div><div style="font-size:17px;font-weight:800;color:var(--grn);" id="xp-pf">£0.00</div></div>
+        <div style="background:var(--redl);border:1px solid var(--redbl);border-radius:var(--r);padding:13px;text-align:center;"><div style="font-size:9px;color:var(--red);font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Total Costs</div><div style="font-size:17px;font-weight:800;color:var(--red);" id="xp-ct">£0.00</div></div>
+        <div style="background:var(--ambl);border:1px solid var(--ambbl);border-radius:var(--r);padding:13px;text-align:center;"><div style="font-size:9px;color:var(--amb);font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;">Margin</div><div style="font-size:17px;font-weight:800;color:var(--amb);" id="xp-mg">0.0%</div></div>
+      </div>
+      <div style="font-size:10px;color:var(--tx4);text-align:right;">Powered by NexaraDash · nexaradash.com · info@nexaradash.com</div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="pg" id="pg-settings">
+    <div class="sh2"><div class="sh2-txt">Company Settings</div><div class="sh2-line"></div></div>
+    <div class="pf">
+      <div class="fg">
+        <div class="fg3"><label class="fl">Client Company</label><input class="fi" id="client-company-input" value="NexaraDash"></div>
+        <div class="fg3"><label class="fl">Agency / Platform</label><input class="fi" value="NexaraDash"></div>
+        <div class="fg3"><label class="fl">Currency</label><input class="fi" id="currency-input" value="GBP £" placeholder="e.g. GBP £, USD $, AUD $"></div>
+      </div>
+      <button class="btn bp" onclick="notify('Settings saved','ok')">Save Settings</button>
+    </div>
+    <div class="sh2"><div class="sh2-txt">Data Management</div><div class="sh2-line"></div></div>
+    <div class="pf">
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:8px;">Your data is stored in your browser's IndexedDB — it persists across sessions and page reloads.</div>
+      <div style="background:var(--grnl);border:1px solid var(--grnbl);border-radius:var(--r);padding:10px 14px;font-size:11.5px;color:var(--grn);margin-bottom:13px;font-weight:600;">💾 Auto-save active — data survives browser close &amp; reload</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn bd" onclick="clrAll()">🗑 Clear All Products</button>
+        <button class="btn bs" onclick="resetUp()">↺ Reset Import Data</button>
+        <button class="btn bd" onclick="clrEverything()" style="background:var(--red);color:#fff;border-color:var(--red);">⚡ Clear Everything</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="nf" id="nf"></div>
+
+<script>
+let prods=[];
+let raws=[],hdrs=[],pnl={},mAds=0,mOth=0,fMode='all',dFrom=null,dTo=null;
+let CH={};
+
+// ══ SUPABASE INIT ══
+const SB_URL='https://kedzsuclnczlqftakolc.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZHpzdWNsbmN6bHFmdGFrb2xjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjE2MTQsImV4cCI6MjA5NDQzNzYxNH0.tcP_gsRdkJL7e2rWvlChtwTjD8xVWSE9DOHEGuaObAI';
+const {createClient}=supabase;
+const sb=createClient(SB_URL,SB_KEY);
+let currentUser=null,tenantId=null,companyName='NexaraDash';
+
+// ══ AUTH FUNCTIONS ══
+function showAuthErr(msg){const el=document.getElementById('auth-err');el.textContent=msg;el.style.display='block';}
+function hideAuthErr(){const el=document.getElementById('auth-err');if(el)el.style.display='none';}
+function showForgot(){document.getElementById('auth-form-wrap').style.display='none';document.getElementById('auth-forgot-wrap').style.display='block';hideAuthErr();}
+function showLogin(){document.getElementById('auth-forgot-wrap').style.display='none';document.getElementById('auth-form-wrap').style.display='block';hideAuthErr();document.getElementById('auth-reset-msg').style.display='none';}
+
+async function signIn(){
+  const email=document.getElementById('auth-email').value.trim();
+  const password=document.getElementById('auth-password').value;
+  if(!email||!email.includes('@')){showAuthErr('Please enter a valid email.');return;}
+  if(!password||password.length<6){showAuthErr('Password must be at least 6 characters.');return;}
+  const btn=document.getElementById('auth-submit');
+  btn.disabled=true;btn.textContent='Signing in...';
+  hideAuthErr();
+  const{error}=await sb.auth.signInWithPassword({email,password});
+  if(error){btn.disabled=false;btn.textContent='Continue';showAuthErr(error.message);return;}
+}
+
+async function sendReset(){
+  const email=document.getElementById('auth-reset-email').value.trim();
+  if(!email||!email.includes('@')){showAuthErr('Please enter a valid email.');return;}
+  const btn=document.getElementById('auth-reset-submit');
+  btn.disabled=true;btn.textContent='Sending...';
+  hideAuthErr();
+  const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://nexaradash.com/app'});
+  btn.disabled=false;btn.textContent='Send Reset Link';
+  if(error){showAuthErr(error.message);return;}
+  const msg=document.getElementById('auth-reset-msg');
+  msg.textContent='Reset link sent! Check your inbox.';
+  msg.style.display='block';
+}
+
+async function signOut(){
+  await sb.auth.signOut();
+  currentUser=null;tenantId=null;prods=[];pnl={};raws=[];hdrs=[];
+  document.getElementById('auth-screen').classList.add('show');
+  document.getElementById('auth-form-wrap').style.display='block';
+  document.getElementById('auth-forgot-wrap').style.display='none';
+  document.getElementById('auth-email').value='';
+  document.getElementById('auth-password').value='';
+  document.getElementById('auth-submit').disabled=false;
+  document.getElementById('auth-submit').textContent='Continue';
+  hideAuthErr();
+}
+
+async function getProfile(){
+  const{data}=await sb.from('profiles').select('tenant_id').single();
+  if(data){
+    tenantId=data.tenant_id;
+    const{data:tenant}=await sb.from('tenants').select('company_name').eq('id',tenantId).single();
+    if(tenant&&tenant.company_name)companyName=tenant.company_name;
+    applyCompanyName();
+  }
+}
+
+function applyCompanyName(){
+  document.querySelectorAll('[data-company]').forEach(el=>el.textContent=companyName);
+  const inp=document.getElementById('client-company-input');
+  if(inp)inp.value=companyName;
+}
+
+// ══ SUPABASE STORAGE (replaces IndexedDB) ══
+async function savP(){
+  if(!tenantId)return;
+  // Upsert all products for this tenant
+  await sb.from('products').delete().eq('tenant_id',tenantId);
+  if(!prods.length){showSaveBadge();return;}
+  const rows=prods.map(p=>({tenant_id:tenantId,sku:p.sku,name:p.name||p.sku,cost:p.cost||0,ship:p.ship||0,ads:p.ads||0,commission:p.fee||0}));
+  const{error}=await sb.from('products').insert(rows);
+  if(!error)showSaveBadge();
+}
+
+async function loadP(){
+  if(!tenantId)return;
+  const{data}=await sb.from('products').select('*').eq('tenant_id',tenantId);
+  if(data){prods=data.map(p=>({sku:p.sku,name:p.name,cost:p.cost,ship:p.ship,ads:p.ads,fee:p.commission}));}
+  rndProds();
+}
+
+async function savePNL(){
+  if(!tenantId||!Object.keys(pnl).length)return;
+  const payload={tenant_id:tenantId,sku:'__snapshot__',order_date:null,qty:0,revenue:0,fees:0,returns:0,settlement_ref:JSON.stringify({pnl,hdrs,saved:Date.now()})};
+  await sb.from('pnl_data').delete().eq('tenant_id',tenantId).eq('sku','__snapshot__');
+  await sb.from('pnl_data').insert([payload]);
+  showSaveBadge();
+}
+
+async function loadPNL(){
+  if(!tenantId)return;
+  const{data}=await sb.from('pnl_data').select('*').eq('tenant_id',tenantId).eq('sku','__snapshot__').single();
+  if(data&&data.settlement_ref){
+    try{
+      const stored=JSON.parse(data.settlement_ref);
+      if(stored.pnl&&Object.keys(stored.pnl).length){
+        pnl=stored.pnl;hdrs=stored.hdrs||[];
+        recalc();
+        notify('✓ Cloud data restored — '+Object.keys(pnl).length+' SKUs loaded','ok');
+      }
+    }catch(e){}
+  }
+}
+
+// dbClear shim for clrEverything compatibility
+async function dbClear(store){
+  if(!tenantId)return;
+  if(store==='products'){await sb.from('products').delete().eq('tenant_id',tenantId);}
+  if(store==='pnl_data'){await sb.from('pnl_data').delete().eq('tenant_id',tenantId);}
+}
+
+function showSaveBadge(){
+  const b=document.getElementById('save-badge');
+  if(!b)return;
+  b.textContent='💾 Saved';b.style.background='var(--grnl)';b.style.color='var(--grn)';b.style.borderColor='var(--grnbl)';
+  clearTimeout(b._t);
+  b._t=setTimeout(()=>{b.textContent='💾 Auto-saved';},1200);
+}
+
+document.getElementById('ldate').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+document.getElementById('xd').textContent='Report Date: '+new Date().toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'});
+Chart.defaults.color='#94a3b8';
+Chart.defaults.borderColor='rgba(226,231,240,1)';
+Chart.defaults.font.family="'Inter',sans-serif";
+
+// ══ BOOT — Auth gate ══
+(async()=>{
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){
+    currentUser=session.user;
+    await getProfile();
+    await loadP();
+    await loadPNL();
+  } else {
+    document.getElementById('auth-screen').classList.add('show');
+  }
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    if(event==='SIGNED_IN'&&session){
+      currentUser=session.user;
+      document.getElementById('auth-screen').classList.remove('show');
+      await getProfile();
+      await loadP();
+      await loadPNL();
+    }
+    if(event==='SIGNED_OUT'){
+      document.getElementById('auth-screen').classList.add('show');
+    }
+  });
+})();
+
+function toggleSB(){document.getElementById('sb').classList.toggle('col');document.getElementById('mn').classList.toggle('exp');}
+
+function goTab(id,nv,tb){
+  document.querySelectorAll('.pg').forEach(c=>c.classList.remove('act'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('act'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));
+  const el=document.getElementById('pg-'+id);if(el)el.classList.add('act');
+  if(tb)tb.classList.add('act');if(nv)nv.classList.add('act');
+  const tm={dashboard:0,products:1,import:2,report:3,vat:4,charts:5,export:6};
+  const tabs=document.querySelectorAll('.tab');
+  if(tm[id]!=null&&tabs[tm[id]])tabs[tm[id]].classList.add('act');
+  if(id==='charts')setTimeout(rndCharts,80);
+  if(id==='export')updXP();
+  if(id==='vat')calcVAT();
+}
+
+function notify(msg,t='inf'){
+  const n=document.getElementById('nf');
+  const icons={ok:'✓',er:'✕',inf:'ℹ',vt:'🏛'};
+  n.innerHTML=(icons[t]||'ℹ')+' '+msg;
+  n.className='nf '+t+' sh';
+  setTimeout(()=>n.classList.remove('sh'),3200);
+}
+
+function animateVal(el,target,prefix,suffix,dur){
+  const start=performance.now(),from=parseFloat(el.textContent.replace(/[^0-9.-]/g,''))||0;
+  function step(now){
+    const p=Math.min((now-start)/dur,1),ease=1-Math.pow(1-p,3);
+    const cur=from+(target-from)*ease;
+    el.textContent=prefix+cur.toFixed(2)+suffix;
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function setF(m,btn){
+  fMode=m;document.querySelectorAll('.fb2').forEach(b=>b.classList.remove('act'));
+  if(btn)btn.classList.add('act');
+  const now=new Date(),fmt=d=>d.toISOString().split('T')[0];
+  if(m==='today'){dFrom=fmt(now);dTo=fmt(now);}
+  else if(m==='7d'){const d=new Date(now);d.setDate(d.getDate()-7);dFrom=fmt(d);dTo=fmt(now);}
+  else if(m==='30d'){const d=new Date(now);d.setDate(1);dFrom=fmt(d);dTo=fmt(now);}
+  else if(m==='custom'){dFrom=document.getElementById('df').value||null;dTo=document.getElementById('dt2').value||null;}
+  else{dFrom=null;dTo=null;}
+  recalc();
+}
+
+function pDt(v){
+  if(!v)return null;const s=String(v);
+  const m1=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(m1)return new Date(+m1[3],+m1[2]-1,+m1[1]);
+  const m2=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m2)return new Date(+m2[1],+m2[2]-1,+m2[3]);
+  const d=new Date(s);return isNaN(d)?null:d;
+}
+
+function addProd(){
+  const sku=document.getElementById('p-sku').value.trim();
+  const name=document.getElementById('p-name').value.trim();
+  const cost=parseFloat(document.getElementById('p-cost').value)||0;
+  const ship=parseFloat(document.getElementById('p-ship').value)||0;
+  const fee=parseFloat(document.getElementById('p-fee').value)||0;
+  const ads=parseFloat(document.getElementById('p-ads').value)||0;
+  if(!sku||!name){notify('SKU and Name are required','er');return;}
+  if(prods.find(p=>p.sku.toLowerCase()===sku.toLowerCase())){notify('SKU already exists','er');return;}
+  prods.push({sku,name,cost,ship,fee,ads});savP();rndProds();clrPF();notify('Added: '+name,'ok');recalc();
+}
+function delProd(i){prods.splice(i,1);savP();rndProds();recalc();notify('Product removed','ok');}
+function clrPF(){['p-sku','p-name','p-cost','p-ship','p-fee','p-ads'].forEach(id=>document.getElementById(id).value='');}
+
+// ── PRODUCT SUB TABS ──
+function switchPTab(tab){
+  document.getElementById('psec-manual').style.display=tab==='manual'?'block':'none';
+  document.getElementById('psec-bulk').style.display=tab==='bulk'?'block':'none';
+  const mt=document.getElementById('ptab-manual'),bt=document.getElementById('ptab-bulk');
+  if(tab==='manual'){mt.style.borderBottomColor='var(--blu2)';mt.style.color='var(--blu2)';mt.style.fontWeight='600';bt.style.borderBottomColor='transparent';bt.style.color='var(--tx3)';bt.style.fontWeight='500';}
+  else{bt.style.borderBottomColor='var(--blu2)';bt.style.color='var(--blu2)';bt.style.fontWeight='600';mt.style.borderBottomColor='transparent';mt.style.color='var(--tx3)';mt.style.fontWeight='500';}
+}
+
+// ── DOWNLOAD TEMPLATE ──
+function dlTemplate(){
+  const rows=[
+    ['SKU','Product Name','Buying Price','Inbound Shipping Per Unit','Temu Fee %','Monthly Ad Spend'],
+    ['TEM-001','Example Product 1','8.00','1.50','8','5.00'],
+    ['TEM-002','Example Product 2','4.00','1.00','8','3.00'],
+    ['TEM-003','Example Product 3','14.00','2.50','8','7.00'],
+  ];
+  const csv=rows.map(r=>r.map(v=>'"'+String(v)+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='NexaraDash-Product-Template.csv';a.click();
+  notify('Template downloaded — fill it in and upload below','inf');
+}
+
+// ── BULK UPLOAD ──
+let bulkPreview=[];
+function onBulkDrop(e){e.preventDefault();document.getElementById('bulk-uz').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)rdBulk(f);}
+function onBulkFile(e){const f=e.target.files[0];if(f)rdBulk(f);}
+function rdBulk(f){
+  if(!['xlsx','xls','csv'].includes(f.name.split('.').pop().toLowerCase())){notify('Use .xlsx, .xls or .csv','er');return;}
+  notify('Reading product file...','inf');
+  const r=new FileReader();
+  r.onload=e=>{try{
+    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const j=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+    if(j.length<2){notify('File appears empty','er');return;}
+    const hdrs=j[0].map(h=>String(h).toLowerCase().trim());
+    // Auto-detect columns
+    function findCol(keys){return hdrs.findIndex(h=>keys.some(k=>h.includes(k)));}
+    const sc=findCol(['sku','product id','item id']);
+    const nc=findCol(['product name','name','title','description']);
+    const cc=findCol(['buying price','cost','buy price','purchase price','unit price']);
+    const shc=findCol(['shipping','inbound ship','freight']);
+    const fc=findCol(['fee','commission','temu fee']);
+    const ac=findCol(['ad spend','ads','advertising','monthly ad']);
+    if(sc<0||nc<0){notify('Could not find SKU and Name columns. Use the template.','er');return;}
+    bulkPreview=[];
+    j.slice(1).forEach(row=>{
+      const sku=String(row[sc]||'').trim();
+      const name=String(row[nc]||'').trim();
+      if(!sku||!name)return;
+      const cost=cc>=0?parseFloat(row[cc])||0:0;
+      const ship=shc>=0?parseFloat(row[shc])||0:0;
+      const fee=fc>=0?parseFloat(row[fc])||0:0;
+      const ads=ac>=0?parseFloat(row[ac])||0:0;
+      const exists=prods.find(p=>p.sku.toLowerCase()===sku.toLowerCase());
+      bulkPreview.push({sku,name,cost,ship,fee,ads,exists:!!exists});
+    });
+    if(!bulkPreview.length){notify('No valid rows found','er');return;}
+    rndBulkPreview();
+    notify(bulkPreview.length+' products found — review and confirm','ok');
+  }catch(e){notify('Could not read file','er');}};
+  r.readAsArrayBuffer(f);
+}
+
+function rndBulkPreview(){
+  const b=document.getElementById('bulk-body');
+  document.getElementById('bulk-cnt').textContent=bulkPreview.length+' rows';
+  b.innerHTML=bulkPreview.map(p=>`<tr>
+    <td class="tsk">${p.sku}</td>
+    <td>${p.name}</td>
+    <td>£${p.cost.toFixed(2)}</td>
+    <td>£${p.ship.toFixed(2)}</td>
+    <td>${p.fee}%</td>
+    <td>£${p.ads.toFixed(2)}</td>
+    <td>${p.exists?'<span style="color:var(--amb);font-size:11px;font-weight:600;">⚠ Skip (exists)</span>':'<span style="color:var(--grn);font-size:11px;font-weight:600;">✓ New</span>'}</td>
+  </tr>`).join('');
+  const newCount=bulkPreview.filter(p=>!p.exists).length;
+  const skipCount=bulkPreview.filter(p=>p.exists).length;
+  document.getElementById('bulk-ok-t').textContent=newCount+' new products to import · '+skipCount+' duplicates will be skipped';
+  document.getElementById('bulk-preview').style.display='block';
+}
+
+async function confirmBulk(){
+  const replaceAll=document.getElementById('replace-all').checked;
+  const newProds=replaceAll?bulkPreview:bulkPreview.filter(p=>!p.exists);
+  if(!newProds.length){notify('No new products to add','inf');return;}
+  if(replaceAll){
+    if(!confirm('This will DELETE all '+prods.length+' existing products and replace with '+newProds.length+' new ones. Are you sure?'))return;
+    prods=[];
+  }
+  newProds.forEach(p=>prods.push({sku:p.sku,name:p.name,cost:p.cost,ship:p.ship,fee:p.fee,ads:p.ads}));
+  savP();rndProds();recalc();
+  document.getElementById('bulk-preview').style.display='none';
+  document.getElementById('bulk-fi').value='';
+  document.getElementById('replace-all').checked=false;
+  bulkPreview=[];
+  notify('✓ '+newProds.length+' products '+(replaceAll?'replaced':'imported')+' successfully!','ok');
+  switchPTab('manual');
+}
+
+function cancelBulk(){
+  bulkPreview=[];
+  document.getElementById('bulk-preview').style.display='none';
+  document.getElementById('bulk-fi').value='';
+  notify('Bulk import cancelled','inf');
+}
+
+// ── EXPORT PRODUCTS ──
+function expProdsCSV(){
+  if(!prods.length){notify('No products to export','er');return;}
+  const rows=[['SKU','Product Name','Buying Price','Inbound Shipping Per Unit','Temu Fee %','Monthly Ad Spend']];
+  prods.forEach(p=>rows.push([p.sku,p.name,p.cost.toFixed(2),p.ship.toFixed(2),p.fee,p.ads.toFixed(2)]));
+  const csv=rows.map(r=>r.map(v=>'"'+String(v)+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='NexaraDash-Products-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+  notify('Products exported!','ok');
+}
+function rndProds(){
+  const b=document.getElementById('pb');
+  document.getElementById('pc2').textContent=prods.length+' products';
+  if(!prods.length){b.innerHTML='<tr><td colspan="8"><div class="em"><div class="em-i">📦</div><div class="em-t">No products yet. Add your first product above.</div></div></td></tr>';return;}
+  b.innerHTML=prods.map((p,i)=>`<tr><td class="tsk">${p.sku}</td><td class="tnm">${p.name}</td><td>£${p.cost.toFixed(2)}</td><td>£${p.ship.toFixed(2)}</td><td>${p.fee}%</td><td>£${p.ads.toFixed(2)}</td><td style="color:var(--amb);font-weight:600;">£${(p.cost+p.ship).toFixed(2)}</td><td><button class="btn bd bsm" onclick="delProd(${i})">✕</button></td></tr>`).join('');
+}
+
+function onDrop(e){e.preventDefault();document.getElementById('uz').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)rdFile(f);}
+function onFil(e){const f=e.target.files[0];if(f)rdFile(f);}
+function rdFile(f){
+  if(!['xlsx','xls','csv'].includes(f.name.split('.').pop().toLowerCase())){notify('Please use .xlsx, .xls or .csv','er');return;}
+  notify('Reading '+f.name+'...','inf');
+  const r=new FileReader();
+  r.onload=e=>{try{
+    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const j=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+    if(!j.length){notify('File appears empty','er');return;}
+    hdrs=j[0].map(h=>String(h).trim()).filter(h=>h);
+    raws=j.slice(1).filter(r=>r.some(c=>c!==''));
+    bldMap();notify(raws.length+' rows loaded','ok');
+  }catch(e){notify('Could not read file','er');}};
+  r.readAsArrayBuffer(f);
+}
+
+function bldMap(){
+  const fields=[
+    {k:'sku',l:'SKU / Product ID'},
+    {k:'revenue',l:'Subtotal / Net Revenue'},
+    {k:'fees',l:'Service Fee (Platform Commission)'},
+    {k:'shipping',l:'Shipping Fee'},
+    {k:'shipping_tax',l:'Shipping Tax'},
+    {k:'product_tax',l:'Product Tax'},
+    {k:'returns',l:'Refund / Return Amount'},
+    {k:'qty',l:'Quantity / Units'},
+    {k:'date',l:'Order Date'},
+    {k:'txtype',l:'Transaction Type (for refunds)'}
+  ];
+  const pri={
+    sku:['sku id','product sku','sku_id','skuid','sku','product id','item id'],
+    revenue:['subtotal','net amount','net revenue','sale amount','order amount','revenue'],
+    fees:['service fee','commission fee','platform commission','commission','platform fee','temu fee','fee'],
+    shipping:['shipping','ship fee','shipping fee','freight'],
+    shipping_tax:['shipping tax','ship tax'],
+    product_tax:['product tax','item tax'],
+    returns:['refund amount','return amount','refund','return'],
+    qty:['order quantity','units sold','unit sold','quantity','qty','units'],
+    date:['order date','created date','order_date','date','settlement date','date/time'],
+    txtype:['transaction type','type','trans type','order type']
+  };
+  const hl=hdrs.map(h=>h.toLowerCase());
+  function best(k){const kws=pri[k];let bi=-1,bs=999;hl.forEach((h,ci)=>{kws.forEach((kw,ki)=>{if(h===kw&&ki<bs){bs=ki;bi=ci;}});});if(bi===-1)hl.forEach((h,ci)=>{kws.forEach((kw,ki)=>{if(h.includes(kw)&&ki<bs){bs=ki;bi=ci;}});});return bi;}
+  const g=document.getElementById('mpg');
+  g.innerHTML=fields.map(f=>{const m=best(f.k);
+    return`<div class="mr2"><label class="ml">${f.l}${m>=0?' <span class="at">✓ AUTO</span>':''}</label><select class="fi" id="map-${f.k}" style="padding:8px 12px;cursor:pointer;"><option value="-1">— Skip —</option>${hdrs.map((h,i)=>`<option value="${i}"${i===m?' selected':''}>${h}</option>`).join('')}</select></div>`;
+  }).join('');
+  document.getElementById('mpr').classList.add('sh');
+}
+
+function procMap(){
+  const gc=k=>{const el=document.getElementById('map-'+k);return el?parseInt(el.value):-1;};
+  const sc=gc('sku'),rc=gc('revenue'),fc=gc('fees'),xc=gc('returns'),qc=gc('qty'),dc=gc('date');
+  const shc=gc('shipping'),stc=gc('shipping_tax'),ptc=gc('product_tax'),ttc=gc('txtype');
+  if(sc<0||rc<0){notify('SKU and Revenue columns are required','er');return;}
+  pnl={};const rows=[];
+  raws.forEach(row=>{
+    const sku=sc>=0?String(row[sc]||'').trim():'UNK';
+    const txType=ttc>=0?String(row[ttc]||'').trim().toLowerCase():'';
+    const isRefund=txType==='refund'||txType.includes('refund');
+    const rawRev=rc>=0?parseFloat(row[rc])||0:0;
+    const rawFee=fc>=0?parseFloat(row[fc])||0:0;
+    const rawShip=shc>=0?parseFloat(row[shc])||0:0;
+    const rawShipTax=stc>=0?parseFloat(row[stc])||0:0;
+    const rawProdTax=ptc>=0?parseFloat(row[ptc])||0:0;
+    const rawRet=xc>=0?parseFloat(row[xc])||0:0;
+    const qty=qc>=0?Math.abs(parseFloat(row[qc])||1):1;
+    const date=dc>=0?row[dc]:'';
+
+    if(!sku)return;
+
+    // For refund rows: revenue is negative, treat as returns
+    let rev=rawRev,fee=Math.abs(rawFee),ship=Math.abs(rawShip),shipTax=Math.abs(rawShipTax),prodTax=Math.abs(rawProdTax),ret=Math.abs(rawRet);
+    if(isRefund){
+      // Refund row: the negative total is the return value
+      ret=Math.abs(rawRev);rev=0;fee=0;ship=0;
+    }
+    if(rev===0&&ret===0)return;
+
+    // Total deductions from Temu: fee + shipping + shipping tax + product tax
+    const totalFee=fee+ship+shipTax+prodTax;
+
+    if(!pnl[sku])pnl[sku]={sku,revenue:0,fees:0,returns:0,qty:0,orders:0,dates:[],shipping:0,taxes:0};
+    pnl[sku].revenue+=rev;
+    pnl[sku].fees+=fee;
+    pnl[sku].shipping+=ship+shipTax;
+    pnl[sku].taxes+=prodTax;
+    pnl[sku].returns+=ret;
+    pnl[sku].qty+=isRefund?0:qty;
+    pnl[sku].orders++;
+    pnl[sku].dates.push({date,rev});
+    rows.push({sku,rev,fee:totalFee,ship,ret,qty,date,isRefund});
+  });
+  // ── Auto-register new SKUs from uploaded file ──
+  let autoAdded=0;
+  Object.keys(pnl).forEach(sku=>{
+    const exists=prods.find(p=>p.sku.trim().toLowerCase()===sku.trim().toLowerCase());
+    if(!exists){
+      // Try to get product name from the raw data (SKU column full name if available)
+      const nameCol=hdrs.findIndex(h=>h.toLowerCase().includes('product name')||h.toLowerCase().includes('title')||h.toLowerCase().includes('item name'));
+      let guessedName=sku;
+      if(nameCol>=0){
+        const matchRow=raws.find(r=>String(r[parseInt(document.getElementById('map-sku').value)]||'').trim()===sku);
+        if(matchRow)guessedName=String(matchRow[nameCol]||sku).trim().substring(0,60);
+      }
+      prods.push({sku,name:guessedName,cost:0,ship:0,fee:0,ads:0,autoAdded:true});
+      autoAdded++;
+    }
+  });
+  if(autoAdded>0){savP();rndProds();notify(autoAdded+' new SKUs auto-registered — add COGS to calculate profit','inf');}
+
+  document.getElementById('imp-th').innerHTML='<th>SKU</th><th>Revenue</th><th>Temu Fee</th><th>Shipping</th><th>Returns</th><th>Qty</th><th>Date</th>';
+  document.getElementById('imp-tb').innerHTML=rows.slice(0,300).map(r=>`<tr><td class="tsk">${r.sku}</td><td>£${r.rev.toFixed(2)}</td><td class="tn2">£${r.fee.toFixed(2)}</td><td class="tn2">£${r.ship.toFixed(2)}</td><td class="tw2">£${r.ret.toFixed(2)}</td><td>${r.qty}</td><td style="color:var(--tx3)">${r.date}</td></tr>`).join('');
+  document.getElementById('imp-cnt').textContent=rows.length+' rows';
+  document.getElementById('imp-tw').style.display='block';
+  const totRev=Object.values(pnl).reduce((a,d)=>a+d.revenue,0);
+  document.getElementById('imp-ok-t').textContent=rows.length+' orders imported · Revenue: £'+totRev.toFixed(2)+' · Data saved to browser';
+  document.getElementById('imp-ok').classList.add('sh');
+  recalc();
+  savePNL();
+  notify('P&L calculated & saved!','ok');
+}
+
+// resetUp defined below in clrAll section
+
+function getFilt(){
+  if(!dFrom&&!dTo)return pnl;
+  const fd=dFrom?new Date(dFrom):null,td=dTo?new Date(dTo):null;
+  if(td)td.setHours(23,59,59);
+  const out={};
+  Object.values(pnl).forEach(d=>{
+    const fd2=d.dates.filter(e=>{const dt=pDt(e.date);if(!dt)return true;if(fd&&dt<fd)return false;if(td&&dt>td)return false;return true;});
+    if(!fd2.length)return;
+    const ratio=fd2.length/d.dates.length;
+    out[d.sku]={...d,revenue:d.revenue*ratio,fees:d.fees*ratio,returns:d.returns*ratio,qty:Math.round(d.qty*ratio),orders:fd2.length,dates:fd2};
+  });
+  return out;
+}
+
+function recalc(){
+  const data=getFilt(),skus=Object.values(data);
+  let rv=0,fe=0,rt=0,cg=0,sh=0,tsh=0,ad=0,od=0,mt=0;
+  skus.forEach(d=>{const p=prods.find(p=>p.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());rv+=d.revenue;fe+=d.fees;rt+=d.returns;od+=d.orders;tsh+=(d.shipping||0);if(p){mt++;cg+=p.cost*d.qty;sh+=p.ship*d.qty;ad+=p.ads;}});
+  ad+=mAds;const tc=cg+sh+ad+fe+rt+mOth+tsh,nr=rv-fe-rt-tsh,np=rv-tc,mg=rv>0?(np/rv*100):0,gm=rv>0?(nr/rv*100):0;
+  const f=n=>'£'+n.toFixed(2),fp=n=>n.toFixed(1)+'%';
+  const kp=document.getElementById('k-pf'),km=document.getElementById('k-mg');
+  animateVal(document.getElementById('k-rv'),rv,'£','',500);
+  animateVal(kp,np,'£','',500);kp.className='kv '+(np>=0?'pos':'neg');
+  animateVal(document.getElementById('k-ct'),tc,'£','',500);
+  animateVal(km,mg,'','%',500);km.className='kv '+(mg>=0?'pos':'neg');
+  // Refund card
+  const kr=document.getElementById('k-rf'),krs=document.getElementById('k-rf-s');
+  animateVal(kr,rt,'£','',500);
+  const rfRate=rv>0?(rt/rv*100):0;
+  krs.textContent=rfRate.toFixed(1)+'% refund rate';
+  kr.className='kv '+(rfRate>5?'neg':rfRate>2?'tw2':'');
+  document.getElementById('k-rv-s').textContent=od+' orders processed';
+  document.getElementById('sr-rv').textContent=f(rv);document.getElementById('sr-fe').textContent=f(fe);
+  document.getElementById('sr-rt').textContent=f(rt);document.getElementById('sr-nr').textContent=f(nr);
+  document.getElementById('sr-cg').textContent=f(cg);document.getElementById('sr-sh').textContent=f(sh+tsh);
+  document.getElementById('sr-ad').textContent=f(ad);document.getElementById('sr-tc').textContent=f(tc);
+  document.getElementById('sr-od').textContent=od;document.getElementById('sr-pm').textContent=mt+' / '+skus.length;
+  document.getElementById('sr-gm').textContent=fp(gm);document.getElementById('sr-np').textContent=f(np);
+  const unm=skus.filter(d=>!prods.find(p=>p.sku.trim().toLowerCase()===d.sku.trim().toLowerCase())).map(d=>d.sku);
+  const sw=document.getElementById('sw2');
+  if(unm.length){sw.textContent='⚠️ '+unm.length+' SKU(s) need COGS — hover the COGS cell in P&L to enter cost: '+unm.join(', ');sw.classList.add('sh');}else sw.classList.remove('sh');
+  rndSKU(data);updXP(rv,np,tc,mg);
+}
+
+function rndSKU(data){
+  const b=document.getElementById('sk-b'),skus=Object.values(data);
+  document.getElementById('sk-cnt').textContent=skus.length+' SKUs';
+  if(!skus.length){b.innerHTML='<tr><td colspan="13"><div class="em"><div class="em-i">📈</div><div class="em-t">Import sales data to see your P&L report</div></div></td></tr>';return;}
+  const rows=skus.map(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
+    const cg=p?p.cost*d.qty:0,sh=p?p.ship*d.qty:0,ad=p?p.ads:0,tsh=d.shipping||0,nm=p?(p.autoAdded&&p.cost===0?'⚠️ '+p.name:p.name):'⚠️ Not in products';
+    const hasCOGS=p&&p.cost>0;
+    const np=d.revenue-d.fees-d.returns-cg-sh-ad-tsh,mg=d.revenue>0?(np/d.revenue*100):0;
+    const refundRate=d.orders>0?(d.returns/d.revenue*100):0;
+    return{d,cg,sh,ad,nm,np,mg,hasCOGS,p,tsh,refundRate};}).sort((a,b)=>b.np-a.np);
+
+  // Top performer badge
+  const topSKU=rows[0]&&rows[0].np>0?rows[0].d.sku:null;
+
+  b.innerHTML=rows.map((r,i)=>{
+    const rkc=i===0?'r1':i===1?'r2':i===2?'r3':'rn',pc=r.np>=0?'tp':'tn2';
+    const mgColor=r.mg>=20?'var(--grn)':r.mg>=0?'var(--amb)':'var(--red)';
+    const cogsCell=r.hasCOGS
+      ? `<td class="tn2 cogs-cell" data-sku="${r.d.sku}" title="Click to edit COGS">£${r.cg.toFixed(2)}</td>`
+      : `<td class="tw2 cogs-cell cogs-missing" data-sku="${r.d.sku}" title="Click to enter your cost of goods">✏️ Enter COGS</td>`;
+    const refundBadge=r.refundRate>5?`<span style="font-size:9px;background:var(--redl);color:var(--red);border:1px solid var(--redbl);padding:1px 5px;border-radius:4px;margin-left:4px;">${r.refundRate.toFixed(1)}% ret</span>`:'';
+    const topBadge=r.d.sku===topSKU?`<span style="font-size:9px;background:var(--grnl);color:var(--grn);border:1px solid var(--grnbl);padding:1px 5px;border-radius:4px;margin-left:4px;">⭐ Top</span>`:'';
+    return`<tr><td><span class="rk ${rkc}">${i+1}</span></td><td class="tsk">${r.d.sku}${topBadge}</td><td class="tnm" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;">${r.nm}${refundBadge}</td><td>${r.d.qty}</td><td>£${r.d.revenue.toFixed(2)}</td>${cogsCell}<td class="tn2">£${r.d.fees.toFixed(2)}</td><td class="tn2">£${(r.tsh).toFixed(2)}</td><td class="tn2">£${r.sh.toFixed(2)}</td><td class="tn2">£${r.ad.toFixed(2)}</td><td class="tw2">£${r.d.returns.toFixed(2)}</td><td class="${pc}">£${r.np.toFixed(2)}</td><td style="color:${mgColor};font-weight:700;">${r.mg.toFixed(1)}%</td></tr>`;
+  }).join('');
+
+  // COGS inline edit — click handler
+  b.querySelectorAll('.cogs-cell').forEach(cell=>{
+    cell.style.cursor='pointer';
+    cell.addEventListener('click',function(){
+      const sku=this.getAttribute('data-sku');
+      const p=prods.find(pr=>pr.sku.trim().toLowerCase()===sku.trim().toLowerCase());
+      const currentCost=p?p.cost:0;
+      const input=document.createElement('input');
+      input.type='number';input.step='0.01';input.min='0';
+      input.value=currentCost>0?currentCost.toFixed(2):'';
+      input.placeholder='Enter unit cost £';
+      input.style.cssText='width:110px;padding:4px 8px;border:2px solid var(--blu2);border-radius:6px;font-size:12px;font-family:var(--fd);background:#fff;color:var(--tx);';
+      this.innerHTML='';this.appendChild(input);input.focus();input.select();
+      const save=()=>{
+        const val=parseFloat(input.value)||0;
+        if(p){p.cost=val;}else{prods.push({sku,name:sku,cost:val,ship:0,fee:0,ads:0});}
+        savP();rndProds();recalc();notify('COGS updated for '+sku,'ok');
+      };
+      input.addEventListener('keydown',e=>{if(e.key==='Enter')save();if(e.key==='Escape')recalc();});
+      input.addEventListener('blur',save);
+    });
+  });
+}
+
+function applyMan(){mAds=parseFloat(document.getElementById('man-ads').value)||0;mOth=parseFloat(document.getElementById('man-oth').value)||0;recalc();notify('Adjustments applied','ok');}
+
+// ══ VAT ENGINE ══
+function calcVAT(){
+  const data=getFilt(),skus=Object.values(data);
+  const vatRateOut=(parseFloat(document.getElementById('vat-rate').value)||20)/100;
+  const vatRateIn=(parseFloat(document.getElementById('vat-rate-in').value)||20)/100;
+  let rv=0,cg=0,sh=0;
+  skus.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());rv+=d.revenue;if(p){cg+=p.cost*d.qty;sh+=p.ship*d.qty;}});
+
+  // VAT calculations
+  const vatOut=rv*(vatRateOut/(1+vatRateOut)); // VAT extracted from gross revenue
+  const netSales=rv-vatOut;                    // Net sales ex-VAT
+  const purchases=cg+sh+mOth;
+  const vatIn=purchases*(vatRateIn/(1+vatRateIn)); // VAT reclaimed on purchases
+  const netPurchases=purchases-vatIn;
+  const vatPayable=vatOut-vatIn;
+  const effRate=rv>0?(vatOut/rv*100):0;
+
+  const f=n=>'£'+Math.abs(n).toFixed(2);
+  document.getElementById('vat-out').textContent=f(vatOut);
+  document.getElementById('vat-in').textContent=f(vatIn);
+  document.getElementById('vat-pay').textContent=f(vatPayable);
+  document.getElementById('vat-net').textContent=f(netSales);
+  document.getElementById('box1').textContent=f(vatOut);
+  document.getElementById('box4').textContent=f(vatIn);
+  document.getElementById('box5').textContent=f(vatPayable);
+  document.getElementById('box6').textContent=f(netSales);
+  document.getElementById('box7').textContent=f(netPurchases);
+  document.getElementById('vat-eff').textContent=effRate.toFixed(1)+'%';
+
+  // SKU VAT breakdown
+  const vr=document.getElementById('vat-rows');
+  if(!skus.length){vr.innerHTML='<div class="vtr"><div class="vtc" style="color:var(--tx3);font-size:12px;">Import sales data and click Calculate VAT to see breakdown</div><div class="vtc"></div><div class="vtc"></div><div class="vtc"></div></div>';return;}
+  vr.innerHTML=skus.map(d=>{
+    const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
+    const nm=p?p.name:d.sku;
+    const vat=d.revenue*(vatRateOut/(1+vatRateOut));
+    const net=d.revenue-vat;
+    return`<div class="vtr"><div class="vtc"><span style="font-weight:600;color:var(--vat)">${d.sku}</span><br><span style="font-size:10px;color:var(--tx3)">${nm}</span></div><div class="vtc">£${d.revenue.toFixed(2)}</div><div class="vtc" style="color:var(--vat);font-weight:600;">£${vat.toFixed(2)}</div><div class="vtc">£${net.toFixed(2)}</div></div>`;
+  }).join('');
+
+  if(rv>0)notify('Tax calculated · Payable: £'+vatPayable.toFixed(2),'vt');
+  else notify('Add sales data first to calculate VAT','inf');
+}
+
+// ══ VAT PDF ══
+function expVATPDF(){
+  const{jsPDF}=window.jspdf;if(!jsPDF){notify('PDF library loading, retry','er');return;}
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const vatRateOut=(parseFloat(document.getElementById('vat-rate').value)||20)/100;
+  const vatRateIn=(parseFloat(document.getElementById('vat-rate-in').value)||20)/100;
+  const data=getFilt(),skus=Object.values(data);
+  let rv=0,cg=0,sh=0;
+  skus.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());rv+=d.revenue;if(p){cg+=p.cost*d.qty;sh+=p.ship*d.qty;}});
+  const vatOut=rv*(vatRateOut/(1+vatRateOut));
+  const netSales=rv-vatOut;
+  const purchases=cg+sh+mOth;
+  const vatIn=purchases*(vatRateIn/(1+vatRateIn));
+  const vatPayable=vatOut-vatIn;
+  const quarter=document.getElementById('vat-quarter').value;
+  const today=new Date().toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'});
+
+  // Header
+  doc.setFillColor(15,32,68);doc.rect(0,0,210,44,'F');
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text(companyName,14,17);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(200,210,230);
+  doc.text('Tax Return Summary · '+quarter+' · Generated by NexaraDash',14,25);
+  doc.text('Report Date: '+today,14,32);
+  doc.setTextColor(160,190,220);doc.text('nexaradash.com',196,32,'right');
+
+  // VAT boxes
+  let y=52;
+  doc.setFillColor(245,243,255);doc.rect(14,y,182,8,'F');
+  doc.setTextColor(124,58,237);doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text('TAX RETURN — BOX REFERENCE',16,y+5.5);y+=14;
+
+  const boxes=[
+    ['Box 1','VAT due on sales (Output Tax)','£'+vatOut.toFixed(2),[124,58,237]],
+    ['Box 4','VAT reclaimed on purchases (Input Tax)','£'+vatIn.toFixed(2),[5,150,105]],
+    ['Box 5','Net Tax Payable','£'+vatPayable.toFixed(2),[15,32,68]],
+    ['Box 6','Total value of sales ex-VAT','£'+netSales.toFixed(2),[37,99,235]],
+    ['Box 7','Total value of purchases ex-VAT','£'+(purchases-vatIn).toFixed(2),[37,99,235]],
+  ];
+
+  boxes.forEach((box,i)=>{
+    const isKey=i===2;
+    if(isKey){doc.setFillColor(15,32,68);}else{doc.setFillColor(i%2===0?248:255,i%2===0?250:255,i%2===0?255:255);}
+    doc.rect(14,y-3,182,10,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(9);
+    if(isKey){doc.setTextColor(255,255,255);}else{doc.setTextColor(...box[3]);}
+    doc.text(box[0],18,y+3.5);
+    doc.setFont('helvetica','normal');
+    if(isKey){doc.setTextColor(200,210,240);}else{doc.setTextColor(50,60,80);}
+    doc.text(box[1],40,y+3.5);
+    doc.setFont('helvetica','bold');
+    if(isKey){doc.setTextColor(255,255,255);}else{doc.setTextColor(...box[3]);}
+    doc.text(box[2],196,y+3.5,'right');
+    y+=13;
+  });
+
+  // SKU breakdown
+  y+=6;
+  doc.setFillColor(245,243,255);doc.rect(14,y,182,8,'F');
+  doc.setTextColor(124,58,237);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.text('VAT BREAKDOWN BY SKU',16,y+5.5);y+=14;
+  const cols=['SKU','Product','Gross Revenue','VAT Element','Net ex-VAT'],cw=[22,60,30,30,30];
+  doc.setFillColor(237,233,254);doc.rect(14,y-3,182,8,'F');
+  doc.setFontSize(7.5);doc.setTextColor(100,70,180);let cx=16;
+  cols.forEach((c,i)=>{doc.text(c,cx,y+2.5);cx+=cw[i];});y+=10;
+  skus.forEach((d,ri)=>{
+    if(y>274){doc.addPage();y=20;}
+    const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
+    const nm=p?p.name.substring(0,35):'-';
+    const vat=d.revenue*(vatRateOut/(1+vatRateOut));
+    const net=d.revenue-vat;
+    if(ri%2===0){doc.setFillColor(250,248,255);doc.rect(14,y-3,182,8,'F');}
+    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(50,60,80);
+    cx=16;[d.sku,nm,'£'+d.revenue.toFixed(2),'£'+vat.toFixed(2),'£'+net.toFixed(2)].forEach((v,i)=>{doc.text(String(v),cx,y+2);cx+=cw[i];});
+    y+=9;
+  });
+
+  // Footer
+  const pg=doc.internal.getNumberOfPages();
+  for(let i=1;i<=pg;i++){doc.setPage(i);doc.setFillColor(15,32,68);doc.rect(0,286,210,12,'F');doc.setFontSize(7);doc.setTextColor(160,190,220);doc.text('Powered by NexaraDash · nexaradash.com · info@nexaradash.com · Confidential',14,293);doc.text('Page '+i+' of '+pg,196,293,'right');}
+  doc.save((companyName.replace(/[^a-zA-Z0-9]/g,'')||'NexaraDash')+'-VAT-Return-'+new Date().toISOString().split('T')[0]+'.pdf');
+  notify('VAT Report downloaded!','vt');
+}
+
+// ══ CHARTS ══
+function dCh(id){if(CH[id]){CH[id].destroy();delete CH[id];}}
+function rndCharts(){
+  const data=getFilt(),skus=Object.values(data);
+  const empty=id=>{dCh(id);const c=document.getElementById(id);if(!c)return;const x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);x.fillStyle='#cbd5e1';x.font='13px Inter';x.textAlign='center';x.fillText('Import sales data to see charts',c.width/2,c.height/2);};
+  if(!skus.length){['ch-ov','ch-sk','ch-cs','ch-mg','ch-tr','ch-mo','ch-un','ch-rf','ch-roi'].forEach(empty);return;}
+  let rv=0,fe=0,rt=0,cg=0,sh=0,ad=0;
+  skus.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());rv+=d.revenue;fe+=d.fees;rt+=d.returns;if(p){cg+=p.cost*d.qty;sh+=p.ship*d.qty;ad+=p.ads;}});
+  ad+=mAds;const tc=cg+sh+ad+fe+rt,np=rv-tc;
+  const gridColor='rgba(226,231,240,1)';
+  const opt={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:gridColor},ticks:{color:'#94a3b8',font:{size:11}}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:11}}}}};
+  dCh('ch-ov');CH['ch-ov']=new Chart(document.getElementById('ch-ov'),{type:'bar',data:{labels:['Revenue','Total Costs','Net Profit'],datasets:[{data:[rv,tc,np],backgroundColor:['#dbeafe','#fee2e2',np>=0?'#d1fae5':'#fee2e2'],borderColor:['#2563eb','#dc2626',np>=0?'#059669':'#dc2626'],borderWidth:2,borderRadius:6,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'£'+c.raw.toFixed(2)}}}}});
+  const sl=skus.map(d=>d.sku),sp=skus.map(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const c=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0;return d.revenue-d.fees-d.returns-c-s-a;});
+  dCh('ch-sk');CH['ch-sk']=new Chart(document.getElementById('ch-sk'),{type:'bar',data:{labels:sl,datasets:[{data:sp,backgroundColor:sp.map(v=>v>=0?'#d1fae5':'#fee2e2'),borderColor:sp.map(v=>v>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'£'+c.raw.toFixed(2)}}}}});
+  dCh('ch-cs');CH['ch-cs']=new Chart(document.getElementById('ch-cs'),{type:'doughnut',data:{labels:['COGS','Temu Fees','Shipping','Ad Spend','Returns'],datasets:[{data:[cg,fe,sh,ad,rt],backgroundColor:['#dbeafe','#fee2e2','#ede9fe','#fef3c7','#ffedd5'],borderColor:['#2563eb','#dc2626','#7c3aed','#d97706','#ea580c'],borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11},color:'#64748b'}},tooltip:{callbacks:{label:c=>'£'+c.raw.toFixed(2)}}},cutout:'65%'}});
+  const sm=skus.map(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const c=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0,n=d.revenue-d.fees-d.returns-c-s-a;return d.revenue>0?(n/d.revenue*100):0;});
+  dCh('ch-mg');CH['ch-mg']=new Chart(document.getElementById('ch-mg'),{type:'bar',data:{labels:sl,datasets:[{data:sm,backgroundColor:sm.map(v=>v>=0?'#d1fae5':'#fee2e2'),borderColor:sm.map(v=>v>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8'}}}}});
+  const dm={};skus.forEach(d=>{d.dates.forEach(e=>{const dt=pDt(e.date);if(!dt)return;const k=dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});dm[k]=(dm[k]||0)+e.rev;});});
+  const mons=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const sd=Object.keys(dm).sort((a,b)=>{const pa=a.split(' '),pb=b.split(' ');return(mons.indexOf(pa[1])*31+parseInt(pa[0]))-(mons.indexOf(pb[1])*31+parseInt(pb[0]));});
+  dCh('ch-tr');
+  const grd=document.getElementById('ch-tr').getContext('2d');
+  const grad=grd.createLinearGradient(0,0,0,280);grad.addColorStop(0,'rgba(37,99,235,0.15)');grad.addColorStop(1,'rgba(37,99,235,0)');
+  CH['ch-tr']=new Chart(document.getElementById('ch-tr'),{type:'line',data:{labels:sd,datasets:[{label:'Revenue',data:sd.map(k=>dm[k]),borderColor:'#2563eb',backgroundColor:grad,fill:true,tension:0.4,pointBackgroundColor:'#2563eb',pointRadius:4,pointHoverRadius:7,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'£'+c.raw.toFixed(2)}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>'£'+v.toFixed(0),color:'#94a3b8'}},x:{grid:{display:false},ticks:{maxTicksLimit:14,color:'#94a3b8'}}}}});
+
+  // ── Chart A: Monthly Revenue vs Profit ──
+  const mm={};
+  skus.forEach(d=>{
+    const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
+    d.dates.forEach(e=>{
+      const dt=pDt(e.date);if(!dt)return;
+      const k=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+      if(!mm[k])mm[k]={rv:0,np:0};
+      const unitShare=d.qty>0?e.qty/d.qty:0;
+      const unitRev=e.rev||0;
+      const unitFee=d.fees*unitShare,unitRet=d.returns*unitShare;
+      const unitCog=p?(p.cost+p.ship)*unitShare*d.qty/Math.max(d.qty,1):0;
+      const unitAds=p?p.ads/Math.max(Object.keys(mm).length||1,1):0;
+      mm[k].rv+=unitRev;
+      mm[k].np+=unitRev-unitFee-unitRet-unitCog-unitAds;
+    });
+  });
+  const mkeys=Object.keys(mm).sort();
+  dCh('ch-mo');
+  const moCtx=document.getElementById('ch-mo').getContext('2d');
+  const gradMo=moCtx.createLinearGradient(0,0,0,240);gradMo.addColorStop(0,'rgba(37,99,235,0.12)');gradMo.addColorStop(1,'rgba(37,99,235,0)');
+  const gradPf=moCtx.createLinearGradient(0,0,0,240);gradPf.addColorStop(0,'rgba(5,150,105,0.12)');gradPf.addColorStop(1,'rgba(5,150,105,0)');
+  CH['ch-mo']=new Chart(document.getElementById('ch-mo'),{type:'line',data:{labels:mkeys,datasets:[{label:'Revenue',data:mkeys.map(k=>mm[k].rv),borderColor:'#2563eb',backgroundColor:gradMo,fill:true,tension:0.4,pointBackgroundColor:'#2563eb',pointRadius:4,pointHoverRadius:7,borderWidth:2.5},{label:'Profit',data:mkeys.map(k=>mm[k].np),borderColor:'#059669',backgroundColor:gradPf,fill:true,tension:0.4,pointBackgroundColor:'#059669',pointRadius:4,pointHoverRadius:7,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:11},color:'#64748b'}},tooltip:{callbacks:{label:c=>'£'+c.raw.toFixed(2)}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>'£'+v.toFixed(0),color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8'}}}}});
+
+  // ── Chart E: Top SKUs by Units Sold ──
+  const byUnits=[...skus].sort((a,b)=>b.qty-a.qty).slice(0,10);
+  dCh('ch-un');
+  CH['ch-un']=new Chart(document.getElementById('ch-un'),{type:'bar',data:{labels:byUnits.map(d=>d.sku),datasets:[{label:'Units',data:byUnits.map(d=>d.qty),backgroundColor:'#dbeafe',borderColor:'#2563eb',borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+' units'}}},scales:{x:{grid:{color:gridColor},ticks:{color:'#94a3b8'}},y:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
+
+  // ── Chart F: Refund Rate per SKU ──
+  const rfData=skus.map(d=>({sku:d.sku,rate:d.revenue>0?(d.returns/d.revenue*100):0})).filter(d=>d.rate>0).sort((a,b)=>b.rate-a.rate).slice(0,15);
+  dCh('ch-rf');
+  if(rfData.length){
+    CH['ch-rf']=new Chart(document.getElementById('ch-rf'),{type:'bar',data:{labels:rfData.map(d=>d.sku),datasets:[{label:'Refund Rate',data:rfData.map(d=>d.rate),backgroundColor:rfData.map(d=>d.rate>10?'#fee2e2':'#fef3c7'),borderColor:rfData.map(d=>d.rate>10?'#dc2626':'#d97706'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v.toFixed(0)+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
+  }else{
+    const c=document.getElementById('ch-rf');const x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);x.fillStyle='#cbd5e1';x.font='13px Inter';x.textAlign='center';x.fillText('No refunds recorded',c.width/2,c.height/2);
+  }
+
+  // ── Chart H: ROI per SKU ──
+  const roiData=skus.map(d=>{
+    const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
+    const cg=p?p.cost*d.qty:0,sh2=p?p.ship*d.qty:0,ad2=p?p.ads:0;
+    const cost=cg+sh2+ad2+d.fees+d.returns;
+    const profit=d.revenue-cost;
+    const roi=cost>0?(profit/cost*100):null;
+    return{sku:d.sku,roi};
+  }).filter(d=>d.roi!==null).sort((a,b)=>b.roi-a.roi).slice(0,15);
+  dCh('ch-roi');
+  CH['ch-roi']=new Chart(document.getElementById('ch-roi'),{type:'bar',data:{labels:roiData.map(d=>d.sku),datasets:[{label:'ROI %',data:roiData.map(d=>d.roi),backgroundColor:roiData.map(d=>d.roi>=0?'#d1fae5':'#fee2e2'),borderColor:roiData.map(d=>d.roi>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v.toFixed(0)+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
+}
+
+function updXP(rv,np,tc,mg){
+  if(rv===undefined){const d=getFilt(),s=Object.values(d);let r=0,f=0,rt=0,c=0,sh=0,a=0;s.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());r+=d.revenue;f+=d.fees;rt+=d.returns;if(p){c+=p.cost*d.qty;sh+=p.ship*d.qty;a+=p.ads;}});a+=mAds;const t=c+sh+a+f+rt;rv=r;np=r-t;tc=t;mg=r>0?((r-t)/r*100):0;}
+  document.getElementById('xp-rv').textContent='£'+(rv||0).toFixed(2);
+  const pv=document.getElementById('xp-pf');pv.textContent='£'+(np||0).toFixed(2);pv.style.color=(np||0)>=0?'var(--grn)':'var(--red)';
+  document.getElementById('xp-ct').textContent='£'+(tc||0).toFixed(2);
+  document.getElementById('xp-mg').textContent=(mg||0).toFixed(1)+'%';
+}
+
+// ══ PDF EXPORT ══
+function expPDF(){
+  const{jsPDF}=window.jspdf;if(!jsPDF){notify('PDF library loading, retry','er');return;}
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const data=getFilt(),skus=Object.values(data);
+  let rv=0,fe=0,rt=0,cg=0,sh=0,ad=0,od=0;
+  skus.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());rv+=d.revenue;fe+=d.fees;rt+=d.returns;od+=d.orders;if(p){cg+=p.cost*d.qty;sh+=p.ship*d.qty;ad+=p.ads;}});
+  ad+=mAds;const tc=cg+sh+ad+fe+rt+mOth,np=rv-tc,mg=rv>0?(np/rv*100):0;
+  const vatRateOut=(parseFloat(document.getElementById('vat-rate').value)||20)/100;
+  const vatOut=rv*(vatRateOut/(1+vatRateOut));
+  const f=n=>'GBP '+n.toFixed(2),today=new Date().toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'});
+
+  doc.setFillColor(15,32,68);doc.rect(0,0,210,44,'F');
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text(companyName,14,17);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(180,200,230);
+  doc.text('Temu P&L Report · Generated by NexaraDash · nexaradash.com · info@nexaradash.com',14,25);
+  doc.text('Report Date: '+today+' · Orders: '+od,14,32);
+
+  const kpis=[[f(rv),'REVENUE',[37,99,235]],[f(np),'NET PROFIT',np>=0?[5,150,105]:[220,38,38]],[f(tc),'TOTAL COSTS',[220,38,38]],[mg.toFixed(1)+'%','MARGIN',[217,119,6]]];
+  kpis.forEach((k,i)=>{const x=14+i*47,y=52;doc.setFillColor(240,244,255);doc.roundedRect(x,y,44,22,2,2,'F');doc.setFontSize(7);doc.setTextColor(100,116,139);doc.setFont('helvetica','bold');doc.text(k[1],x+4,y+7);doc.setTextColor(...k[2]);doc.setFontSize(11);doc.text(k[0],x+4,y+16);});
+
+  let y=84;
+  doc.setFillColor(15,32,68);doc.rect(14,y,182,7,'F');doc.setTextColor(180,200,255);doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text('P&L SUMMARY',16,y+5);y+=10;
+  [['Gross Revenue',f(rv)],['— Temu Platform Fees','('+f(fe)+')'],['— Returns / Refunds','('+f(rt)+')'],['— Product Cost (COGS)','('+f(cg)+')'],['— Inbound Shipping','('+f(sh)+')'],['— Ad Spend','('+f(ad)+')'],['= NET PROFIT',f(np)],['VAT Liability (est.)',f(vatOut)]].forEach((row,i)=>{
+    if(i%2===0){doc.setFillColor(248,250,255);doc.rect(14,y-3,182,7,'F');}
+    const isT=i===6;doc.setFont('helvetica',isT?'bold':'normal');doc.setFontSize(9);
+    doc.setTextColor(isT?(np>=0?5:220):80,isT?(np>=0?150:38):90,isT?(np>=0?105:38):120);
+    doc.text(row[0],18,y+2);doc.text(row[1],196,y+2,'right');y+=8;
+  });
+
+  y+=8;doc.setFillColor(15,32,68);doc.rect(14,y,182,7,'F');doc.setTextColor(180,200,255);doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text('SKU PROFITABILITY',16,y+5);y+=10;
+  const cols=['SKU','Units','Revenue','COGS','Fees','Net Profit','Margin'],cw=[30,14,28,25,22,28,20];
+  doc.setFillColor(240,244,255);doc.rect(14,y-3,182,7,'F');doc.setFontSize(7);doc.setTextColor(100,116,139);let cx=16;
+  cols.forEach((c,i)=>{doc.text(c,cx,y+2);cx+=cw[i];});y+=8;
+  skus.sort((a,b)=>b.revenue-a.revenue).forEach((d,ri)=>{
+    if(y>272){doc.addPage();y=20;}
+    const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
+    const dc=p?p.cost*d.qty:0,ds=p?p.ship*d.qty:0,da=p?p.ads:0,dn=d.revenue-d.fees-d.returns-dc-ds-da,dm=d.revenue>0?(dn/d.revenue*100):0;
+    if(ri%2===0){doc.setFillColor(248,250,255);doc.rect(14,y-3,182,7,'F');}
+    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(55,67,101);
+    cx=16;[d.sku,d.qty,f(d.revenue),f(dc),f(d.fees),f(dn),dm.toFixed(1)+'%'].forEach((v,i)=>{doc.text(String(v),cx,y+2);cx+=cw[i];});y+=8;
+  });
+
+  const pg=doc.internal.getNumberOfPages();
+  for(let i=1;i<=pg;i++){doc.setPage(i);doc.setFillColor(15,32,68);doc.rect(0,286,210,12,'F');doc.setFontSize(7);doc.setTextColor(160,180,220);doc.text('Powered by NexaraDash · nexaradash.com · info@nexaradash.com · Confidential',14,293);doc.text('Page '+i+' of '+pg,196,293,'right');}
+  doc.save((companyName.replace(/[^a-zA-Z0-9]/g,'')||'NexaraDash')+'-PnL-'+new Date().toISOString().split('T')[0]+'.pdf');
+  notify('PDF downloaded!','ok');
+}
+
+function expCSV(){
+  const data=getFilt(),skus=Object.values(data);
+  if(!skus.length){notify('No data to export','er');return;}
+  const rows=[['SKU','Product','Units','Revenue GBP','Temu Fees','Returns','COGS','Shipping','Ad Spend','Net Profit','Margin %']];
+  skus.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const c=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0,np=d.revenue-d.fees-d.returns-c-s-a,mg=d.revenue>0?(np/d.revenue*100):0;rows.push([d.sku,p?p.name:'Unknown',d.qty,d.revenue.toFixed(2),d.fees.toFixed(2),d.returns.toFixed(2),c.toFixed(2),s.toFixed(2),a.toFixed(2),np.toFixed(2),mg.toFixed(1)+'%']);});
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=(companyName.replace(/[^a-zA-Z0-9]/g,'')||'NexaraDash')+'-PnL-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+  notify('CSV downloaded!','ok');
+}
+
+function clrAll(){
+  if(!prods.length){notify('No products to clear','inf');return;}
+  if(confirm('Delete all '+prods.length+' products? This cannot be undone.')){
+    prods=[];savP();rndProds();recalc();
+    notify('All products cleared','ok');
+  }
+}
+
+async function clrEverything(){
+  if(!confirm('Clear ALL data — products, import and P&L? This cannot be undone.'))return;
+  prods=[];raws=[];hdrs=[];pnl={};mAds=0;mOth=0;
+  await dbClear('products').catch(()=>{});
+  await dbClear('pnl_data').catch(()=>{});
+  localStorage.removeItem('nx_p');
+  rndProds();recalc();
+  document.getElementById('mpr').classList.remove('sh');
+  document.getElementById('imp-ok').classList.remove('sh');
+  document.getElementById('imp-tw').style.display='none';
+  document.getElementById('fi2').value='';
+  notify('All data cleared','ok');
+}
+
+// Also clear PNL data on reset
+function resetUp(){
+  raws=[];hdrs=[];pnl={};
+  document.getElementById('mpr').classList.remove('sh');
+  document.getElementById('imp-ok').classList.remove('sh');
+  document.getElementById('imp-tw').style.display='none';
+  document.getElementById('fi2').value='';
+  dbClear('pnl_data').catch(()=>{});
+  recalc();notify('Import reset','inf');
+}
+</script>
+</body>
+</html>
