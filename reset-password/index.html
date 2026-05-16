@@ -148,39 +148,54 @@ function show(id){
 
 // ── Check for recovery token in URL ──
 (async()=>{
+  // Supabase v2 handles recovery automatically via onAuthStateChange
+  // We just need to detect the PASSWORD_RECOVERY event
+  
+  // First check if we have hash params (older flow)
   const fullHash = window.location.hash.substring(1);
   const params = new URLSearchParams(fullHash);
   const type = params.get('type');
   const accessToken = params.get('access_token');
   const refreshToken = params.get('refresh_token') || '';
 
+  // Listen for Supabase auth state — v2 fires PASSWORD_RECOVERY automatically
+  sb.auth.onAuthStateChange(async(event, session) => {
+    if(event === 'PASSWORD_RECOVERY'){
+      if(bc) bc.postMessage('PASSWORD_RECOVERY_STARTED');
+      // Clear hash from URL
+      window.history.replaceState(null, '', window.location.pathname);
+      show('form');
+      setTimeout(()=>document.getElementById('pw1').focus(), 100);
+    }
+  });
+
+  // Also handle hash-based flow for compatibility
   if(type === 'recovery' && accessToken){
     if(bc) bc.postMessage('PASSWORD_RECOVERY_STARTED');
-
-    // Try setSession first
-    const { data, error } = await sb.auth.setSession({
+    const { error } = await sb.auth.setSession({
       access_token: accessToken,
       refresh_token: refreshToken
     });
-
-    if(error || !data?.session){
-      // Fallback: try verifyOtp which works for newer Supabase token formats
-      const { error: err2 } = await sb.auth.verifyOtp({
-        token_hash: params.get('token_hash') || accessToken,
-        type: 'recovery'
-      });
-      if(err2){
-        show('error');
-        return;
-      }
+    if(!error){
+      window.history.replaceState(null, '', window.location.pathname);
+      show('form');
+      setTimeout(()=>document.getElementById('pw1').focus(), 100);
+      return;
     }
-    // Clear hash from URL so token can't be reused on page refresh
-    window.history.replaceState(null, '', window.location.pathname);
-    show('form');
-    setTimeout(()=>document.getElementById('pw1').focus(), 100);
-  } else {
+    // setSession failed — Supabase may handle it via onAuthStateChange above
+    // Wait 2 seconds for the event to fire
+    setTimeout(()=>{
+      // If still loading, show error
+      const loading = document.getElementById('state-loading');
+      if(loading && loading.classList.contains('active')){
+        show('error');
+      }
+    }, 2000);
+  } else if(!fullHash || !accessToken){
+    // No token at all
     show('error');
   }
+  // else: wait for onAuthStateChange to fire
 })();
 
 // ── Password strength indicator ──
