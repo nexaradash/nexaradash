@@ -519,10 +519,10 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
         <div class="fg">
           <div class="fg3"><label class="fl">SKU / Product ID</label><input class="fi" id="p-sku" placeholder="e.g. TEM-001"></div>
           <div class="fg3"><label class="fl">Product Name</label><input class="fi" id="p-name" placeholder="e.g. Wireless Earbuds"></div>
-          <div class="fg3"><label class="fl">Buying Price (£)</label><input class="fi" id="p-cost" type="number" step="0.01" placeholder="0.00"></div>
-          <div class="fg3"><label class="fl">Inbound Shipping / Unit (£)</label><input class="fi" id="p-ship" type="number" step="0.01" placeholder="0.00"></div>
+          <div class="fg3"><label class="fl">Buying Price (<span class="cur-lbl">£</span>)</label><input class="fi" id="p-cost" type="number" step="0.01" placeholder="0.00"></div>
+          <div class="fg3"><label class="fl">Inbound Shipping / Unit (<span class="cur-lbl">£</span>)</label><input class="fi" id="p-ship" type="number" step="0.01" placeholder="0.00"></div>
           <div class="fg3"><label class="fl">Temu Fee % (Commission)</label><input class="fi" id="p-fee" type="number" step="0.1" placeholder="e.g. 8"></div>
-          <div class="fg3"><label class="fl">Monthly Ad Spend (£)</label><input class="fi" id="p-ads" type="number" step="0.01" placeholder="0.00"></div>
+          <div class="fg3"><label class="fl">Monthly Ad Spend (<span class="cur-lbl">£</span>)</label><input class="fi" id="p-ads" type="number" step="0.01" placeholder="0.00"></div>
         </div>
         <div style="display:flex;gap:8px;"><button class="btn bp" onclick="addProd()">+ Add Product</button><button class="btn bs" onclick="clrPF()">Clear</button></div>
       </div>
@@ -633,8 +633,8 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     <div class="pf">
       <div style="font-size:12px;color:var(--tx3);margin-bottom:13px;">Add extra costs not captured in your Temu export:</div>
       <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:flex-end;">
-        <div class="fg3"><label class="fl">Extra Ad Spend (£)</label><input class="fi" id="man-ads" type="number" step="0.01" placeholder="0.00"></div>
-        <div class="fg3"><label class="fl">Other Costs (£)</label><input class="fi" id="man-oth" type="number" step="0.01" placeholder="0.00"></div>
+        <div class="fg3"><label class="fl">Extra Ad Spend (<span class="cur-lbl">£</span>)</label><input class="fi" id="man-ads" type="number" step="0.01" placeholder="0.00"></div>
+        <div class="fg3"><label class="fl">Other Costs (<span class="cur-lbl">£</span>)</label><input class="fi" id="man-oth" type="number" step="0.01" placeholder="0.00"></div>
         <button class="btn bp" onclick="applyMan()">Apply</button>
       </div>
     </div>
@@ -751,14 +751,38 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     <div class="pf">
       <div class="fg">
         <div class="fg3"><label class="fl">Client Company</label><input class="fi" id="client-company-input" value="NexaraDash"></div>
-        <div class="fg3"><label class="fl">Agency / Platform</label><input class="fi" value="NexaraDash"></div>
-        <div class="fg3"><label class="fl">Currency</label><input class="fi" id="currency-input" value="GBP £" placeholder="e.g. GBP £, USD $, AUD $"></div>
+        <div class="fg3"><label class="fl">Country / Region</label>
+          <select class="fi" id="country-select" onchange="onCountryChange()">
+            <option value="GB">🇬🇧 United Kingdom</option>
+            <option value="US">🇺🇸 United States</option>
+            <option value="AU">🇦🇺 Australia</option>
+            <option value="CA">🇨🇦 Canada</option>
+            <option value="IE">🇮🇪 Ireland</option>
+            <option value="NZ">🇳🇿 New Zealand</option>
+            <option value="ZA">🇿🇦 South Africa</option>
+            <option value="OTHER">🌍 Other</option>
+          </select>
+        </div>
+        <div class="fg3"><label class="fl">Currency Symbol</label>
+          <select class="fi" id="currency-select">
+            <option value="£">£ — British Pound (GBP)</option>
+            <option value="$">$ — US Dollar (USD)</option>
+            <option value="A$">A$ — Australian Dollar (AUD)</option>
+            <option value="CA$">CA$ — Canadian Dollar (CAD)</option>
+            <option value="€">€ — Euro (EUR)</option>
+            <option value="NZ$">NZ$ — New Zealand Dollar (NZD)</option>
+            <option value="R">R — South African Rand (ZAR)</option>
+          </select>
+        </div>
       </div>
-      <button class="btn bp" onclick="notify('Settings saved','ok')">Save Settings</button>
+      <div style="background:var(--blul);border:1px solid var(--blubl);border-radius:var(--r);padding:10px 14px;font-size:11.5px;color:var(--blu2);margin-bottom:14px;">
+        ℹ Currency symbol updates all values across the entire dashboard — KPIs, breakdowns, reports and PDF exports.
+      </div>
+      <button class="btn bp" onclick="saveSettings()">Save Settings</button>
     </div>
     <div class="sh2"><div class="sh2-txt">Data Management</div><div class="sh2-line"></div></div>
     <div class="pf">
-      <div style="font-size:12px;color:var(--tx3);margin-bottom:8px;">Your data is stored in your browser's IndexedDB — it persists across sessions and page reloads.</div>
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:8px;">Your data is stored securely in the cloud — it persists across sessions and devices.</div>
       <div style="background:var(--grnl);border:1px solid var(--grnbl);border-radius:var(--r);padding:10px 14px;font-size:11.5px;color:var(--grn);margin-bottom:13px;font-weight:600;">💾 Auto-save active — data survives browser close &amp; reload</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn bd" onclick="clrAll()">🗑 Clear All Products</button>
@@ -775,6 +799,59 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 let prods=[];
 let raws=[],hdrs=[],pnl={},mAds=0,mOth=0,fMode='all',dFrom=null,dTo=null;
 let CH={};
+
+// ══ CURRENCY SYSTEM ══
+let cur='£'; // global currency symbol — used everywhere
+const COUNTRY_CURRENCY={GB:'£',US:'$',AU:'A$',CA:'CA$',IE:'€',NZ:'NZ$',ZA:'R',OTHER:'£'};
+const COUNTRY_TAX={GB:'VAT (20%)',US:'Sales Tax',AU:'GST (10%)',CA:'GST/HST',IE:'VAT (23%)',NZ:'GST (15%)',ZA:'VAT (15%)',OTHER:'Tax'};
+
+function c(n){
+  // Format number with current currency symbol
+  if(typeof n!=='number'||isNaN(n))return cur+'0.00';
+  return cur+Math.abs(n).toFixed(2);
+}
+function cs(n){
+  // Signed format — negative shows minus
+  if(typeof n!=='number'||isNaN(n))return cur+'0.00';
+  return (n<0?'-':'')+cur+Math.abs(n).toFixed(2);
+}
+
+function applyCurrency(){
+  // Update all static £ labels in HTML
+  document.querySelectorAll('.cur-lbl').forEach(el=>el.textContent=cur);
+  // Update sidebar currency display
+  const clSub=document.querySelector('.cl-sub');
+  if(clSub)clSub.textContent='Temu Seller · Worldwide · '+cur;
+  // Update currency select to match
+  const sel=document.getElementById('currency-select');
+  if(sel){[...sel.options].forEach(o=>{if(o.value===cur)o.selected=true;});}
+  // Re-render all values
+  recalc();
+}
+
+function onCountryChange(){
+  const country=document.getElementById('country-select').value;
+  const sym=COUNTRY_CURRENCY[country]||'£';
+  const sel=document.getElementById('currency-select');
+  if(sel){[...sel.options].forEach(o=>{if(o.value===sym)o.selected=true;});}
+}
+
+async function saveSettings(){
+  const company=document.getElementById('client-company-input').value.trim();
+  const newCur=document.getElementById('currency-select').value;
+  const country=document.getElementById('country-select').value;
+  if(company){companyName=company;applyCompanyName();}
+  if(newCur!==cur){cur=newCur;applyCurrency();}
+  // Save to Supabase tenants table
+  if(tenantId){
+    await sb.from('tenants').update({
+      company_name:company||companyName,
+      currency:cur,
+      country:country
+    }).eq('id',tenantId);
+  }
+  notify('Settings saved','ok');
+}
 
 // ══ SUPABASE INIT ══
 const SB_URL='https://kedzsuclnczlqftakolc.supabase.co';
@@ -832,9 +909,17 @@ async function getProfile(){
   const{data}=await sb.from('profiles').select('tenant_id').single();
   if(data){
     tenantId=data.tenant_id;
-    const{data:tenant}=await sb.from('tenants').select('company_name').eq('id',tenantId).single();
-    if(tenant&&tenant.company_name)companyName=tenant.company_name;
+    const{data:tenant}=await sb.from('tenants').select('company_name,currency,country').eq('id',tenantId).single();
+    if(tenant){
+      if(tenant.company_name)companyName=tenant.company_name;
+      if(tenant.currency)cur=tenant.currency;
+      if(tenant.country){
+        const cs=document.getElementById('country-select');
+        if(cs)[...cs.options].forEach(o=>{if(o.value===tenant.country)o.selected=true;});
+      }
+    }
     applyCompanyName();
+    applyCurrency();
   }
 }
 
@@ -1071,10 +1156,10 @@ function rndBulkPreview(){
   b.innerHTML=bulkPreview.map(p=>`<tr>
     <td class="tsk">${p.sku}</td>
     <td>${p.name}</td>
-    <td>£${p.cost.toFixed(2)}</td>
-    <td>£${p.ship.toFixed(2)}</td>
+    <td>${c(p.cost)}</td>
+    <td>${c(p.ship)}</td>
     <td>${p.fee}%</td>
-    <td>£${p.ads.toFixed(2)}</td>
+    <td>${c(p.ads)}</td>
     <td>${p.exists?'<span style="color:var(--amb);font-size:11px;font-weight:600;">⚠ Skip (exists)</span>':'<span style="color:var(--grn);font-size:11px;font-weight:600;">✓ New</span>'}</td>
   </tr>`).join('');
   const newCount=bulkPreview.filter(p=>!p.exists).length;
@@ -1122,7 +1207,7 @@ function rndProds(){
   const b=document.getElementById('pb');
   document.getElementById('pc2').textContent=prods.length+' products';
   if(!prods.length){b.innerHTML='<tr><td colspan="8"><div class="em"><div class="em-i">📦</div><div class="em-t">No products yet. Add your first product above.</div></div></td></tr>';return;}
-  b.innerHTML=prods.map((p,i)=>`<tr><td class="tsk">${p.sku}</td><td class="tnm">${p.name}</td><td>£${p.cost.toFixed(2)}</td><td>£${p.ship.toFixed(2)}</td><td>${p.fee}%</td><td>£${p.ads.toFixed(2)}</td><td style="color:var(--amb);font-weight:600;">£${(p.cost+p.ship).toFixed(2)}</td><td><button class="btn bd bsm" onclick="delProd(${i})">✕</button></td></tr>`).join('');
+  b.innerHTML=prods.map((p,i)=>`<tr><td class="tsk">${p.sku}</td><td class="tnm">${p.name}</td><td>${c(p.cost)}</td><td>${c(p.ship)}</td><td>${p.fee}%</td><td>${c(p.ads)}</td><td style="color:var(--amb);font-weight:600;">${c(p.cost+p.ship)}</td><td><button class="btn bd bsm" onclick="delProd(${i})">✕</button></td></tr>`).join('');
 }
 
 function onDrop(e){e.preventDefault();document.getElementById('uz').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)rdFile(f);}
@@ -1239,11 +1324,11 @@ function procMap(){
   if(autoAdded>0){savP();rndProds();notify(autoAdded+' new SKUs auto-registered — add COGS to calculate profit','inf');}
 
   document.getElementById('imp-th').innerHTML='<th>SKU</th><th>Revenue</th><th>Temu Fee</th><th>Shipping</th><th>Returns</th><th>Qty</th><th>Date</th>';
-  document.getElementById('imp-tb').innerHTML=rows.slice(0,300).map(r=>`<tr><td class="tsk">${r.sku}</td><td>£${r.rev.toFixed(2)}</td><td class="tn2">£${r.fee.toFixed(2)}</td><td class="tn2">£${r.ship.toFixed(2)}</td><td class="tw2">£${r.ret.toFixed(2)}</td><td>${r.qty}</td><td style="color:var(--tx3)">${r.date}</td></tr>`).join('');
+  document.getElementById('imp-tb').innerHTML=rows.slice(0,300).map(r=>`<tr><td class="tsk">${r.sku}</td><td>${c(r.rev)}</td><td class="tn2">${c(r.fee)}</td><td class="tn2">${c(r.ship)}</td><td class="tw2">${c(r.ret)}</td><td>${r.qty}</td><td style="color:var(--tx3)">${r.date}</td></tr>`).join('');
   document.getElementById('imp-cnt').textContent=rows.length+' rows';
   document.getElementById('imp-tw').style.display='block';
   const totRev=Object.values(pnl).reduce((a,d)=>a+d.revenue,0);
-  document.getElementById('imp-ok-t').textContent=rows.length+' orders imported · Revenue: £'+totRev.toFixed(2)+' · Data saved to browser';
+  document.getElementById('imp-ok-t').textContent=rows.length+' orders imported · Revenue: '+c(totRev)+' · Data saved to cloud';
   document.getElementById('imp-ok').classList.add('sh');
   recalc();
   savePNL();
@@ -1271,15 +1356,15 @@ function recalc(){
   let rv=0,fe=0,rt=0,cg=0,sh=0,tsh=0,ad=0,od=0,mt=0;
   skus.forEach(d=>{const p=prods.find(p=>p.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());rv+=d.revenue;fe+=d.fees;rt+=d.returns;od+=d.orders;tsh+=(d.shipping||0);if(p){mt++;cg+=p.cost*d.qty;sh+=p.ship*d.qty;ad+=p.ads;}});
   ad+=mAds;const tc=cg+sh+ad+fe+rt+mOth+tsh,nr=rv-fe-rt-tsh,np=rv-tc,mg=rv>0?(np/rv*100):0,gm=rv>0?(nr/rv*100):0;
-  const f=n=>'£'+n.toFixed(2),fp=n=>n.toFixed(1)+'%';
+  const f=n=>c(n),fp=n=>n.toFixed(1)+'%';
   const kp=document.getElementById('k-pf'),km=document.getElementById('k-mg');
-  animateVal(document.getElementById('k-rv'),rv,'£','',500);
-  animateVal(kp,np,'£','',500);kp.className='kv '+(np>=0?'pos':'neg');
-  animateVal(document.getElementById('k-ct'),tc,'£','',500);
+  animateVal(document.getElementById('k-rv'),rv,cur,'',500);
+  animateVal(kp,np,cur,'',500);kp.className='kv '+(np>=0?'pos':'neg');
+  animateVal(document.getElementById('k-ct'),tc,cur,'',500);
   animateVal(km,mg,'','%',500);km.className='kv '+(mg>=0?'pos':'neg');
   // Refund card
   const kr=document.getElementById('k-rf'),krs=document.getElementById('k-rf-s');
-  animateVal(kr,rt,'£','',500);
+  animateVal(kr,rt,cur,'',500);
   const rfRate=rv>0?(rt/rv*100):0;
   krs.textContent=rfRate.toFixed(1)+'% refund rate';
   kr.className='kv '+(rfRate>5?'neg':rfRate>2?'tw2':'');
@@ -1314,11 +1399,11 @@ function rndSKU(data){
     const rkc=i===0?'r1':i===1?'r2':i===2?'r3':'rn',pc=r.np>=0?'tp':'tn2';
     const mgColor=r.mg>=20?'var(--grn)':r.mg>=0?'var(--amb)':'var(--red)';
     const cogsCell=r.hasCOGS
-      ? `<td class="tn2 cogs-cell" data-sku="${r.d.sku}" title="Click to edit COGS">£${r.cg.toFixed(2)}</td>`
+      ? `<td class="tn2 cogs-cell" data-sku="${r.d.sku}" title="Click to edit COGS">${c(r.cg)}</td>`
       : `<td class="tw2 cogs-cell cogs-missing" data-sku="${r.d.sku}" title="Click to enter your cost of goods">✏️ Enter COGS</td>`;
     const refundBadge=r.refundRate>5?`<span style="font-size:9px;background:var(--redl);color:var(--red);border:1px solid var(--redbl);padding:1px 5px;border-radius:4px;margin-left:4px;">${r.refundRate.toFixed(1)}% ret</span>`:'';
     const topBadge=r.d.sku===topSKU?`<span style="font-size:9px;background:var(--grnl);color:var(--grn);border:1px solid var(--grnbl);padding:1px 5px;border-radius:4px;margin-left:4px;">⭐ Top</span>`:'';
-    return`<tr><td><span class="rk ${rkc}">${i+1}</span></td><td class="tsk">${r.d.sku}${topBadge}</td><td class="tnm" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;">${r.nm}${refundBadge}</td><td>${r.d.qty}</td><td>£${r.d.revenue.toFixed(2)}</td>${cogsCell}<td class="tn2">£${r.d.fees.toFixed(2)}</td><td class="tn2">£${(r.tsh).toFixed(2)}</td><td class="tn2">£${r.sh.toFixed(2)}</td><td class="tn2">£${r.ad.toFixed(2)}</td><td class="tw2">£${r.d.returns.toFixed(2)}</td><td class="${pc}">£${r.np.toFixed(2)}</td><td style="color:${mgColor};font-weight:700;">${r.mg.toFixed(1)}%</td></tr>`;
+    return`<tr><td><span class="rk ${rkc}">${i+1}</span></td><td class="tsk">${r.d.sku}${topBadge}</td><td class="tnm" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;">${r.nm}${refundBadge}</td><td>${r.d.qty}</td><td>${c(r.d.revenue)}</td>${cogsCell}<td class="tn2">${c(r.d.fees)}</td><td class="tn2">${c(r.tsh)}</td><td class="tn2">${c(r.sh)}</td><td class="tn2">${c(r.ad)}</td><td class="tw2">${c(r.d.returns)}</td><td class="${pc}">${cs(r.np)}</td><td style="color:${mgColor};font-weight:700;">${r.mg.toFixed(1)}%</td></tr>`;
   }).join('');
 
   // COGS inline edit — click handler
@@ -1331,7 +1416,7 @@ function rndSKU(data){
       const input=document.createElement('input');
       input.type='number';input.step='0.01';input.min='0';
       input.value=currentCost>0?currentCost.toFixed(2):'';
-      input.placeholder='Enter unit cost £';
+      input.placeholder='Enter unit cost ('+cur+')';
       input.style.cssText='width:110px;padding:4px 8px;border:2px solid var(--blu2);border-radius:6px;font-size:12px;font-family:var(--fd);background:#fff;color:var(--tx);';
       this.innerHTML='';this.appendChild(input);input.focus();input.select();
       const save=()=>{
@@ -1364,7 +1449,7 @@ function calcVAT(){
   const vatPayable=vatOut-vatIn;
   const effRate=rv>0?(vatOut/rv*100):0;
 
-  const f=n=>'£'+Math.abs(n).toFixed(2);
+  const f=n=>c(n);
   document.getElementById('vat-out').textContent=f(vatOut);
   document.getElementById('vat-in').textContent=f(vatIn);
   document.getElementById('vat-pay').textContent=f(vatPayable);
@@ -1387,7 +1472,7 @@ function calcVAT(){
     return`<div class="vtr"><div class="vtc"><span style="font-weight:600;color:var(--vat)">${d.sku}</span><br><span style="font-size:10px;color:var(--tx3)">${nm}</span></div><div class="vtc">£${d.revenue.toFixed(2)}</div><div class="vtc" style="color:var(--vat);font-weight:600;">£${vat.toFixed(2)}</div><div class="vtc">£${net.toFixed(2)}</div></div>`;
   }).join('');
 
-  if(rv>0)notify('Tax calculated · Payable: £'+vatPayable.toFixed(2),'vt');
+  if(rv>0)notify('Tax calculated · Payable: '+c(vatPayable),'vt');
   else notify('Add sales data first to calculate VAT','inf');
 }
 
@@ -1422,11 +1507,11 @@ function expVATPDF(){
   doc.setTextColor(124,58,237);doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text('TAX RETURN — BOX REFERENCE',16,y+5.5);y+=14;
 
   const boxes=[
-    ['Box 1','VAT due on sales (Output Tax)','£'+vatOut.toFixed(2),[124,58,237]],
-    ['Box 4','VAT reclaimed on purchases (Input Tax)','£'+vatIn.toFixed(2),[5,150,105]],
-    ['Box 5','Net Tax Payable','£'+vatPayable.toFixed(2),[15,32,68]],
-    ['Box 6','Total value of sales ex-VAT','£'+netSales.toFixed(2),[37,99,235]],
-    ['Box 7','Total value of purchases ex-VAT','£'+(purchases-vatIn).toFixed(2),[37,99,235]],
+    ['Box 1','VAT due on sales (Output Tax)',c(vatOut),[124,58,237]],
+    ['Box 4','VAT reclaimed on purchases (Input Tax)',c(vatIn),[5,150,105]],
+    ['Box 5','Net Tax Payable',c(vatPayable),[15,32,68]],
+    ['Box 6','Total value of sales ex-VAT',c(netSales),[37,99,235]],
+    ['Box 7','Total value of purchases ex-VAT',c(purchases-vatIn),[37,99,235]],
   ];
 
   boxes.forEach((box,i)=>{
@@ -1461,7 +1546,7 @@ function expVATPDF(){
     const net=d.revenue-vat;
     if(ri%2===0){doc.setFillColor(250,248,255);doc.rect(14,y-3,182,8,'F');}
     doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(50,60,80);
-    cx=16;[d.sku,nm,'£'+d.revenue.toFixed(2),'£'+vat.toFixed(2),'£'+net.toFixed(2)].forEach((v,i)=>{doc.text(String(v),cx,y+2);cx+=cw[i];});
+    cx=16;[d.sku,nm,c(d.revenue),c(vat),c(net)].forEach((v,i)=>{doc.text(String(v),cx,y+2);cx+=cw[i];});
     y+=9;
   });
 
@@ -1483,10 +1568,10 @@ function rndCharts(){
   ad+=mAds;const tc=cg+sh+ad+fe+rt,np=rv-tc;
   const gridColor='rgba(226,231,240,1)';
   const opt={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:gridColor},ticks:{color:'#94a3b8',font:{size:11}}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:11}}}}};
-  dCh('ch-ov');CH['ch-ov']=new Chart(document.getElementById('ch-ov'),{type:'bar',data:{labels:['Revenue','Total Costs','Net Profit'],datasets:[{data:[rv,tc,np],backgroundColor:['#dbeafe','#fee2e2',np>=0?'#d1fae5':'#fee2e2'],borderColor:['#2563eb','#dc2626',np>=0?'#059669':'#dc2626'],borderWidth:2,borderRadius:6,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'£'+c.raw.toFixed(2)}}}}});
+  dCh('ch-ov');CH['ch-ov']=new Chart(document.getElementById('ch-ov'),{type:'bar',data:{labels:['Revenue','Total Costs','Net Profit'],datasets:[{data:[rv,tc,np],backgroundColor:['#dbeafe','#fee2e2',np>=0?'#d1fae5':'#fee2e2'],borderColor:['#2563eb','#dc2626',np>=0?'#059669':'#dc2626'],borderWidth:2,borderRadius:6,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>cur+c.raw.toFixed(2)}}}}});
   const sl=skus.map(d=>d.sku),sp=skus.map(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const c=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0;return d.revenue-d.fees-d.returns-c-s-a;});
-  dCh('ch-sk');CH['ch-sk']=new Chart(document.getElementById('ch-sk'),{type:'bar',data:{labels:sl,datasets:[{data:sp,backgroundColor:sp.map(v=>v>=0?'#d1fae5':'#fee2e2'),borderColor:sp.map(v=>v>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'£'+c.raw.toFixed(2)}}}}});
-  dCh('ch-cs');CH['ch-cs']=new Chart(document.getElementById('ch-cs'),{type:'doughnut',data:{labels:['COGS','Temu Fees','Shipping','Ad Spend','Returns'],datasets:[{data:[cg,fe,sh,ad,rt],backgroundColor:['#dbeafe','#fee2e2','#ede9fe','#fef3c7','#ffedd5'],borderColor:['#2563eb','#dc2626','#7c3aed','#d97706','#ea580c'],borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11},color:'#64748b'}},tooltip:{callbacks:{label:c=>'£'+c.raw.toFixed(2)}}},cutout:'65%'}});
+  dCh('ch-sk');CH['ch-sk']=new Chart(document.getElementById('ch-sk'),{type:'bar',data:{labels:sl,datasets:[{data:sp,backgroundColor:sp.map(v=>v>=0?'#d1fae5':'#fee2e2'),borderColor:sp.map(v=>v>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>cur+c.raw.toFixed(2)}}}}});
+  dCh('ch-cs');CH['ch-cs']=new Chart(document.getElementById('ch-cs'),{type:'doughnut',data:{labels:['COGS','Temu Fees','Shipping','Ad Spend','Returns'],datasets:[{data:[cg,fe,sh,ad,rt],backgroundColor:['#dbeafe','#fee2e2','#ede9fe','#fef3c7','#ffedd5'],borderColor:['#2563eb','#dc2626','#7c3aed','#d97706','#ea580c'],borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11},color:'#64748b'}},tooltip:{callbacks:{label:c=>cur+c.raw.toFixed(2)}}},cutout:'65%'}});
   const sm=skus.map(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const c=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0,n=d.revenue-d.fees-d.returns-c-s-a;return d.revenue>0?(n/d.revenue*100):0;});
   dCh('ch-mg');CH['ch-mg']=new Chart(document.getElementById('ch-mg'),{type:'bar',data:{labels:sl,datasets:[{data:sm,backgroundColor:sm.map(v=>v>=0?'#d1fae5':'#fee2e2'),borderColor:sm.map(v=>v>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8'}}}}});
   const dm={};skus.forEach(d=>{d.dates.forEach(e=>{const dt=pDt(e.date);if(!dt)return;const k=dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});dm[k]=(dm[k]||0)+e.rev;});});
@@ -1495,7 +1580,7 @@ function rndCharts(){
   dCh('ch-tr');
   const grd=document.getElementById('ch-tr').getContext('2d');
   const grad=grd.createLinearGradient(0,0,0,280);grad.addColorStop(0,'rgba(37,99,235,0.15)');grad.addColorStop(1,'rgba(37,99,235,0)');
-  CH['ch-tr']=new Chart(document.getElementById('ch-tr'),{type:'line',data:{labels:sd,datasets:[{label:'Revenue',data:sd.map(k=>dm[k]),borderColor:'#2563eb',backgroundColor:grad,fill:true,tension:0.4,pointBackgroundColor:'#2563eb',pointRadius:4,pointHoverRadius:7,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'£'+c.raw.toFixed(2)}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>'£'+v.toFixed(0),color:'#94a3b8'}},x:{grid:{display:false},ticks:{maxTicksLimit:14,color:'#94a3b8'}}}}});
+  CH['ch-tr']=new Chart(document.getElementById('ch-tr'),{type:'line',data:{labels:sd,datasets:[{label:'Revenue',data:sd.map(k=>dm[k]),borderColor:'#2563eb',backgroundColor:grad,fill:true,tension:0.4,pointBackgroundColor:'#2563eb',pointRadius:4,pointHoverRadius:7,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>cur+c.raw.toFixed(2)}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>cur+v.toFixed(0),color:'#94a3b8'}},x:{grid:{display:false},ticks:{maxTicksLimit:14,color:'#94a3b8'}}}}});
 
   // ── Chart A: Monthly Revenue vs Profit ──
   const mm={};
@@ -1519,7 +1604,7 @@ function rndCharts(){
   const moCtx=document.getElementById('ch-mo').getContext('2d');
   const gradMo=moCtx.createLinearGradient(0,0,0,240);gradMo.addColorStop(0,'rgba(37,99,235,0.12)');gradMo.addColorStop(1,'rgba(37,99,235,0)');
   const gradPf=moCtx.createLinearGradient(0,0,0,240);gradPf.addColorStop(0,'rgba(5,150,105,0.12)');gradPf.addColorStop(1,'rgba(5,150,105,0)');
-  CH['ch-mo']=new Chart(document.getElementById('ch-mo'),{type:'line',data:{labels:mkeys,datasets:[{label:'Revenue',data:mkeys.map(k=>mm[k].rv),borderColor:'#2563eb',backgroundColor:gradMo,fill:true,tension:0.4,pointBackgroundColor:'#2563eb',pointRadius:4,pointHoverRadius:7,borderWidth:2.5},{label:'Profit',data:mkeys.map(k=>mm[k].np),borderColor:'#059669',backgroundColor:gradPf,fill:true,tension:0.4,pointBackgroundColor:'#059669',pointRadius:4,pointHoverRadius:7,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:11},color:'#64748b'}},tooltip:{callbacks:{label:c=>'£'+c.raw.toFixed(2)}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>'£'+v.toFixed(0),color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8'}}}}});
+  CH['ch-mo']=new Chart(document.getElementById('ch-mo'),{type:'line',data:{labels:mkeys,datasets:[{label:'Revenue',data:mkeys.map(k=>mm[k].rv),borderColor:'#2563eb',backgroundColor:gradMo,fill:true,tension:0.4,pointBackgroundColor:'#2563eb',pointRadius:4,pointHoverRadius:7,borderWidth:2.5},{label:'Profit',data:mkeys.map(k=>mm[k].np),borderColor:'#059669',backgroundColor:gradPf,fill:true,tension:0.4,pointBackgroundColor:'#059669',pointRadius:4,pointHoverRadius:7,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:11},color:'#64748b'}},tooltip:{callbacks:{label:c=>cur+c.raw.toFixed(2)}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>cur+v.toFixed(0),color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8'}}}}});
 
   // ── Chart E: Top SKUs by Units Sold ──
   const byUnits=[...skus].sort((a,b)=>b.qty-a.qty).slice(0,10);
@@ -1550,9 +1635,9 @@ function rndCharts(){
 
 function updXP(rv,np,tc,mg){
   if(rv===undefined){const d=getFilt(),s=Object.values(d);let r=0,f=0,rt=0,c=0,sh=0,a=0;s.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());r+=d.revenue;f+=d.fees;rt+=d.returns;if(p){c+=p.cost*d.qty;sh+=p.ship*d.qty;a+=p.ads;}});a+=mAds;const t=c+sh+a+f+rt;rv=r;np=r-t;tc=t;mg=r>0?((r-t)/r*100):0;}
-  document.getElementById('xp-rv').textContent='£'+(rv||0).toFixed(2);
-  const pv=document.getElementById('xp-pf');pv.textContent='£'+(np||0).toFixed(2);pv.style.color=(np||0)>=0?'var(--grn)':'var(--red)';
-  document.getElementById('xp-ct').textContent='£'+(tc||0).toFixed(2);
+  document.getElementById('xp-rv').textContent=c(rv||0);
+  const pv=document.getElementById('xp-pf');pv.textContent=c(np||0);pv.style.color=(np||0)>=0?'var(--grn)':'var(--red)';
+  document.getElementById('xp-ct').textContent=c(tc||0);
   document.getElementById('xp-mg').textContent=(mg||0).toFixed(1)+'%';
 }
 
@@ -1566,7 +1651,7 @@ function expPDF(){
   ad+=mAds;const tc=cg+sh+ad+fe+rt+mOth,np=rv-tc,mg=rv>0?(np/rv*100):0;
   const vatRateOut=(parseFloat(document.getElementById('vat-rate').value)||20)/100;
   const vatOut=rv*(vatRateOut/(1+vatRateOut));
-  const f=n=>'GBP '+n.toFixed(2),today=new Date().toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'});
+  const f=n=>cur+Math.abs(n).toFixed(2),today=new Date().toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'});
 
   doc.setFillColor(15,32,68);doc.rect(0,0,210,44,'F');
   doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text(companyName,14,17);
@@ -1608,7 +1693,7 @@ function expPDF(){
 function expCSV(){
   const data=getFilt(),skus=Object.values(data);
   if(!skus.length){notify('No data to export','er');return;}
-  const rows=[['SKU','Product','Units','Revenue GBP','Temu Fees','Returns','COGS','Shipping','Ad Spend','Net Profit','Margin %']];
+  const rows=[['SKU','Product','Units','Revenue ('+cur+')','Temu Fees','Returns','COGS','Shipping','Ad Spend','Net Profit','Margin %']];
   skus.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const c=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0,np=d.revenue-d.fees-d.returns-c-s-a,mg=d.revenue>0?(np/d.revenue*100):0;rows.push([d.sku,p?p.name:'Unknown',d.qty,d.revenue.toFixed(2),d.fees.toFixed(2),d.returns.toFixed(2),c.toFixed(2),s.toFixed(2),a.toFixed(2),np.toFixed(2),mg.toFixed(1)+'%']);});
   const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
