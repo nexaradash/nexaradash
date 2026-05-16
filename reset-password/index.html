@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Set New Password · NexaraDash</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232563eb'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Inter,sans-serif' font-weight='700' font-size='18' fill='white'>N</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#07111f;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+  background-image:linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px);
+  background-size:52px 52px;}
+
+.card{background:#fff;border-radius:20px;padding:44px 40px;width:100%;max-width:420px;box-shadow:0 32px 80px rgba(0,0,0,0.4),0 0 0 1px rgba(255,255,255,0.06);}
+
+/* Logo */
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:32px;}
+.logo-mark{width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;color:#fff;box-shadow:0 4px 14px rgba(37,99,235,0.4);}
+.logo-name{font-size:18px;font-weight:800;color:#0f172a;letter-spacing:-.03em;}
+.logo-sub{font-size:11px;color:#94a3b8;margin-top:1px;}
+
+/* States */
+.state{display:none;}
+.state.active{display:block;}
+
+/* Loading state */
+.loading-wrap{text-align:center;padding:20px 0;}
+.spinner{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-size:14px;color:#64748b;}
+
+/* Form state */
+.icon-wrap{text-align:center;margin-bottom:24px;}
+.icon-circle{width:56px;height:56px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:24px;box-shadow:0 6px 20px rgba(5,150,105,0.35);}
+.form-h{font-size:20px;font-weight:800;color:#0f172a;text-align:center;letter-spacing:-.03em;margin-bottom:6px;}
+.form-p{font-size:13px;color:#64748b;text-align:center;line-height:1.6;margin-bottom:24px;}
+
+.label{font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;display:block;letter-spacing:.02em;}
+.inp{width:100%;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;color:#0f172a;transition:all .15s;margin-bottom:14px;}
+.inp:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,0.1);}
+.inp::placeholder{color:#94a3b8;}
+.inp.err{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,0.1);}
+
+/* Password strength bar */
+.strength-bar{height:3px;border-radius:3px;background:#e2e8f0;margin-bottom:14px;margin-top:-10px;overflow:hidden;}
+.strength-fill{height:100%;width:0;border-radius:3px;transition:width .3s,background .3s;}
+
+.hint-box{background:#f0fdf4;border:1px solid #a7f3d0;border-radius:8px;padding:10px 13px;font-size:12px;color:#059669;margin-bottom:18px;line-height:1.6;}
+
+.err-box{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 13px;font-size:12px;color:#dc2626;margin-bottom:14px;display:none;font-weight:500;}
+
+.btn{width:100%;padding:13px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;box-shadow:0 4px 14px rgba(37,99,235,0.35);}
+.btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(37,99,235,0.45);}
+.btn:disabled{opacity:.65;cursor:not-allowed;transform:none;}
+
+/* Success state */
+.success-wrap{text-align:center;padding:10px 0;}
+.success-icon{width:64px;height:64px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;box-shadow:0 8px 24px rgba(5,150,105,0.4);}
+.success-h{font-size:22px;font-weight:800;color:#0f172a;letter-spacing:-.03em;margin-bottom:8px;}
+.success-p{font-size:14px;color:#64748b;line-height:1.65;margin-bottom:24px;}
+.countdown{font-size:12px;color:#94a3b8;}
+.countdown span{font-weight:700;color:#2563eb;}
+
+/* Error state */
+.error-wrap{text-align:center;padding:10px 0;}
+.error-icon{width:56px;height:56px;background:#fef2f2;border:2px solid #fecaca;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;}
+.error-h{font-size:18px;font-weight:700;color:#0f172a;margin-bottom:8px;}
+.error-p{font-size:13px;color:#64748b;line-height:1.6;margin-bottom:20px;}
+.link-btn{display:inline-block;padding:10px 24px;background:#f1f5f9;color:#374151;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;font-family:'Inter',sans-serif;cursor:pointer;border:none;transition:background .15s;}
+.link-btn:hover{background:#e2e8f0;}
+
+.footer{text-align:center;margin-top:20px;font-size:11px;color:#94a3b8;}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">
+    <div class="logo-mark">N</div>
+    <div><div class="logo-name">NexaraDash</div><div class="logo-sub">nexaradash.com</div></div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="state active" id="state-loading">
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <div class="loading-txt">Verifying your reset link...</div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="state" id="state-form">
+    <div class="icon-wrap">
+      <div class="icon-circle">🔑</div>
+      <div class="form-h">Set your new password</div>
+      <div class="form-p">Choose a strong password — at least 8 characters with a mix of letters and numbers.</div>
+    </div>
+    <div class="err-box" id="err-box"></div>
+    <label class="label">New Password</label>
+    <input class="inp" type="password" id="pw1" placeholder="Minimum 8 characters" autocomplete="new-password" oninput="checkStrength()" onkeydown="if(event.key==='Enter')document.getElementById('pw2').focus()">
+    <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+    <label class="label">Confirm Password</label>
+    <input class="inp" type="password" id="pw2" placeholder="Repeat your new password" autocomplete="new-password" onkeydown="if(event.key==='Enter')submit()">
+    <div class="hint-box">✓ Minimum 8 characters &nbsp;·&nbsp; ✓ Mix letters and numbers</div>
+    <button class="btn" id="submit-btn" onclick="submit()">Set New Password</button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="state" id="state-success">
+    <div class="success-wrap">
+      <div class="success-icon">✓</div>
+      <div class="success-h">Password updated!</div>
+      <div class="success-p">Your password has been changed successfully. You'll be redirected to your dashboard now.</div>
+      <div class="countdown">Redirecting in <span id="countdown">3</span> seconds...</div>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div class="state" id="state-error">
+    <div class="error-wrap">
+      <div class="error-icon">⚠️</div>
+      <div class="error-h">Link expired or invalid</div>
+      <div class="error-p">This password reset link has expired or already been used. Reset links are valid for 1 hour. Please request a new one.</div>
+      <button class="link-btn" onclick="window.location.href='/app'">← Back to login</button>
+    </div>
+  </div>
+
+  <div class="footer">NexaraDash · Secure password reset</div>
+</div>
+
+<script>
+const SB_URL='https://kedzsuclnczlqftakolc.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZHpzdWNsbmN6bHFmdGFrb2xjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjE2MTQsImV4cCI6MjA5NDQzNzYxNH0.tcP_gsRdkJL7e2rWvlChtwTjD8xVWSE9DOHEGuaObAI';
+const{createClient}=supabase;
+const sb=createClient(SB_URL,SB_KEY);
+
+function show(id){
+  document.querySelectorAll('.state').forEach(s=>s.classList.remove('active'));
+  document.getElementById('state-'+id).classList.add('active');
+}
+
+// ── Check for recovery token in URL ──
+(async()=>{
+  // Supabase puts the tokens in the URL hash (#access_token=...&type=recovery)
+  const hash=window.location.hash;
+  const params=new URLSearchParams(hash.replace('#',''));
+  const type=params.get('type');
+  const accessToken=params.get('access_token');
+  const refreshToken=params.get('refresh_token');
+
+  if(type==='recovery'&&accessToken){
+    // Set the session from the URL tokens
+    const{error}=await sb.auth.setSession({access_token:accessToken,refresh_token:refreshToken||''});
+    if(error){
+      console.error('Session error:',error);
+      show('error');
+      return;
+    }
+    show('form');
+    setTimeout(()=>document.getElementById('pw1').focus(),100);
+  } else {
+    // No valid recovery token — show error
+    show('error');
+  }
+})();
+
+// ── Password strength indicator ──
+function checkStrength(){
+  const pw=document.getElementById('pw1').value;
+  const fill=document.getElementById('strength-fill');
+  let score=0;
+  if(pw.length>=8)score++;
+  if(pw.length>=12)score++;
+  if(/[A-Z]/.test(pw))score++;
+  if(/[0-9]/.test(pw))score++;
+  if(/[^A-Za-z0-9]/.test(pw))score++;
+  const pct=Math.min(score/4*100,100);
+  const colors=['#ef4444','#f59e0b','#f59e0b','#10b981','#059669'];
+  fill.style.width=pct+'%';
+  fill.style.background=colors[Math.min(score,4)];
+}
+
+// ── Submit new password ──
+async function submit(){
+  const pw1=document.getElementById('pw1').value;
+  const pw2=document.getElementById('pw2').value;
+  const errBox=document.getElementById('err-box');
+  const btn=document.getElementById('submit-btn');
+  errBox.style.display='none';
+  document.getElementById('pw1').classList.remove('err');
+  document.getElementById('pw2').classList.remove('err');
+
+  if(!pw1||pw1.length<8){
+    errBox.textContent='Password must be at least 8 characters.';
+    errBox.style.display='block';
+    document.getElementById('pw1').classList.add('err');
+    document.getElementById('pw1').focus();
+    return;
+  }
+  if(pw1!==pw2){
+    errBox.textContent='Passwords do not match — please try again.';
+    errBox.style.display='block';
+    document.getElementById('pw2').classList.add('err');
+    document.getElementById('pw2').focus();
+    return;
+  }
+
+  btn.disabled=true;btn.textContent='Saving your password...';
+
+  const{error}=await sb.auth.updateUser({password:pw1});
+
+  if(error){
+    btn.disabled=false;btn.textContent='Set New Password';
+    errBox.textContent=error.message;
+    errBox.style.display='block';
+    return;
+  }
+
+  // ── Success ──
+  show('success');
+  // Sign out cleanly then redirect to /app for fresh login
+  await sb.auth.signOut();
+  let n=3;
+  const cd=document.getElementById('countdown');
+  const t=setInterval(()=>{
+    n--;cd.textContent=n;
+    if(n<=0){clearInterval(t);window.location.href='/app';}
+  },1000);
+}
+</script>
+</body>
+</html>
