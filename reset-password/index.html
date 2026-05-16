@@ -148,25 +148,36 @@ function show(id){
 
 // ── Check for recovery token in URL ──
 (async()=>{
-  // Supabase puts the tokens in the URL hash (#access_token=...&type=recovery)
-  const hash=window.location.hash;
-  const params=new URLSearchParams(hash.replace('#',''));
-  const type=params.get('type');
-  const accessToken=params.get('access_token');
-  const refreshToken=params.get('refresh_token');
+  const fullHash = window.location.hash.substring(1);
+  const params = new URLSearchParams(fullHash);
+  const type = params.get('type');
+  const accessToken = params.get('access_token');
+  const refreshToken = params.get('refresh_token') || '';
 
-  if(type==='recovery'&&accessToken){
-    // Signal all open dashboard tabs that recovery is in progress
+  if(type === 'recovery' && accessToken){
     if(bc) bc.postMessage('PASSWORD_RECOVERY_STARTED');
 
-    const{error}=await sb.auth.setSession({access_token:accessToken,refresh_token:refreshToken||''});
-    if(error){
-      console.error('Session error:',error);
-      show('error');
-      return;
+    // Try setSession first
+    const { data, error } = await sb.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken
+    });
+
+    if(error || !data?.session){
+      // Fallback: try verifyOtp which works for newer Supabase token formats
+      const { error: err2 } = await sb.auth.verifyOtp({
+        token_hash: params.get('token_hash') || accessToken,
+        type: 'recovery'
+      });
+      if(err2){
+        show('error');
+        return;
+      }
     }
+    // Clear hash from URL so token can't be reused on page refresh
+    window.history.replaceState(null, '', window.location.pathname);
     show('form');
-    setTimeout(()=>document.getElementById('pw1').focus(),100);
+    setTimeout(()=>document.getElementById('pw1').focus(), 100);
   } else {
     show('error');
   }
