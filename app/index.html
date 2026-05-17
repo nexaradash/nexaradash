@@ -329,6 +329,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 .auth-footer{margin-top:20px;font-size:10px;color:var(--tx4);text-align:center;}
 
 .mob{display:none;position:fixed;top:10px;left:10px;z-index:200;background:var(--navy);border:none;border-radius:var(--r);padding:8px 11px;cursor:pointer;color:#fff;font-size:15px;align-items:center;box-shadow:var(--shadow2);}
+.app-hidden{display:none!important;}
 @media(max-width:1100px){.kg{grid-template-columns:repeat(3,1fr);}.vat-grid{grid-template-columns:repeat(2,1fr);}.cg{grid-template-columns:1fr;}.cc.full{grid-column:auto;}}
 @media(max-width:768px){.sb{transform:translateX(-100%);}.sb.mop{transform:translateX(0);}.mn{margin-left:0!important;}.mob{display:flex;}.kg,.vat-grid{grid-template-columns:1fr 1fr;}.sg,.stg,.xf,.fg,.vat-settings,.vf-grid{grid-template-columns:1fr;}.mpg{grid-template-columns:1fr;}.pg{padding:16px;}}
 </style>
@@ -336,7 +337,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 <body>
 
 <!-- ══ AUTH SCREEN ══ -->
-<div id="auth-screen">
+<div id="auth-screen" class="show">
   <div class="auth-box">
     <div class="auth-logo">
       <div class="auth-mark">N</div>
@@ -373,7 +374,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 <button class="mob" onclick="document.querySelector('.sb').classList.toggle('mop')">☰</button>
 
 <!-- ══ SIDEBAR ══ -->
-<aside class="sb" id="sb">
+<aside class="sb app-hidden" id="sb">
   <div class="sb-tog" onclick="toggleSB()" title="Collapse">◀</div>
   <div class="sb-top">
     <div class="nx-logo">
@@ -430,7 +431,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 </aside>
 
 <!-- ══ MAIN ══ -->
-<div class="mn" id="mn">
+<div class="mn app-hidden" id="mn">
   <header class="hdr">
     <div class="hl">
       <div class="ht">Profit & Loss Dashboard</div>
@@ -872,6 +873,8 @@ async function signOut(){
   await sb.auth.signOut();
   currentUser=null;tenantId=null;prods=[];pnl={};raws=[];hdrs=[];
   document.getElementById('auth-screen').classList.add('show');
+  document.getElementById('sb').classList.add('app-hidden');
+  document.getElementById('mn').classList.add('app-hidden');
   document.getElementById('auth-form-wrap').style.display='block';
   document.getElementById('auth-forgot-wrap').style.display='none';
   document.getElementById('auth-email').value='';
@@ -1020,16 +1023,18 @@ Chart.defaults.font.family="'Inter',sans-serif";
     const isRecovery=session.user?.amr?.some(a=>a.method==='recovery');
     if(isRecovery){
       await sb.auth.signOut();
-      document.getElementById('auth-screen').classList.add('show');
+      // auth-screen already visible, keep app hidden
     } else {
       currentUser=session.user;
+      document.getElementById('auth-screen').classList.remove('show');
+      document.getElementById('sb').classList.remove('app-hidden');
+      document.getElementById('mn').classList.remove('app-hidden');
       await getProfile();
       await loadP();
       await loadPNL();
     }
-  } else {
-    document.getElementById('auth-screen').classList.add('show');
   }
+  // If no session: auth-screen already visible by default, nothing to do
 
   sb.auth.onAuthStateChange(async(event,session)=>{
     if(event==='PASSWORD_RECOVERY'){
@@ -1045,10 +1050,14 @@ Chart.defaults.font.family="'Inter',sans-serif";
       if(isRecovery){
         await sb.auth.signOut();
         document.getElementById('auth-screen').classList.add('show');
+        document.getElementById('sb').classList.add('app-hidden');
+        document.getElementById('mn').classList.add('app-hidden');
         return;
       }
       currentUser=session.user;
       document.getElementById('auth-screen').classList.remove('show');
+      document.getElementById('sb').classList.remove('app-hidden');
+      document.getElementById('mn').classList.remove('app-hidden');
       await getProfile();
       await loadP();
       await loadPNL();
@@ -1056,6 +1065,8 @@ Chart.defaults.font.family="'Inter',sans-serif";
     if(event==='SIGNED_OUT'){
       currentUser=null;tenantId=null;prods=[];pnl={};raws=[];hdrs=[];
       document.getElementById('auth-screen').classList.add('show');
+      document.getElementById('sb').classList.add('app-hidden');
+      document.getElementById('mn').classList.add('app-hidden');
       document.getElementById('auth-form-wrap').style.display='block';
       document.getElementById('auth-forgot-wrap').style.display='none';
       const lock=document.getElementById('auth-lock-msg');
@@ -1770,16 +1781,26 @@ function clrAll(){
 
 async function clrEverything(){
   if(!confirm('Clear ALL data — products, import and P&L? This cannot be undone.'))return;
+  // Clear memory first
   prods=[];raws=[];hdrs=[];pnl={};mAds=0;mOth=0;
-  await dbClear('products').catch(()=>{});
-  await dbClear('pnl_data').catch(()=>{});
+  // Clear Supabase — both tables
+  try{await sb.from('products').delete().eq('tenant_id',tenantId);}catch(e){console.error('clear products:',e);}
+  try{await sb.from('pnl_data').delete().eq('tenant_id',tenantId);}catch(e){console.error('clear pnl:',e);}
+  // Clear localStorage fallback
   localStorage.removeItem('nx_p');
-  rndProds();recalc();
+  // Reset all UI elements
+  rndProds();
+  recalc();
   document.getElementById('mpr').classList.remove('sh');
   document.getElementById('imp-ok').classList.remove('sh');
   document.getElementById('imp-tw').style.display='none';
   document.getElementById('fi2').value='';
-  notify('All data cleared','ok');
+  // Reset manual adjustments
+  document.getElementById('man-ads').value='';
+  document.getElementById('man-oth').value='';
+  // Show save badge
+  showSaveBadge();
+  notify('All data cleared successfully','ok');
 }
 
 function resetUp(){
