@@ -505,14 +505,10 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 
   <!-- PRODUCTS -->
   <div class="pg" id="pg-products">
-
-    <!-- PRODUCT SUB TABS -->
     <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;">
       <div id="ptab-manual" onclick="switchPTab('manual')" style="padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid var(--blu2);color:var(--blu2);">✏️ Manual Entry</div>
       <div id="ptab-bulk" onclick="switchPTab('bulk')" style="padding:9px 18px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--tx3);">📤 Bulk Upload</div>
     </div>
-
-    <!-- MANUAL ENTRY -->
     <div id="psec-manual">
       <div class="sh2"><div class="sh2-txt">Add Product / SKU</div><div class="sh2-line"></div></div>
       <div class="pf">
@@ -527,12 +523,8 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
         <div style="display:flex;gap:8px;"><button class="btn bp" onclick="addProd()">+ Add Product</button><button class="btn bs" onclick="clrPF()">Clear</button></div>
       </div>
     </div>
-
-    <!-- BULK UPLOAD -->
     <div id="psec-bulk" style="display:none;">
       <div class="sh2"><div class="sh2-txt">Bulk Upload Products</div><div class="sh2-line"></div></div>
-
-      <!-- Step 1 - Download template -->
       <div class="pf" style="margin-bottom:14px;">
         <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
           <div style="flex:1;min-width:200px;">
@@ -543,8 +535,6 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
           <button class="btn bg" onclick="dlTemplate()" style="flex-shrink:0;">📥 Download Template</button>
         </div>
       </div>
-
-      <!-- Step 2 - Upload -->
       <div class="uz" id="bulk-uz" onclick="document.getElementById('bulk-fi').click()"
         ondragover="event.preventDefault();this.classList.add('drag')"
         ondragleave="this.classList.remove('drag')"
@@ -561,8 +551,6 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
           </label>
         </div>
       </div>
-
-      <!-- Bulk preview -->
       <div id="bulk-preview" style="display:none;">
         <div class="al al-ok sh" id="bulk-ok"><span>✅</span><span id="bulk-ok-t"></span></div>
         <div class="tw">
@@ -578,8 +566,6 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
         </div>
       </div>
     </div>
-
-    <!-- YOUR PRODUCTS TABLE — always visible -->
     <div class="sh2" style="margin-top:8px;"><div class="sh2-txt">Your Products</div><div class="sh2-line"></div></div>
     <div class="tw">
       <div class="th">
@@ -657,9 +643,8 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
           </select>
         </div>
       </div>
-      <button class="btn bv" onclick="calcVAT()">📋 Calculate Tax</button></button>
+      <button class="btn bv" onclick="calcVAT()">📋 Calculate Tax</button>
     </div>
-
     <div class="sh2"><div class="sh2-txt">Tax Summary</div><div class="sh2-line"></div></div>
     <div class="vat-grid">
       <div class="vc"><div class="vc-accent"></div><div class="vc-top"><div class="vc-lbl">Output VAT</div><div class="vc-icon">📤</div></div><div class="vc-val" id="vat-out">£0.00</div><div class="vc-sub">VAT collected on sales</div></div>
@@ -667,7 +652,6 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
       <div class="vc"><div class="vc-accent"></div><div class="vc-top"><div class="vc-lbl">VAT Payable</div><div class="vc-icon">🏛</div></div><div class="vc-val" id="vat-pay">£0.00</div><div class="vc-sub">Amount due to tax authority</div></div>
       <div class="vc"><div class="vc-accent"></div><div class="vc-top"><div class="vc-lbl">Net Sales ex-VAT</div><div class="vc-icon">💷</div></div><div class="vc-val" id="vat-net">£0.00</div><div class="vc-sub">Revenue excluding VAT</div></div>
     </div>
-
     <div class="vat-section">
       <div class="vat-header">
         <div class="vat-title">📋 Tax Return Summary <span class="vat-badge">Quarterly Filing</span></div>
@@ -684,7 +668,6 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
           <div class="vf-row" style="background:var(--grnl);"><span class="vf-lbl" style="color:var(--grn);">Effective VAT Rate</span><span class="vf-val" style="color:var(--grn);" id="vat-eff">0.0%</span></div>
         </div>
       </div>
-
       <div style="margin-top:14px;">
         <div class="sh2"><div class="sh2-txt">VAT by SKU</div><div class="sh2-line"></div></div>
         <div class="vat-table">
@@ -801,31 +784,25 @@ let raws=[],hdrs=[],pnl={},mAds=0,mOth=0,fMode='all',dFrom=null,dTo=null;
 let CH={};
 
 // ══ CURRENCY SYSTEM ══
-let cur='£'; // global currency symbol — used everywhere
+let cur='£';
 const COUNTRY_CURRENCY={GB:'£',US:'$',AU:'A$',CA:'CA$',IE:'€',NZ:'NZ$',ZA:'R',OTHER:'£'};
 const COUNTRY_TAX={GB:'VAT (20%)',US:'Sales Tax',AU:'GST (10%)',CA:'GST/HST',IE:'VAT (23%)',NZ:'GST (15%)',ZA:'VAT (15%)',OTHER:'Tax'};
 
 function c(n){
-  // Format number with current currency symbol
   if(typeof n!=='number'||isNaN(n))return cur+'0.00';
   return cur+Math.abs(n).toFixed(2);
 }
 function cs(n){
-  // Signed format — negative shows minus
   if(typeof n!=='number'||isNaN(n))return cur+'0.00';
   return (n<0?'-':'')+cur+Math.abs(n).toFixed(2);
 }
 
 function applyCurrency(){
-  // Update all static £ labels in HTML
   document.querySelectorAll('.cur-lbl').forEach(el=>el.textContent=cur);
-  // Update sidebar currency display
   const clSub=document.querySelector('.cl-sub');
   if(clSub)clSub.textContent='Temu Seller · Worldwide · '+cur;
-  // Update currency select to match
   const sel=document.getElementById('currency-select');
   if(sel){[...sel.options].forEach(o=>{if(o.value===cur)o.selected=true;});}
-  // Re-render all values
   recalc();
 }
 
@@ -842,7 +819,6 @@ async function saveSettings(){
   const country=document.getElementById('country-select').value;
   if(company){companyName=company;applyCompanyName();}
   if(newCur!==cur){cur=newCur;applyCurrency();}
-  // Save to Supabase tenants table
   if(tenantId){
     await sb.from('tenants').update({
       company_name:company||companyName,
@@ -929,10 +905,9 @@ function applyCompanyName(){
   if(inp)inp.value=companyName;
 }
 
-// ══ SUPABASE STORAGE (replaces IndexedDB) ══
+// ══ SUPABASE STORAGE ══
 async function savP(){
   if(!tenantId)return;
-  // Upsert all products for this tenant
   await sb.from('products').delete().eq('tenant_id',tenantId);
   if(!prods.length){showSaveBadge();return;}
   const rows=prods.map(p=>({tenant_id:tenantId,sku:p.sku,name:p.name||p.sku,cost:p.cost||0,ship:p.ship||0,ads:p.ads||0,commission:p.fee||0}));
@@ -970,7 +945,6 @@ async function loadPNL(){
   }
 }
 
-// dbClear shim for clrEverything compatibility
 async function dbClear(store){
   if(!tenantId)return;
   if(store==='products'){await sb.from('products').delete().eq('tenant_id',tenantId);}
@@ -994,71 +968,76 @@ Chart.defaults.font.family="'Inter',sans-serif";
 // ══ BOOT — Auth gate ══
 (async()=>{
 
-  // ── BroadcastChannel: cross-tab communication ──
-  // When reset-password page is active, it broadcasts to all open dashboard tabs
-  // Dashboard tabs listen and lock themselves to prevent auto-loading
-  const bc = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('nexaradash_auth') : null;
-  let recoveryInProgress = false;
+  const bc=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('nexaradash_auth'):null;
+  let recoveryInProgress=false;
 
   if(bc){
-    bc.onmessage = (e) => {
-      if(e.data === 'PASSWORD_RECOVERY_STARTED'){
-        // Another tab (reset-password) is handling recovery — lock this tab
-        recoveryInProgress = true;
+    bc.onmessage=(e)=>{
+      if(e.data==='PASSWORD_RECOVERY_STARTED'){
+        recoveryInProgress=true;
         document.getElementById('auth-screen').classList.add('show');
-        document.getElementById('auth-form-wrap').style.display = 'none';
-        document.getElementById('auth-forgot-wrap').style.display = 'none';
-        // Show a clean "reset in progress" message
-        const wrap = document.getElementById('auth-form-wrap');
-        const lockDiv = document.createElement('div');
-        lockDiv.id = 'auth-lock-msg';
-        lockDiv.innerHTML = `
+        document.getElementById('auth-form-wrap').style.display='none';
+        document.getElementById('auth-forgot-wrap').style.display='none';
+        const wrap=document.getElementById('auth-form-wrap');
+        const lockDiv=document.createElement('div');
+        lockDiv.id='auth-lock-msg';
+        lockDiv.innerHTML=`
           <div style="text-align:center;padding:20px 0;">
             <div style="font-size:36px;margin-bottom:14px;">🔐</div>
             <div style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:8px;">Password reset in progress</div>
             <div style="font-size:13px;color:#64748b;line-height:1.6;">Please complete the password reset in the other tab, then log in again here.</div>
           </div>`;
-        lockDiv.style.display = 'block';
-        wrap.parentNode.insertBefore(lockDiv, wrap);
+        lockDiv.style.display='block';
+        wrap.parentNode.insertBefore(lockDiv,wrap);
       }
-      if(e.data === 'PASSWORD_RESET_COMPLETE'){
-        // Reset done — refresh this tab cleanly to login screen
-        recoveryInProgress = false;
+      if(e.data==='PASSWORD_RESET_COMPLETE'){
+        recoveryInProgress=false;
         window.location.reload();
       }
     };
   }
 
-  // ── Check for PASSWORD_RECOVERY in current URL hash (shouldn't happen on /app but guard anyway) ──
-  const urlHash = new URLSearchParams(window.location.hash.replace('#',''));
-  if(urlHash.get('type') === 'recovery'){
-    // Someone navigated directly to /app with a recovery token — redirect to reset-password page
-    window.location.href = '/reset-password' + window.location.hash;
+  // ── Block recovery token landing on /app ──
+  const urlHash=new URLSearchParams(window.location.hash.replace('#',''));
+  if(urlHash.get('type')==='recovery'){
+    window.location.href='/reset-password'+window.location.hash;
     return;
   }
 
-  // ── Normal session check ──
+  // ── THE FIX: Check if existing session is a recovery session ──
   const{data:{session}}=await sb.auth.getSession();
   if(session){
-    currentUser=session.user;
-    await getProfile();
-    await loadP();
-    await loadPNL();
+    // If session came from password recovery, sign out and force fresh login
+    const isRecovery=session.user?.amr?.some(a=>a.method==='recovery');
+    if(isRecovery){
+      await sb.auth.signOut();
+      document.getElementById('auth-screen').classList.add('show');
+    } else {
+      currentUser=session.user;
+      await getProfile();
+      await loadP();
+      await loadPNL();
+    }
   } else {
     document.getElementById('auth-screen').classList.add('show');
   }
 
   sb.auth.onAuthStateChange(async(event,session)=>{
-    // ── Block dashboard if recovery is in progress ──
     if(event==='PASSWORD_RECOVERY'){
-      recoveryInProgress = true;
-      // Redirect to reset-password page — this tab shouldn't handle recovery
-      window.location.href = '/reset-password' + window.location.hash;
+      recoveryInProgress=true;
+      window.location.href='/reset-password'+window.location.hash;
       return;
     }
-    if(recoveryInProgress) return; // ignore all events during recovery
+    if(recoveryInProgress)return;
 
     if(event==='SIGNED_IN'&&session){
+      // Also check on SIGNED_IN event — block recovery sessions
+      const isRecovery=session.user?.amr?.some(a=>a.method==='recovery');
+      if(isRecovery){
+        await sb.auth.signOut();
+        document.getElementById('auth-screen').classList.add('show');
+        return;
+      }
       currentUser=session.user;
       document.getElementById('auth-screen').classList.remove('show');
       await getProfile();
@@ -1144,7 +1123,6 @@ function addProd(){
 function delProd(i){prods.splice(i,1);savP();rndProds();recalc();notify('Product removed','ok');}
 function clrPF(){['p-sku','p-name','p-cost','p-ship','p-fee','p-ads'].forEach(id=>document.getElementById(id).value='');}
 
-// ── PRODUCT SUB TABS ──
 function switchPTab(tab){
   document.getElementById('psec-manual').style.display=tab==='manual'?'block':'none';
   document.getElementById('psec-bulk').style.display=tab==='bulk'?'block':'none';
@@ -1153,7 +1131,6 @@ function switchPTab(tab){
   else{bt.style.borderBottomColor='var(--blu2)';bt.style.color='var(--blu2)';bt.style.fontWeight='600';mt.style.borderBottomColor='transparent';mt.style.color='var(--tx3)';mt.style.fontWeight='500';}
 }
 
-// ── DOWNLOAD TEMPLATE ──
 function dlTemplate(){
   const rows=[
     ['SKU','Product Name','Buying Price','Inbound Shipping Per Unit','Temu Fee %','Monthly Ad Spend'],
@@ -1168,7 +1145,6 @@ function dlTemplate(){
   notify('Template downloaded — fill it in and upload below','inf');
 }
 
-// ── BULK UPLOAD ──
 let bulkPreview=[];
 function onBulkDrop(e){e.preventDefault();document.getElementById('bulk-uz').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)rdBulk(f);}
 function onBulkFile(e){const f=e.target.files[0];if(f)rdBulk(f);}
@@ -1182,7 +1158,6 @@ function rdBulk(f){
     const j=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
     if(j.length<2){notify('File appears empty','er');return;}
     const hdrs=j[0].map(h=>String(h).toLowerCase().trim());
-    // Auto-detect columns
     function findCol(keys){return hdrs.findIndex(h=>keys.some(k=>h.includes(k)));}
     const sc=findCol(['sku','product id','item id']);
     const nc=findCol(['product name','name','title','description']);
@@ -1253,7 +1228,6 @@ function cancelBulk(){
   notify('Bulk import cancelled','inf');
 }
 
-// ── EXPORT PRODUCTS ──
 function expProdsCSV(){
   if(!prods.length){notify('No products to export','er');return;}
   const rows=[['SKU','Product Name','Buying Price','Inbound Shipping Per Unit','Temu Fee %','Monthly Ad Spend']];
@@ -1263,6 +1237,7 @@ function expProdsCSV(){
   a.download='NexaraDash-Products-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
   notify('Products exported!','ok');
 }
+
 function rndProds(){
   const b=document.getElementById('pb');
   document.getElementById('pc2').textContent=prods.length+' products';
@@ -1340,20 +1315,11 @@ function procMap(){
     const rawRet=xc>=0?parseFloat(row[xc])||0:0;
     const qty=qc>=0?Math.abs(parseFloat(row[qc])||1):1;
     const date=dc>=0?row[dc]:'';
-
     if(!sku)return;
-
-    // For refund rows: revenue is negative, treat as returns
     let rev=rawRev,fee=Math.abs(rawFee),ship=Math.abs(rawShip),shipTax=Math.abs(rawShipTax),prodTax=Math.abs(rawProdTax),ret=Math.abs(rawRet);
-    if(isRefund){
-      // Refund row: the negative total is the return value
-      ret=Math.abs(rawRev);rev=0;fee=0;ship=0;
-    }
+    if(isRefund){ret=Math.abs(rawRev);rev=0;fee=0;ship=0;}
     if(rev===0&&ret===0)return;
-
-    // Total deductions from Temu: fee + shipping + shipping tax + product tax
     const totalFee=fee+ship+shipTax+prodTax;
-
     if(!pnl[sku])pnl[sku]={sku,revenue:0,fees:0,returns:0,qty:0,orders:0,dates:[],shipping:0,taxes:0};
     pnl[sku].revenue+=rev;
     pnl[sku].fees+=fee;
@@ -1365,12 +1331,10 @@ function procMap(){
     pnl[sku].dates.push({date,rev});
     rows.push({sku,rev,fee:totalFee,ship,ret,qty,date,isRefund});
   });
-  // ── Auto-register new SKUs from uploaded file ──
   let autoAdded=0;
   Object.keys(pnl).forEach(sku=>{
     const exists=prods.find(p=>p.sku.trim().toLowerCase()===sku.trim().toLowerCase());
     if(!exists){
-      // Try to get product name from the raw data (SKU column full name if available)
       const nameCol=hdrs.findIndex(h=>h.toLowerCase().includes('product name')||h.toLowerCase().includes('title')||h.toLowerCase().includes('item name'));
       let guessedName=sku;
       if(nameCol>=0){
@@ -1382,7 +1346,6 @@ function procMap(){
     }
   });
   if(autoAdded>0){savP();rndProds();notify(autoAdded+' new SKUs auto-registered — add COGS to calculate profit','inf');}
-
   document.getElementById('imp-th').innerHTML='<th>SKU</th><th>Revenue</th><th>Temu Fee</th><th>Shipping</th><th>Returns</th><th>Qty</th><th>Date</th>';
   document.getElementById('imp-tb').innerHTML=rows.slice(0,300).map(r=>`<tr><td class="tsk">${r.sku}</td><td>${c(r.rev)}</td><td class="tn2">${c(r.fee)}</td><td class="tn2">${c(r.ship)}</td><td class="tw2">${c(r.ret)}</td><td>${r.qty}</td><td style="color:var(--tx3)">${r.date}</td></tr>`).join('');
   document.getElementById('imp-cnt').textContent=rows.length+' rows';
@@ -1394,8 +1357,6 @@ function procMap(){
   savePNL();
   notify('P&L calculated & saved!','ok');
 }
-
-// resetUp defined below in clrAll section
 
 function getFilt(){
   if(!dFrom&&!dTo)return pnl;
@@ -1422,7 +1383,6 @@ function recalc(){
   animateVal(kp,np,cur,'',500);kp.className='kv '+(np>=0?'pos':'neg');
   animateVal(document.getElementById('k-ct'),tc,cur,'',500);
   animateVal(km,mg,'','%',500);km.className='kv '+(mg>=0?'pos':'neg');
-  // Refund card
   const kr=document.getElementById('k-rf'),krs=document.getElementById('k-rf-s');
   animateVal(kr,rt,cur,'',500);
   const rfRate=rv>0?(rt/rv*100):0;
@@ -1451,10 +1411,7 @@ function rndSKU(data){
     const np=d.revenue-d.fees-d.returns-cg-sh-ad-tsh,mg=d.revenue>0?(np/d.revenue*100):0;
     const refundRate=d.orders>0?(d.returns/d.revenue*100):0;
     return{d,cg,sh,ad,nm,np,mg,hasCOGS,p,tsh,refundRate};}).sort((a,b)=>b.np-a.np);
-
-  // Top performer badge
   const topSKU=rows[0]&&rows[0].np>0?rows[0].d.sku:null;
-
   b.innerHTML=rows.map((r,i)=>{
     const rkc=i===0?'r1':i===1?'r2':i===2?'r3':'rn',pc=r.np>=0?'tp':'tn2';
     const mgColor=r.mg>=20?'var(--grn)':r.mg>=0?'var(--amb)':'var(--red)';
@@ -1465,8 +1422,6 @@ function rndSKU(data){
     const topBadge=r.d.sku===topSKU?`<span style="font-size:9px;background:var(--grnl);color:var(--grn);border:1px solid var(--grnbl);padding:1px 5px;border-radius:4px;margin-left:4px;">⭐ Top</span>`:'';
     return`<tr><td><span class="rk ${rkc}">${i+1}</span></td><td class="tsk">${r.d.sku}${topBadge}</td><td class="tnm" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;">${r.nm}${refundBadge}</td><td>${r.d.qty}</td><td>${c(r.d.revenue)}</td>${cogsCell}<td class="tn2">${c(r.d.fees)}</td><td class="tn2">${c(r.tsh)}</td><td class="tn2">${c(r.sh)}</td><td class="tn2">${c(r.ad)}</td><td class="tw2">${c(r.d.returns)}</td><td class="${pc}">${cs(r.np)}</td><td style="color:${mgColor};font-weight:700;">${r.mg.toFixed(1)}%</td></tr>`;
   }).join('');
-
-  // COGS inline edit — click handler
   b.querySelectorAll('.cogs-cell').forEach(cell=>{
     cell.style.cursor='pointer';
     cell.addEventListener('click',function(){
@@ -1499,16 +1454,13 @@ function calcVAT(){
   const vatRateIn=(parseFloat(document.getElementById('vat-rate-in').value)||20)/100;
   let rv=0,cg=0,sh=0;
   skus.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());rv+=d.revenue;if(p){cg+=p.cost*d.qty;sh+=p.ship*d.qty;}});
-
-  // VAT calculations
-  const vatOut=rv*(vatRateOut/(1+vatRateOut)); // VAT extracted from gross revenue
-  const netSales=rv-vatOut;                    // Net sales ex-VAT
+  const vatOut=rv*(vatRateOut/(1+vatRateOut));
+  const netSales=rv-vatOut;
   const purchases=cg+sh+mOth;
-  const vatIn=purchases*(vatRateIn/(1+vatRateIn)); // VAT reclaimed on purchases
+  const vatIn=purchases*(vatRateIn/(1+vatRateIn));
   const netPurchases=purchases-vatIn;
   const vatPayable=vatOut-vatIn;
   const effRate=rv>0?(vatOut/rv*100):0;
-
   const f=n=>c(n);
   document.getElementById('vat-out').textContent=f(vatOut);
   document.getElementById('vat-in').textContent=f(vatIn);
@@ -1520,8 +1472,6 @@ function calcVAT(){
   document.getElementById('box6').textContent=f(netSales);
   document.getElementById('box7').textContent=f(netPurchases);
   document.getElementById('vat-eff').textContent=effRate.toFixed(1)+'%';
-
-  // SKU VAT breakdown
   const vr=document.getElementById('vat-rows');
   if(!skus.length){vr.innerHTML='<div class="vtr"><div class="vtc" style="color:var(--tx3);font-size:12px;">Import sales data and click Calculate VAT to see breakdown</div><div class="vtc"></div><div class="vtc"></div><div class="vtc"></div></div>';return;}
   vr.innerHTML=skus.map(d=>{
@@ -1531,7 +1481,6 @@ function calcVAT(){
     const net=d.revenue-vat;
     return`<div class="vtr"><div class="vtc"><span style="font-weight:600;color:var(--vat)">${d.sku}</span><br><span style="font-size:10px;color:var(--tx3)">${nm}</span></div><div class="vtc">£${d.revenue.toFixed(2)}</div><div class="vtc" style="color:var(--vat);font-weight:600;">£${vat.toFixed(2)}</div><div class="vtc">£${net.toFixed(2)}</div></div>`;
   }).join('');
-
   if(rv>0)notify('Tax calculated · Payable: '+c(vatPayable),'vt');
   else notify('Add sales data first to calculate VAT','inf');
 }
@@ -1552,20 +1501,15 @@ function expVATPDF(){
   const vatPayable=vatOut-vatIn;
   const quarter=document.getElementById('vat-quarter').value;
   const today=new Date().toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'});
-
-  // Header
   doc.setFillColor(15,32,68);doc.rect(0,0,210,44,'F');
   doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text(companyName,14,17);
   doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(200,210,230);
   doc.text('Tax Return Summary · '+quarter+' · Generated by NexaraDash',14,25);
   doc.text('Report Date: '+today,14,32);
   doc.setTextColor(160,190,220);doc.text('nexaradash.com',196,32,'right');
-
-  // VAT boxes
   let y=52;
   doc.setFillColor(245,243,255);doc.rect(14,y,182,8,'F');
   doc.setTextColor(124,58,237);doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text('TAX RETURN — BOX REFERENCE',16,y+5.5);y+=14;
-
   const boxes=[
     ['Box 1','VAT due on sales (Output Tax)',c(vatOut),[124,58,237]],
     ['Box 4','VAT reclaimed on purchases (Input Tax)',c(vatIn),[5,150,105]],
@@ -1573,7 +1517,6 @@ function expVATPDF(){
     ['Box 6','Total value of sales ex-VAT',c(netSales),[37,99,235]],
     ['Box 7','Total value of purchases ex-VAT',c(purchases-vatIn),[37,99,235]],
   ];
-
   boxes.forEach((box,i)=>{
     const isKey=i===2;
     if(isKey){doc.setFillColor(15,32,68);}else{doc.setFillColor(i%2===0?248:255,i%2===0?250:255,i%2===0?255:255);}
@@ -1589,15 +1532,13 @@ function expVATPDF(){
     doc.text(box[2],196,y+3.5,'right');
     y+=13;
   });
-
-  // SKU breakdown
   y+=6;
   doc.setFillColor(245,243,255);doc.rect(14,y,182,8,'F');
   doc.setTextColor(124,58,237);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.text('VAT BREAKDOWN BY SKU',16,y+5.5);y+=14;
   const cols=['SKU','Product','Gross Revenue','VAT Element','Net ex-VAT'],cw=[22,60,30,30,30];
   doc.setFillColor(237,233,254);doc.rect(14,y-3,182,8,'F');
   doc.setFontSize(7.5);doc.setTextColor(100,70,180);let cx=16;
-  cols.forEach((c,i)=>{doc.text(c,cx,y+2.5);cx+=cw[i];});y+=10;
+  cols.forEach((col,i)=>{doc.text(col,cx,y+2.5);cx+=cw[i];});y+=10;
   skus.forEach((d,ri)=>{
     if(y>274){doc.addPage();y=20;}
     const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
@@ -1609,8 +1550,6 @@ function expVATPDF(){
     cx=16;[d.sku,nm,c(d.revenue),c(vat),c(net)].forEach((v,i)=>{doc.text(String(v),cx,y+2);cx+=cw[i];});
     y+=9;
   });
-
-  // Footer
   const pg=doc.internal.getNumberOfPages();
   for(let i=1;i<=pg;i++){doc.setPage(i);doc.setFillColor(15,32,68);doc.rect(0,286,210,12,'F');doc.setFontSize(7);doc.setTextColor(160,190,220);doc.text('Powered by NexaraDash · nexaradash.com · info@nexaradash.com · Confidential',14,293);doc.text('Page '+i+' of '+pg,196,293,'right');}
   doc.save((companyName.replace(/[^a-zA-Z0-9]/g,'')||'NexaraDash')+'-VAT-Return-'+new Date().toISOString().split('T')[0]+'.pdf');
@@ -1621,28 +1560,26 @@ function expVATPDF(){
 function dCh(id){if(CH[id]){CH[id].destroy();delete CH[id];}}
 function rndCharts(){
   const data=getFilt(),skus=Object.values(data);
-  const empty=id=>{dCh(id);const c=document.getElementById(id);if(!c)return;const x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);x.fillStyle='#cbd5e1';x.font='13px Inter';x.textAlign='center';x.fillText('Import sales data to see charts',c.width/2,c.height/2);};
+  const empty=id=>{dCh(id);const cv=document.getElementById(id);if(!cv)return;const x=cv.getContext('2d');x.clearRect(0,0,cv.width,cv.height);x.fillStyle='#cbd5e1';x.font='13px Inter';x.textAlign='center';x.fillText('Import sales data to see charts',cv.width/2,cv.height/2);};
   if(!skus.length){['ch-ov','ch-sk','ch-cs','ch-mg','ch-tr','ch-mo','ch-un','ch-rf','ch-roi'].forEach(empty);return;}
   let rv=0,fe=0,rt=0,cg=0,sh=0,ad=0;
   skus.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());rv+=d.revenue;fe+=d.fees;rt+=d.returns;if(p){cg+=p.cost*d.qty;sh+=p.ship*d.qty;ad+=p.ads;}});
   ad+=mAds;const tc=cg+sh+ad+fe+rt,np=rv-tc;
   const gridColor='rgba(226,231,240,1)';
   const opt={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:gridColor},ticks:{color:'#94a3b8',font:{size:11}}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:11}}}}};
-  dCh('ch-ov');CH['ch-ov']=new Chart(document.getElementById('ch-ov'),{type:'bar',data:{labels:['Revenue','Total Costs','Net Profit'],datasets:[{data:[rv,tc,np],backgroundColor:['#dbeafe','#fee2e2',np>=0?'#d1fae5':'#fee2e2'],borderColor:['#2563eb','#dc2626',np>=0?'#059669':'#dc2626'],borderWidth:2,borderRadius:6,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>cur+c.raw.toFixed(2)}}}}});
-  const sl=skus.map(d=>d.sku),sp=skus.map(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const c=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0;return d.revenue-d.fees-d.returns-c-s-a;});
-  dCh('ch-sk');CH['ch-sk']=new Chart(document.getElementById('ch-sk'),{type:'bar',data:{labels:sl,datasets:[{data:sp,backgroundColor:sp.map(v=>v>=0?'#d1fae5':'#fee2e2'),borderColor:sp.map(v=>v>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>cur+c.raw.toFixed(2)}}}}});
-  dCh('ch-cs');CH['ch-cs']=new Chart(document.getElementById('ch-cs'),{type:'doughnut',data:{labels:['COGS','Temu Fees','Shipping','Ad Spend','Returns'],datasets:[{data:[cg,fe,sh,ad,rt],backgroundColor:['#dbeafe','#fee2e2','#ede9fe','#fef3c7','#ffedd5'],borderColor:['#2563eb','#dc2626','#7c3aed','#d97706','#ea580c'],borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11},color:'#64748b'}},tooltip:{callbacks:{label:c=>cur+c.raw.toFixed(2)}}},cutout:'65%'}});
-  const sm=skus.map(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const c=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0,n=d.revenue-d.fees-d.returns-c-s-a;return d.revenue>0?(n/d.revenue*100):0;});
-  dCh('ch-mg');CH['ch-mg']=new Chart(document.getElementById('ch-mg'),{type:'bar',data:{labels:sl,datasets:[{data:sm,backgroundColor:sm.map(v=>v>=0?'#d1fae5':'#fee2e2'),borderColor:sm.map(v=>v>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8'}}}}});
+  dCh('ch-ov');CH['ch-ov']=new Chart(document.getElementById('ch-ov'),{type:'bar',data:{labels:['Revenue','Total Costs','Net Profit'],datasets:[{data:[rv,tc,np],backgroundColor:['#dbeafe','#fee2e2',np>=0?'#d1fae5':'#fee2e2'],borderColor:['#2563eb','#dc2626',np>=0?'#059669':'#dc2626'],borderWidth:2,borderRadius:6,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cur+cv.raw.toFixed(2)}}}}});
+  const sl=skus.map(d=>d.sku),sp=skus.map(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const cg2=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0;return d.revenue-d.fees-d.returns-cg2-s-a;});
+  dCh('ch-sk');CH['ch-sk']=new Chart(document.getElementById('ch-sk'),{type:'bar',data:{labels:sl,datasets:[{data:sp,backgroundColor:sp.map(v=>v>=0?'#d1fae5':'#fee2e2'),borderColor:sp.map(v=>v>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cur+cv.raw.toFixed(2)}}}}});
+  dCh('ch-cs');CH['ch-cs']=new Chart(document.getElementById('ch-cs'),{type:'doughnut',data:{labels:['COGS','Temu Fees','Shipping','Ad Spend','Returns'],datasets:[{data:[cg,fe,sh,ad,rt],backgroundColor:['#dbeafe','#fee2e2','#ede9fe','#fef3c7','#ffedd5'],borderColor:['#2563eb','#dc2626','#7c3aed','#d97706','#ea580c'],borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11},color:'#64748b'}},tooltip:{callbacks:{label:cv=>cur+cv.raw.toFixed(2)}}},cutout:'65%'}});
+  const sm=skus.map(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const cg2=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0,n=d.revenue-d.fees-d.returns-cg2-s-a;return d.revenue>0?(n/d.revenue*100):0;});
+  dCh('ch-mg');CH['ch-mg']=new Chart(document.getElementById('ch-mg'),{type:'bar',data:{labels:sl,datasets:[{data:sm,backgroundColor:sm.map(v=>v>=0?'#d1fae5':'#fee2e2'),borderColor:sm.map(v=>v>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8'}}}}});
   const dm={};skus.forEach(d=>{d.dates.forEach(e=>{const dt=pDt(e.date);if(!dt)return;const k=dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});dm[k]=(dm[k]||0)+e.rev;});});
   const mons=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const sd=Object.keys(dm).sort((a,b)=>{const pa=a.split(' '),pb=b.split(' ');return(mons.indexOf(pa[1])*31+parseInt(pa[0]))-(mons.indexOf(pb[1])*31+parseInt(pb[0]));});
   dCh('ch-tr');
   const grd=document.getElementById('ch-tr').getContext('2d');
   const grad=grd.createLinearGradient(0,0,0,280);grad.addColorStop(0,'rgba(37,99,235,0.15)');grad.addColorStop(1,'rgba(37,99,235,0)');
-  CH['ch-tr']=new Chart(document.getElementById('ch-tr'),{type:'line',data:{labels:sd,datasets:[{label:'Revenue',data:sd.map(k=>dm[k]),borderColor:'#2563eb',backgroundColor:grad,fill:true,tension:0.4,pointBackgroundColor:'#2563eb',pointRadius:4,pointHoverRadius:7,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>cur+c.raw.toFixed(2)}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>cur+v.toFixed(0),color:'#94a3b8'}},x:{grid:{display:false},ticks:{maxTicksLimit:14,color:'#94a3b8'}}}}});
-
-  // ── Chart A: Monthly Revenue vs Profit ──
+  CH['ch-tr']=new Chart(document.getElementById('ch-tr'),{type:'line',data:{labels:sd,datasets:[{label:'Revenue',data:sd.map(k=>dm[k]),borderColor:'#2563eb',backgroundColor:grad,fill:true,tension:0.4,pointBackgroundColor:'#2563eb',pointRadius:4,pointHoverRadius:7,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cur+cv.raw.toFixed(2)}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>cur+v.toFixed(0),color:'#94a3b8'}},x:{grid:{display:false},ticks:{maxTicksLimit:14,color:'#94a3b8'}}}}});
   const mm={};
   skus.forEach(d=>{
     const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
@@ -1664,37 +1601,31 @@ function rndCharts(){
   const moCtx=document.getElementById('ch-mo').getContext('2d');
   const gradMo=moCtx.createLinearGradient(0,0,0,240);gradMo.addColorStop(0,'rgba(37,99,235,0.12)');gradMo.addColorStop(1,'rgba(37,99,235,0)');
   const gradPf=moCtx.createLinearGradient(0,0,0,240);gradPf.addColorStop(0,'rgba(5,150,105,0.12)');gradPf.addColorStop(1,'rgba(5,150,105,0)');
-  CH['ch-mo']=new Chart(document.getElementById('ch-mo'),{type:'line',data:{labels:mkeys,datasets:[{label:'Revenue',data:mkeys.map(k=>mm[k].rv),borderColor:'#2563eb',backgroundColor:gradMo,fill:true,tension:0.4,pointBackgroundColor:'#2563eb',pointRadius:4,pointHoverRadius:7,borderWidth:2.5},{label:'Profit',data:mkeys.map(k=>mm[k].np),borderColor:'#059669',backgroundColor:gradPf,fill:true,tension:0.4,pointBackgroundColor:'#059669',pointRadius:4,pointHoverRadius:7,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:11},color:'#64748b'}},tooltip:{callbacks:{label:c=>cur+c.raw.toFixed(2)}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>cur+v.toFixed(0),color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8'}}}}});
-
-  // ── Chart E: Top SKUs by Units Sold ──
+  CH['ch-mo']=new Chart(document.getElementById('ch-mo'),{type:'line',data:{labels:mkeys,datasets:[{label:'Revenue',data:mkeys.map(k=>mm[k].rv),borderColor:'#2563eb',backgroundColor:gradMo,fill:true,tension:0.4,pointBackgroundColor:'#2563eb',pointRadius:4,pointHoverRadius:7,borderWidth:2.5},{label:'Profit',data:mkeys.map(k=>mm[k].np),borderColor:'#059669',backgroundColor:gradPf,fill:true,tension:0.4,pointBackgroundColor:'#059669',pointRadius:4,pointHoverRadius:7,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:11},color:'#64748b'}},tooltip:{callbacks:{label:cv=>cur+cv.raw.toFixed(2)}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>cur+v.toFixed(0),color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8'}}}}});
   const byUnits=[...skus].sort((a,b)=>b.qty-a.qty).slice(0,10);
   dCh('ch-un');
-  CH['ch-un']=new Chart(document.getElementById('ch-un'),{type:'bar',data:{labels:byUnits.map(d=>d.sku),datasets:[{label:'Units',data:byUnits.map(d=>d.qty),backgroundColor:'#dbeafe',borderColor:'#2563eb',borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+' units'}}},scales:{x:{grid:{color:gridColor},ticks:{color:'#94a3b8'}},y:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
-
-  // ── Chart F: Refund Rate per SKU ──
+  CH['ch-un']=new Chart(document.getElementById('ch-un'),{type:'bar',data:{labels:byUnits.map(d=>d.sku),datasets:[{label:'Units',data:byUnits.map(d=>d.qty),backgroundColor:'#dbeafe',borderColor:'#2563eb',borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw+' units'}}},scales:{x:{grid:{color:gridColor},ticks:{color:'#94a3b8'}},y:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
   const rfData=skus.map(d=>({sku:d.sku,rate:d.revenue>0?(d.returns/d.revenue*100):0})).filter(d=>d.rate>0).sort((a,b)=>b.rate-a.rate).slice(0,15);
   dCh('ch-rf');
   if(rfData.length){
-    CH['ch-rf']=new Chart(document.getElementById('ch-rf'),{type:'bar',data:{labels:rfData.map(d=>d.sku),datasets:[{label:'Refund Rate',data:rfData.map(d=>d.rate),backgroundColor:rfData.map(d=>d.rate>10?'#fee2e2':'#fef3c7'),borderColor:rfData.map(d=>d.rate>10?'#dc2626':'#d97706'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v.toFixed(0)+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
+    CH['ch-rf']=new Chart(document.getElementById('ch-rf'),{type:'bar',data:{labels:rfData.map(d=>d.sku),datasets:[{label:'Refund Rate',data:rfData.map(d=>d.rate),backgroundColor:rfData.map(d=>d.rate>10?'#fee2e2':'#fef3c7'),borderColor:rfData.map(d=>d.rate>10?'#dc2626':'#d97706'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v.toFixed(0)+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
   }else{
-    const c=document.getElementById('ch-rf');const x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);x.fillStyle='#cbd5e1';x.font='13px Inter';x.textAlign='center';x.fillText('No refunds recorded',c.width/2,c.height/2);
+    const cv=document.getElementById('ch-rf');const x=cv.getContext('2d');x.clearRect(0,0,cv.width,cv.height);x.fillStyle='#cbd5e1';x.font='13px Inter';x.textAlign='center';x.fillText('No refunds recorded',cv.width/2,cv.height/2);
   }
-
-  // ── Chart H: ROI per SKU ──
   const roiData=skus.map(d=>{
     const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
-    const cg=p?p.cost*d.qty:0,sh2=p?p.ship*d.qty:0,ad2=p?p.ads:0;
-    const cost=cg+sh2+ad2+d.fees+d.returns;
+    const cg2=p?p.cost*d.qty:0,sh2=p?p.ship*d.qty:0,ad2=p?p.ads:0;
+    const cost=cg2+sh2+ad2+d.fees+d.returns;
     const profit=d.revenue-cost;
     const roi=cost>0?(profit/cost*100):null;
     return{sku:d.sku,roi};
   }).filter(d=>d.roi!==null).sort((a,b)=>b.roi-a.roi).slice(0,15);
   dCh('ch-roi');
-  CH['ch-roi']=new Chart(document.getElementById('ch-roi'),{type:'bar',data:{labels:roiData.map(d=>d.sku),datasets:[{label:'ROI %',data:roiData.map(d=>d.roi),backgroundColor:roiData.map(d=>d.roi>=0?'#d1fae5':'#fee2e2'),borderColor:roiData.map(d=>d.roi>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v.toFixed(0)+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
+  CH['ch-roi']=new Chart(document.getElementById('ch-roi'),{type:'bar',data:{labels:roiData.map(d=>d.sku),datasets:[{label:'ROI %',data:roiData.map(d=>d.roi),backgroundColor:roiData.map(d=>d.roi>=0?'#d1fae5':'#fee2e2'),borderColor:roiData.map(d=>d.roi>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v.toFixed(0)+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
 }
 
 function updXP(rv,np,tc,mg){
-  if(rv===undefined){const d=getFilt(),s=Object.values(d);let r=0,f=0,rt=0,c=0,sh=0,a=0;s.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());r+=d.revenue;f+=d.fees;rt+=d.returns;if(p){c+=p.cost*d.qty;sh+=p.ship*d.qty;a+=p.ads;}});a+=mAds;const t=c+sh+a+f+rt;rv=r;np=r-t;tc=t;mg=r>0?((r-t)/r*100):0;}
+  if(rv===undefined){const d=getFilt(),s=Object.values(d);let r=0,f=0,rt=0,cg2=0,sh2=0,a=0;s.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());r+=d.revenue;f+=d.fees;rt+=d.returns;if(p){cg2+=p.cost*d.qty;sh2+=p.ship*d.qty;a+=p.ads;}});a+=mAds;const t=cg2+sh2+a+f+rt;rv=r;np=r-t;tc=t;mg=r>0?((r-t)/r*100):0;}
   document.getElementById('xp-rv').textContent=c(rv||0);
   const pv=document.getElementById('xp-pf');pv.textContent=c(np||0);pv.style.color=(np||0)>=0?'var(--grn)':'var(--red)';
   document.getElementById('xp-ct').textContent=c(tc||0);
@@ -1712,16 +1643,13 @@ function expPDF(){
   const vatRateOut=(parseFloat(document.getElementById('vat-rate').value)||20)/100;
   const vatOut=rv*(vatRateOut/(1+vatRateOut));
   const f=n=>cur+Math.abs(n).toFixed(2),today=new Date().toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'});
-
   doc.setFillColor(15,32,68);doc.rect(0,0,210,44,'F');
   doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text(companyName,14,17);
   doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(180,200,230);
   doc.text('Temu P&L Report · Generated by NexaraDash · nexaradash.com · info@nexaradash.com',14,25);
   doc.text('Report Date: '+today+' · Orders: '+od,14,32);
-
   const kpis=[[f(rv),'REVENUE',[37,99,235]],[f(np),'NET PROFIT',np>=0?[5,150,105]:[220,38,38]],[f(tc),'TOTAL COSTS',[220,38,38]],[mg.toFixed(1)+'%','MARGIN',[217,119,6]]];
   kpis.forEach((k,i)=>{const x=14+i*47,y=52;doc.setFillColor(240,244,255);doc.roundedRect(x,y,44,22,2,2,'F');doc.setFontSize(7);doc.setTextColor(100,116,139);doc.setFont('helvetica','bold');doc.text(k[1],x+4,y+7);doc.setTextColor(...k[2]);doc.setFontSize(11);doc.text(k[0],x+4,y+16);});
-
   let y=84;
   doc.setFillColor(15,32,68);doc.rect(14,y,182,7,'F');doc.setTextColor(180,200,255);doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text('P&L SUMMARY',16,y+5);y+=10;
   [['Gross Revenue',f(rv)],['— Temu Platform Fees','('+f(fe)+')'],['— Returns / Refunds','('+f(rt)+')'],['— Product Cost (COGS)','('+f(cg)+')'],['— Inbound Shipping','('+f(sh)+')'],['— Ad Spend','('+f(ad)+')'],['= NET PROFIT',f(np)],['VAT Liability (est.)',f(vatOut)]].forEach((row,i)=>{
@@ -1730,11 +1658,10 @@ function expPDF(){
     doc.setTextColor(isT?(np>=0?5:220):80,isT?(np>=0?150:38):90,isT?(np>=0?105:38):120);
     doc.text(row[0],18,y+2);doc.text(row[1],196,y+2,'right');y+=8;
   });
-
   y+=8;doc.setFillColor(15,32,68);doc.rect(14,y,182,7,'F');doc.setTextColor(180,200,255);doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text('SKU PROFITABILITY',16,y+5);y+=10;
   const cols=['SKU','Units','Revenue','COGS','Fees','Net Profit','Margin'],cw=[30,14,28,25,22,28,20];
   doc.setFillColor(240,244,255);doc.rect(14,y-3,182,7,'F');doc.setFontSize(7);doc.setTextColor(100,116,139);let cx=16;
-  cols.forEach((c,i)=>{doc.text(c,cx,y+2);cx+=cw[i];});y+=8;
+  cols.forEach((col,i)=>{doc.text(col,cx,y+2);cx+=cw[i];});y+=8;
   skus.sort((a,b)=>b.revenue-a.revenue).forEach((d,ri)=>{
     if(y>272){doc.addPage();y=20;}
     const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
@@ -1743,7 +1670,6 @@ function expPDF(){
     doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(55,67,101);
     cx=16;[d.sku,d.qty,f(d.revenue),f(dc),f(d.fees),f(dn),dm.toFixed(1)+'%'].forEach((v,i)=>{doc.text(String(v),cx,y+2);cx+=cw[i];});y+=8;
   });
-
   const pg=doc.internal.getNumberOfPages();
   for(let i=1;i<=pg;i++){doc.setPage(i);doc.setFillColor(15,32,68);doc.rect(0,286,210,12,'F');doc.setFontSize(7);doc.setTextColor(160,180,220);doc.text('Powered by NexaraDash · nexaradash.com · info@nexaradash.com · Confidential',14,293);doc.text('Page '+i+' of '+pg,196,293,'right');}
   doc.save((companyName.replace(/[^a-zA-Z0-9]/g,'')||'NexaraDash')+'-PnL-'+new Date().toISOString().split('T')[0]+'.pdf');
@@ -1754,7 +1680,7 @@ function expCSV(){
   const data=getFilt(),skus=Object.values(data);
   if(!skus.length){notify('No data to export','er');return;}
   const rows=[['SKU','Product','Units','Revenue ('+cur+')','Temu Fees','Returns','COGS','Shipping','Ad Spend','Net Profit','Margin %']];
-  skus.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const c=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0,np=d.revenue-d.fees-d.returns-c-s-a,mg=d.revenue>0?(np/d.revenue*100):0;rows.push([d.sku,p?p.name:'Unknown',d.qty,d.revenue.toFixed(2),d.fees.toFixed(2),d.returns.toFixed(2),c.toFixed(2),s.toFixed(2),a.toFixed(2),np.toFixed(2),mg.toFixed(1)+'%']);});
+  skus.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const cg2=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0,np=d.revenue-d.fees-d.returns-cg2-s-a,mg=d.revenue>0?(np/d.revenue*100):0;rows.push([d.sku,p?p.name:'Unknown',d.qty,d.revenue.toFixed(2),d.fees.toFixed(2),d.returns.toFixed(2),cg2.toFixed(2),s.toFixed(2),a.toFixed(2),np.toFixed(2),mg.toFixed(1)+'%']);});
   const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
   a.download=(companyName.replace(/[^a-zA-Z0-9]/g,'')||'NexaraDash')+'-PnL-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
@@ -1783,7 +1709,6 @@ async function clrEverything(){
   notify('All data cleared','ok');
 }
 
-// Also clear PNL data on reset
 function resetUp(){
   raws=[];hdrs=[];pnl={};
   document.getElementById('mpr').classList.remove('sh');
