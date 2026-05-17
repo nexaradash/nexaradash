@@ -330,8 +330,8 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 
 .mob{display:none;position:fixed;top:10px;left:10px;z-index:200;background:var(--navy);border:none;border-radius:var(--r);padding:8px 11px;cursor:pointer;color:#fff;font-size:15px;align-items:center;box-shadow:var(--shadow2);}
 .app-hidden{display:none!important;}
-#loading-screen{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:99999;}
-#loading-screen.hide{display:none;}
+#loading-screen{position:fixed;inset:0;background:var(--navy);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:99999;}
+#loading-screen.hide{display:none;}#loading-screen.show{display:flex;}
 .ls-spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,0.15);border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite;margin-bottom:16px;}
 .ls-logo{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
 .ls-mark{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;}
@@ -1033,16 +1033,26 @@ Chart.defaults.font.family="'Inter',sans-serif";
     return;
   }
 
-  // ── THE FIX: Check if existing session is a recovery session ──
+  // ── Fast auth check: show loader only if a Supabase session token exists in storage ──
+  const hasCachedSession = Object.keys(localStorage).some(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+  if(hasCachedSession){
+    // Likely logged in — show loading screen while we verify
+    document.getElementById('loading-screen').classList.add('show');
+    document.getElementById('auth-screen').classList.remove('show');
+  }
+  // else: login form already visible by default — no flash, no delay
+
   const{data:{session}}=await sb.auth.getSession();
   if(session){
     // If session came from password recovery, sign out and force fresh login
     const isRecovery=session.user?.amr?.some(a=>a.method==='recovery');
     if(isRecovery){
       await sb.auth.signOut();
-      // auth-screen already visible, keep app hidden
+      document.getElementById('loading-screen').classList.remove('show');
+      document.getElementById('auth-screen').classList.add('show');
     } else {
       currentUser=session.user;
+      document.getElementById('loading-screen').classList.remove('show');
       document.getElementById('loading-screen').classList.add('hide');
       document.getElementById('auth-screen').classList.remove('show');
       document.getElementById('sb').classList.remove('app-hidden');
@@ -1052,9 +1062,10 @@ Chart.defaults.font.family="'Inter',sans-serif";
       await loadPNL();
     }
   }
-  // No session — hide loader, show login
+  // No session — hide loader, ensure login visible
   if(!currentUser){
-    document.getElementById('loading-screen').classList.add('hide');
+    document.getElementById('loading-screen').classList.remove('show');
+    document.getElementById('auth-screen').classList.add('show');
   }
 
   sb.auth.onAuthStateChange(async(event,session)=>{
