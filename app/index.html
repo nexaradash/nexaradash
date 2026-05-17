@@ -925,24 +925,33 @@ async function loadP(){
 async function savePNL(){
   if(!tenantId||!Object.keys(pnl).length)return;
   const payload={tenant_id:tenantId,sku:'__snapshot__',order_date:null,qty:0,revenue:0,fees:0,returns:0,settlement_ref:JSON.stringify({pnl,hdrs,saved:Date.now()})};
-  await sb.from('pnl_data').delete().eq('tenant_id',tenantId).eq('sku','__snapshot__');
-  await sb.from('pnl_data').insert([payload]);
-  showSaveBadge();
+  try{
+    // Use upsert instead of delete+insert — atomic, no data loss risk
+    const{error}=await sb.from('pnl_data').upsert([payload],{onConflict:'tenant_id,sku'});
+    if(error){
+      // Fallback: delete then insert
+      await sb.from('pnl_data').delete().eq('tenant_id',tenantId).eq('sku','__snapshot__');
+      const{error:err2}=await sb.from('pnl_data').insert([payload]);
+      if(err2){console.error('savePNL failed:',err2);return;}
+    }
+    showSaveBadge();
+  }catch(e){console.error('savePNL exception:',e);}
 }
 
 async function loadPNL(){
   if(!tenantId)return;
-  const{data}=await sb.from('pnl_data').select('*').eq('tenant_id',tenantId).eq('sku','__snapshot__').single();
-  if(data&&data.settlement_ref){
-    try{
+  try{
+    const{data,error}=await sb.from('pnl_data').select('*').eq('tenant_id',tenantId).eq('sku','__snapshot__').maybeSingle();
+    if(error){console.error('loadPNL error:',error);return;}
+    if(data&&data.settlement_ref){
       const stored=JSON.parse(data.settlement_ref);
       if(stored.pnl&&Object.keys(stored.pnl).length){
         pnl=stored.pnl;hdrs=stored.hdrs||[];
         recalc();
         notify('✓ Cloud data restored — '+Object.keys(pnl).length+' SKUs loaded','ok');
       }
-    }catch(e){}
-  }
+    }
+  }catch(e){console.error('loadPNL exception:',e);}
 }
 
 async function dbClear(store){
@@ -1631,11 +1640,12 @@ function rndCharts(){
   const gridColor='rgba(226,231,240,1)';
   const opt={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:gridColor},ticks:{color:'#94a3b8',font:{size:11}}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:11}}}}};
   dCh('ch-ov');CH['ch-ov']=new Chart(document.getElementById('ch-ov'),{type:'bar',data:{labels:['Revenue','Total Costs','Net Profit'],datasets:[{data:[rv,tc,np],backgroundColor:['#dbeafe','#fee2e2',np>=0?'#d1fae5':'#fee2e2'],borderColor:['#2563eb','#dc2626',np>=0?'#059669':'#dc2626'],borderWidth:2,borderRadius:6,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cur+cv.raw.toFixed(2)}}}}});
-  const sl=skus.map(d=>d.sku),sp=skus.map(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const cg2=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0;return d.revenue-d.fees-d.returns-cg2-s-a;});
+  const sl=skus.map(d=>(d.name&&d.name!==d.sku?d.name:d.sku).substring(0,20)),sp=skus.map(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const cg2=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0;return d.revenue-d.fees-d.returns-cg2-s-a;});
   dCh('ch-sk');CH['ch-sk']=new Chart(document.getElementById('ch-sk'),{type:'bar',data:{labels:sl,datasets:[{data:sp,backgroundColor:sp.map(v=>v>=0?'#d1fae5':'#fee2e2'),borderColor:sp.map(v=>v>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cur+cv.raw.toFixed(2)}}}}});
   dCh('ch-cs');CH['ch-cs']=new Chart(document.getElementById('ch-cs'),{type:'doughnut',data:{labels:['COGS','Temu Fees','Shipping','Ad Spend','Returns'],datasets:[{data:[cg,fe,sh,ad,rt],backgroundColor:['#dbeafe','#fee2e2','#ede9fe','#fef3c7','#ffedd5'],borderColor:['#2563eb','#dc2626','#7c3aed','#d97706','#ea580c'],borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11},color:'#64748b'}},tooltip:{callbacks:{label:cv=>cur+cv.raw.toFixed(2)}}},cutout:'65%'}});
   const sm=skus.map(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const cg2=p?p.cost*d.qty:0,s=p?p.ship*d.qty:0,a=p?p.ads:0,n=d.revenue-d.fees-d.returns-cg2-s-a;return d.revenue>0?(n/d.revenue*100):0;});
-  dCh('ch-mg');CH['ch-mg']=new Chart(document.getElementById('ch-mg'),{type:'bar',data:{labels:sl,datasets:[{data:sm,backgroundColor:sm.map(v=>v>=0?'#d1fae5':'#fee2e2'),borderColor:sm.map(v=>v>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8'}}}}});
+  const sml=skus.map(d=>(d.name&&d.name!==d.sku?d.name:d.sku).substring(0,20));
+  dCh('ch-mg');CH['ch-mg']=new Chart(document.getElementById('ch-mg'),{type:'bar',data:{labels:sml,datasets:[{data:sm,backgroundColor:sm.map(v=>v>=0?'#d1fae5':'#fee2e2'),borderColor:sm.map(v=>v>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{...opt,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8'}}}}});
   const dm={};skus.forEach(d=>{d.dates.forEach(e=>{const dt=pDt(e.date);if(!dt)return;const k=dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});dm[k]=(dm[k]||0)+e.rev;});});
   const mons=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const sd=Object.keys(dm).sort((a,b)=>{const pa=a.split(' '),pb=b.split(' ');return(mons.indexOf(pa[1])*31+parseInt(pa[0]))-(mons.indexOf(pb[1])*31+parseInt(pb[0]));});
@@ -1667,11 +1677,11 @@ function rndCharts(){
   CH['ch-mo']=new Chart(document.getElementById('ch-mo'),{type:'line',data:{labels:mkeys,datasets:[{label:'Revenue',data:mkeys.map(k=>mm[k].rv),borderColor:'#2563eb',backgroundColor:gradMo,fill:true,tension:0.4,pointBackgroundColor:'#2563eb',pointRadius:4,pointHoverRadius:7,borderWidth:2.5},{label:'Profit',data:mkeys.map(k=>mm[k].np),borderColor:'#059669',backgroundColor:gradPf,fill:true,tension:0.4,pointBackgroundColor:'#059669',pointRadius:4,pointHoverRadius:7,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:11},color:'#64748b'}},tooltip:{callbacks:{label:cv=>cur+cv.raw.toFixed(2)}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>cur+v.toFixed(0),color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8'}}}}});
   const byUnits=[...skus].sort((a,b)=>b.qty-a.qty).slice(0,10);
   dCh('ch-un');
-  CH['ch-un']=new Chart(document.getElementById('ch-un'),{type:'bar',data:{labels:byUnits.map(d=>d.sku),datasets:[{label:'Units',data:byUnits.map(d=>d.qty),backgroundColor:'#dbeafe',borderColor:'#2563eb',borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw+' units'}}},scales:{x:{grid:{color:gridColor},ticks:{color:'#94a3b8'}},y:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
+  CH['ch-un']=new Chart(document.getElementById('ch-un'),{type:'bar',data:{labels:byUnits.map(d=>(d.name&&d.name!==d.sku?d.name:d.sku).substring(0,20)),datasets:[{label:'Units',data:byUnits.map(d=>d.qty),backgroundColor:'#dbeafe',borderColor:'#2563eb',borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw+' units'}}},scales:{x:{grid:{color:gridColor},ticks:{color:'#94a3b8'}},y:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
   const rfData=skus.map(d=>({sku:d.sku,rate:d.revenue>0?(d.returns/d.revenue*100):0})).filter(d=>d.rate>0).sort((a,b)=>b.rate-a.rate).slice(0,15);
   dCh('ch-rf');
   if(rfData.length){
-    CH['ch-rf']=new Chart(document.getElementById('ch-rf'),{type:'bar',data:{labels:rfData.map(d=>d.sku),datasets:[{label:'Refund Rate',data:rfData.map(d=>d.rate),backgroundColor:rfData.map(d=>d.rate>10?'#fee2e2':'#fef3c7'),borderColor:rfData.map(d=>d.rate>10?'#dc2626':'#d97706'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v.toFixed(0)+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
+    CH['ch-rf']=new Chart(document.getElementById('ch-rf'),{type:'bar',data:{labels:rfData.map(d=>{const sk=skus.find(s=>s.sku===d.sku);return(sk&&sk.name&&sk.name!==sk.sku?sk.name:d.sku).substring(0,20);}),datasets:[{label:'Refund Rate',data:rfData.map(d=>d.rate),backgroundColor:rfData.map(d=>d.rate>10?'#fee2e2':'#fef3c7'),borderColor:rfData.map(d=>d.rate>10?'#dc2626':'#d97706'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v.toFixed(0)+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
   }else{
     const cv=document.getElementById('ch-rf');const x=cv.getContext('2d');x.clearRect(0,0,cv.width,cv.height);x.fillStyle='#cbd5e1';x.font='13px Inter';x.textAlign='center';x.fillText('No refunds recorded',cv.width/2,cv.height/2);
   }
@@ -1684,7 +1694,7 @@ function rndCharts(){
     return{sku:d.sku,roi};
   }).filter(d=>d.roi!==null).sort((a,b)=>b.roi-a.roi).slice(0,15);
   dCh('ch-roi');
-  CH['ch-roi']=new Chart(document.getElementById('ch-roi'),{type:'bar',data:{labels:roiData.map(d=>d.sku),datasets:[{label:'ROI %',data:roiData.map(d=>d.roi),backgroundColor:roiData.map(d=>d.roi>=0?'#d1fae5':'#fee2e2'),borderColor:roiData.map(d=>d.roi>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v.toFixed(0)+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
+  CH['ch-roi']=new Chart(document.getElementById('ch-roi'),{type:'bar',data:{labels:roiData.map(d=>{const sk=skus.find(s=>s.sku===d.sku);return(sk&&sk.name&&sk.name!==sk.sku?sk.name:d.sku).substring(0,20);}),datasets:[{label:'ROI %',data:roiData.map(d=>d.roi),backgroundColor:roiData.map(d=>d.roi>=0?'#d1fae5':'#fee2e2'),borderColor:roiData.map(d=>d.roi>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v.toFixed(0)+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
 }
 
 function updXP(rv,np,tc,mg){
