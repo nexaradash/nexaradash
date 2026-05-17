@@ -1265,7 +1265,8 @@ function rdFile(f){
 
 function bldMap(){
   const fields=[
-    {k:'sku',l:'SKU / Product ID'},
+    {k:'sku',l:'SKU ID (Unique Key)'},
+    {k:'skuname',l:'SKU / Product Name'},
     {k:'revenue',l:'Subtotal / Net Revenue'},
     {k:'fees',l:'Service Fee (Platform Commission)'},
     {k:'shipping',l:'Shipping Fee'},
@@ -1277,7 +1278,8 @@ function bldMap(){
     {k:'txtype',l:'Transaction Type (for refunds)'}
   ];
   const pri={
-    sku:['sku id','product sku','sku_id','skuid','sku','product id','item id'],
+    sku:['sku id','skuid','sku_id','product id','item id'],
+    skuname:['sku','product name','item name','title','product title','description'],
     revenue:['subtotal','net amount','net revenue','sale amount','order amount','revenue'],
     fees:['service fee','commission fee','platform commission','commission','platform fee','temu fee','fee'],
     shipping:['shipping','ship fee','shipping fee','freight'],
@@ -1299,7 +1301,7 @@ function bldMap(){
 
 function procMap(){
   const gc=k=>{const el=document.getElementById('map-'+k);return el?parseInt(el.value):-1;};
-  const sc=gc('sku'),rc=gc('revenue'),fc=gc('fees'),xc=gc('returns'),qc=gc('qty'),dc=gc('date');
+  const sc=gc('sku'),nc=gc('skuname'),rc=gc('revenue'),fc=gc('fees'),xc=gc('returns'),qc=gc('qty'),dc=gc('date');
   const shc=gc('shipping'),stc=gc('shipping_tax'),ptc=gc('product_tax'),ttc=gc('txtype');
   if(sc<0||rc<0){notify('SKU and Revenue columns are required','er');return;}
   pnl={};const rows=[];
@@ -1337,7 +1339,8 @@ function procMap(){
       tx==='shipping label for return purchase'
     ) return;
 
-    const sku=sc>=0?String(row[sc]||'').trim():'UNK';
+    const sku=sc>=0?String(row[sc]||'').trim():'UNK'; // SKU ID — unique key
+    const skuName=nc>=0?String(row[nc]||'').trim():'';  // Product name — display label
     const isRefund=tx==='refund';
     const rawRev=rc>=0?parseFloat(row[rc])||0:0;
     const rawFee=fc>=0?parseFloat(row[fc])||0:0;
@@ -1367,7 +1370,9 @@ function procMap(){
     }
 
     const totalFee=fee+shipTax+prodTax; // ship is revenue, not cost here
-    if(!pnl[sku])pnl[sku]={sku,revenue:0,fees:0,returns:0,qty:0,orders:0,dates:[],shipping:0,taxes:0,shippingLabels:0};
+    if(!pnl[sku])pnl[sku]={sku,name:skuName||sku,revenue:0,fees:0,returns:0,qty:0,orders:0,dates:[],shipping:0,taxes:0,shippingLabels:0};
+    // Update name if we get a better one (non-empty)
+    if(skuName&&pnl[sku].name===sku)pnl[sku].name=skuName;
     pnl[sku].revenue+=rev;
     pnl[sku].fees+=fee;
     pnl[sku].shipping+=shipTax;
@@ -1395,13 +1400,9 @@ function procMap(){
   Object.keys(pnl).forEach(sku=>{
     const exists=prods.find(p=>p.sku.trim().toLowerCase()===sku.trim().toLowerCase());
     if(!exists){
-      const nameCol=hdrs.findIndex(h=>h.toLowerCase().includes('product name')||h.toLowerCase().includes('title')||h.toLowerCase().includes('item name'));
-      let guessedName=sku;
-      if(nameCol>=0){
-        const matchRow=raws.find(r=>String(r[parseInt(document.getElementById('map-sku').value)]||'').trim()===sku);
-        if(matchRow)guessedName=String(matchRow[nameCol]||sku).trim().substring(0,60);
-      }
-      prods.push({sku,name:guessedName,cost:0,ship:0,fee:0,ads:0,autoAdded:true});
+      // Use the product name already captured in pnl object
+      const productName=pnl[sku].name&&pnl[sku].name!==sku?pnl[sku].name:sku;
+      prods.push({sku,name:productName.substring(0,80),cost:0,ship:0,fee:0,ads:0,autoAdded:true});
       autoAdded++;
     }
   });
@@ -1466,7 +1467,9 @@ function rndSKU(data){
   document.getElementById('sk-cnt').textContent=skus.length+' SKUs';
   if(!skus.length){b.innerHTML='<tr><td colspan="13"><div class="em"><div class="em-i">📈</div><div class="em-t">Import sales data to see your P&L report</div></div></td></tr>';return;}
   const rows=skus.map(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
-    const cg=p?p.cost*d.qty:0,sh=p?p.ship*d.qty:0,ad=p?p.ads:0,tsh=d.shipping||0,nm=p?(p.autoAdded&&p.cost===0?'⚠️ '+p.name:p.name):'⚠️ Not in products';
+    const cg=p?p.cost*d.qty:0,sh=p?p.ship*d.qty:0,ad=p?p.ads:0,tsh=d.shipping||0;
+    const displayName=p?p.name:(d.name&&d.name!==d.sku?d.name:d.sku);
+    const nm=p?(p.autoAdded&&p.cost===0?'⚠️ '+displayName:displayName):'⚠️ '+displayName;
     const hasCOGS=p&&p.cost>0;
     const np=d.revenue-d.fees-d.returns-cg-sh-ad-tsh,mg=d.revenue>0?(np/d.revenue*100):0;
     const refundRate=d.orders>0?(d.returns/d.revenue*100):0;
@@ -1685,7 +1688,7 @@ function rndCharts(){
 }
 
 function updXP(rv,np,tc,mg){
-  if(rv===undefined){const d=getFilt(),s=Object.values(d);let r=0,f=0,rt=0,cg2=0,sh2=0,a=0;s.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());r+=d.revenue;f+=d.fees;rt+=d.returns;if(p){cg2+=p.cost*d.qty;sh2+=p.ship*d.qty;a+=p.ads;}});a+=mAds;const t=cg2+sh2+a+f+rt;rv=r;np=r-t;tc=t;mg=r>0?((r-t)/r*100):0;}
+  if(rv===undefined){const d=getFilt(),s=Object.values(d);let r=0,f=0,rt=0,cg2=0,sh2=0,tsh2=0,a=0;s.forEach(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());r+=d.revenue;f+=d.fees;rt+=d.returns;tsh2+=(d.shipping||0);if(p){cg2+=p.cost*d.qty;sh2+=p.ship*d.qty;a+=p.ads;}});a+=mAds;const t=cg2+sh2+a+f+rt+mOth+tsh2;rv=r;np=r-t;tc=t;mg=r>0?((r-t)/r*100):0;}
   document.getElementById('xp-rv').textContent=c(rv||0);
   const pv=document.getElementById('xp-pf');pv.textContent=c(np||0);pv.style.color=(np||0)>=0?'var(--grn)':'var(--red)';
   document.getElementById('xp-ct').textContent=c(tc||0);
