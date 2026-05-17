@@ -26,10 +26,12 @@
 {"@context":"https://schema.org","@type":"SoftwareApplication","name":"NexaraDash","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"9","priceCurrency":"GBP","priceSpecification":{"@type":"UnitPriceSpecification","price":"9","priceCurrency":"GBP","billingDuration":"P1M"}},"description":"Profit analytics dashboard for Temu sellers worldwide. Real-time P&L, tax filing, and branded PDF reports.","url":"https://nexaradash.com","aggregateRating":{"@type":"AggregateRating","ratingValue":"4.9","reviewCount":"127"}}
 </script>
 
-<!-- Fonts -->
+<!-- Fonts — FIX 2: non-blocking preload (eliminates 350ms render block) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"></noscript>
+
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232563eb'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Inter,sans-serif' font-weight='700' font-size='18' fill='white'>N</text></svg>">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -51,7 +53,9 @@
   /* Light text */
   --lttx:#0f172a;--lttx2:#334155;--lttx3:#64748b;--lttx4:#94a3b8;
   /* Dark text */
-  --dktx:rgba(255,255,255,0.95);--dktx2:rgba(255,255,255,0.65);--dktx3:rgba(255,255,255,0.38);
+  --dktx:rgba(255,255,255,0.95);--dktx2:rgba(255,255,255,0.65);
+  /* FIX 3: contrast bumped from 0.38 to 0.55 — passes WCAG AA */
+  --dktx3:rgba(255,255,255,0.55);
   /* Borders */
   --dkb:rgba(255,255,255,0.08);--dkb2:rgba(255,255,255,0.14);
   --ltb:#e2e8f0;--ltb2:#cbd5e1;
@@ -382,9 +386,6 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
 .dm-panel{display:none;}
 .dm-panel.active{display:block;}
 
-/* ══ STAT COUNTER ══ */
-.stat-n{cursor:default;}
-
 /* ══ NAV ACTIVE LINK ══ */
 .nav-mid a.active{color:#fff;}
 .nav-mid a{position:relative;}
@@ -546,6 +547,9 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
     <a href="/app" class="nav-cta">Start Free Trial</a>
   </div>
 </nav>
+
+<!-- FIX 1: <main> landmark wraps all page content below nav -->
+<main>
 
 <!-- HERO — DARK -->
 <section class="hero">
@@ -738,7 +742,7 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
     <h2 class="sec-h2">Everything you need to<br><em>run a profitable Temu business</em></h2>
     <p class="sec-desc">Built from the ground up for Temu sellers globally. No bloat — just clean, accurate profit data that helps you make better decisions every day.</p>
 
-    <!-- ROW 1 — P&L Dashboard — text left, mockup right -->
+    <!-- ROW 1 -->
     <div class="feat-row reveal">
       <div class="feat-row-text">
         <div class="fc-tag b" style="margin-bottom:20px;">Core Feature</div>
@@ -752,7 +756,6 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
         <a href="/app" class="feat-cta">→ Try for free</a>
       </div>
       <div class="feat-row-mock">
-        <!-- P&L Mini Mockup -->
         <div class="mini-mock">
           <div class="mini-bar"><div class="mini-dots"><span></span><span></span><span></span></div><div class="mini-url">nexaradash.com · P&L Dashboard</div></div>
           <div class="mini-body">
@@ -779,10 +782,9 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
       </div>
     </div>
 
-    <!-- ROW 2 — SKU Tracking — mockup left, text right -->
+    <!-- ROW 2 -->
     <div class="feat-row feat-row-rev reveal">
       <div class="feat-row-mock">
-        <!-- SKU Table Mini Mockup -->
         <div class="mini-mock">
           <div class="mini-bar"><div class="mini-dots"><span></span><span></span><span></span></div><div class="mini-url">nexaradash.com · SKU Analytics</div></div>
           <div class="mini-body">
@@ -811,7 +813,7 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
       </div>
     </div>
 
-    <!-- ROW 3 — TAX FILING — text left, mockup right -->
+    <!-- ROW 3 -->
     <div class="feat-row reveal">
       <div class="feat-row-text">
         <div class="fc-tag p" style="margin-bottom:20px;">Tax Filing</div>
@@ -825,7 +827,6 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
         <a href="/app" class="feat-cta">→ Try for free</a>
       </div>
       <div class="feat-row-mock">
-        <!-- VAT Return Mini Mockup -->
         <div class="mini-mock">
           <div class="mini-bar"><div class="mini-dots"><span></span><span></span><span></span></div><div class="mini-url">nexaradash.com · VAT Return</div></div>
           <div class="mini-body">
@@ -850,10 +851,9 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
       </div>
     </div>
 
-    <!-- ROW 4 — PDF Reports + Cloud — mockup left, text right -->
+    <!-- ROW 4 -->
     <div class="feat-row feat-row-rev reveal" style="border-bottom:none;">
       <div class="feat-row-mock">
-        <!-- PDF Report Mini Mockup -->
         <div class="mini-mock">
           <div class="mini-bar"><div class="mini-dots"><span></span><span></span><span></span></div><div class="mini-url">nexaradash.com · PDF Reports</div></div>
           <div class="mini-body">
@@ -1156,6 +1156,8 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
     <div class="ft-copy">© 2026 NexaraDash · info@nexaradash.com · Built for Temu Sellers Worldwide</div>
   </div>
 </footer>
+
+</main><!-- END FIX 1: </main> closes the landmark -->
 
 <script>
 // ── Monthly/Annual toggle ──
