@@ -1303,34 +1303,94 @@ function procMap(){
   const shc=gc('shipping'),stc=gc('shipping_tax'),ptc=gc('product_tax'),ttc=gc('txtype');
   if(sc<0||rc<0){notify('SKU and Revenue columns are required','er');return;}
   pnl={};const rows=[];
+
+  // ── Pass 1: find the "Others" and "Total" column indices from headers ──
+  // These are needed for shipping label costs and refund totals
+  const othersCol=hdrs.findIndex(h=>h.toLowerCase()==='others');
+  const totalCol=hdrs.findIndex(h=>h.toLowerCase()==='total');
+
+  // ── Pass 2: accumulate shipping label costs per order ID ──
+  // Temu charges shipping labels as separate rows — we spread the cost
+  // across all SKUs proportionally (stored in a global pool)
+  let totalShippingLabelCost=0;
   raws.forEach(row=>{
+    const tx=ttc>=0?String(row[ttc]||'').trim().toLowerCase():'';
+    // Shipping label purchase = outbound shipping cost charged by Temu
+    if(tx==='shipping label purchase'||tx==='shipping label purchase adjustment'){
+      const cost=othersCol>=0?parseFloat(row[othersCol])||0:0;
+      totalShippingLabelCost+=Math.abs(cost); // always positive cost
+    }
+  });
+
+  // ── Pass 3: process order payment and refund rows ──
+  raws.forEach(row=>{
+    const tx=ttc>=0?String(row[ttc]||'').trim().toLowerCase():'';
+
+    // Skip rows that are not P&L relevant
+    if(
+      tx==='transfer'||
+      tx==='shipping label purchase'||
+      tx==='shipping label purchase adjustment'||
+      tx==='shipping label for return purchase covered by platform'||
+      tx==='shipping label for return purchase adjustment covered by platform'||
+      tx==='return shipping credit'||
+      tx==='shipping label for return purchase'
+    ) return;
+
     const sku=sc>=0?String(row[sc]||'').trim():'UNK';
-    const txType=ttc>=0?String(row[ttc]||'').trim().toLowerCase():'';
-    const isRefund=txType==='refund'||txType.includes('refund');
+    const isRefund=tx==='refund';
     const rawRev=rc>=0?parseFloat(row[rc])||0:0;
     const rawFee=fc>=0?parseFloat(row[fc])||0:0;
     const rawShip=shc>=0?parseFloat(row[shc])||0:0;
     const rawShipTax=stc>=0?parseFloat(row[stc])||0:0;
     const rawProdTax=ptc>=0?parseFloat(row[ptc])||0:0;
-    const rawRet=xc>=0?parseFloat(row[xc])||0:0;
+    const rawTotal=totalCol>=0?parseFloat(row[totalCol])||0:0;
     const qty=qc>=0?Math.abs(parseFloat(row[qc])||1):1;
     const date=dc>=0?row[dc]:'';
+
     if(!sku)return;
-    let rev=rawRev,fee=Math.abs(rawFee),ship=Math.abs(rawShip),shipTax=Math.abs(rawShipTax),prodTax=Math.abs(rawProdTax),ret=Math.abs(rawRet);
-    if(isRefund){ret=Math.abs(rawRev);rev=0;fee=0;ship=0;}
-    if(rev===0&&ret===0)return;
-    const totalFee=fee+ship+shipTax+prodTax;
-    if(!pnl[sku])pnl[sku]={sku,revenue:0,fees:0,returns:0,qty:0,orders:0,dates:[],shipping:0,taxes:0};
+
+    let rev=0,fee=0,ship=0,shipTax=0,prodTax=0,ret=0;
+
+    if(isRefund){
+      // Refund row: Total column holds the negative refund amount
+      ret=Math.abs(rawTotal);
+      if(ret===0)return;
+    } else {
+      // Order Payment row
+      rev=rawRev; // Subtotal = net revenue after platform discounts
+      fee=Math.abs(rawFee); // Service fee (already negative in file)
+      ship=Math.abs(rawShip); // Temu shipping credited to seller
+      shipTax=Math.abs(rawShipTax);
+      prodTax=Math.abs(rawProdTax);
+      if(rev===0)return;
+    }
+
+    const totalFee=fee+shipTax+prodTax; // ship is revenue, not cost here
+    if(!pnl[sku])pnl[sku]={sku,revenue:0,fees:0,returns:0,qty:0,orders:0,dates:[],shipping:0,taxes:0,shippingLabels:0};
     pnl[sku].revenue+=rev;
     pnl[sku].fees+=fee;
-    pnl[sku].shipping+=ship+shipTax;
+    pnl[sku].shipping+=shipTax;
     pnl[sku].taxes+=prodTax;
     pnl[sku].returns+=ret;
     pnl[sku].qty+=isRefund?0:qty;
     pnl[sku].orders++;
     pnl[sku].dates.push({date,rev});
-    rows.push({sku,rev,fee:totalFee,ship,ret,qty,date,isRefund});
+    rows.push({sku,rev,fee:totalFee,ship:0,ret,qty,date,isRefund});
   });
+
+  // ── Pass 4: distribute shipping label costs across SKUs by revenue share ──
+  // This correctly attributes the real outbound shipping cost to each SKU
+  if(totalShippingLabelCost>0){
+    const totalRev=Object.values(pnl).reduce((a,d)=>a+d.revenue,0);
+    if(totalRev>0){
+      Object.values(pnl).forEach(d=>{
+        const share=d.revenue/totalRev;
+        d.shippingLabels=totalShippingLabelCost*share;
+        d.shipping+=d.shippingLabels; // add to shipping so recalc picks it up
+      });
+    }
+  }
   let autoAdded=0;
   Object.keys(pnl).forEach(sku=>{
     const exists=prods.find(p=>p.sku.trim().toLowerCase()===sku.trim().toLowerCase());
