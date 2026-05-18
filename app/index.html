@@ -1279,14 +1279,14 @@ Chart.defaults.font.family="'Inter',system-ui,sans-serif";
   if(hasCachedSession){ls.classList.add('show');as.classList.remove('show');}
   const{data:{session}}=await sb.auth.getSession();
   // Hide loader immediately — session check complete
-  ls.style.display='none';
+  ls.classList.remove('show');ls.style.display='none';
   if(session){
     const isRecovery=session.user?.amr?.some(a=>a.method==='recovery');
     if(isRecovery){
       await sb.auth.signOut();
       as.classList.add('show');
     }else{
-      sessionHandled=true; // mark handled so SIGNED_IN event below is ignored
+      
       currentUser=session.user;
       as.classList.remove('show');
       document.getElementById('sb').classList.remove('app-hidden');
