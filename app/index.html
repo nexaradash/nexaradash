@@ -1279,7 +1279,7 @@ Chart.defaults.font.family="'Inter',system-ui,sans-serif";
   if(hasCachedSession){ls.classList.add('show');as.classList.remove('show');}
   const{data:{session}}=await sb.auth.getSession();
   // Hide loader immediately — session check complete
-  ls.classList.remove('show');ls.classList.add('hide');
+  ls.ls.style.display='none';
   if(session){
     const isRecovery=session.user?.amr?.some(a=>a.method==='recovery');
     if(isRecovery){
@@ -1300,11 +1300,11 @@ Chart.defaults.font.family="'Inter',system-ui,sans-serif";
     if(recoveryInProgress)return;
     if(event==='SIGNED_IN'&&session){
       // Skip if already handled by getSession() above — prevents reload flicker
-      if(sessionHandled){sessionHandled=false;return;}
+      if(currentUser&&currentUser.id===session.user.id)return;
       const isRecovery=session.user?.amr?.some(a=>a.method==='recovery');
       if(isRecovery){await sb.auth.signOut();document.getElementById('auth-screen').classList.add('show');document.getElementById('sb').classList.add('app-hidden');document.getElementById('mn').classList.add('app-hidden');return;}
       currentUser=session.user;
-      document.getElementById('loading-screen').classList.add('hide');
+      document.getElementById('loading-screen').style.display='none';
       document.getElementById('auth-screen').classList.remove('show');
       document.getElementById('sb').classList.remove('app-hidden');
       document.getElementById('mn').classList.remove('app-hidden');
