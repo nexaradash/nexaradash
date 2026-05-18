@@ -1279,7 +1279,7 @@ Chart.defaults.font.family="'Inter',system-ui,sans-serif";
   if(hasCachedSession){ls.classList.add('show');as.classList.remove('show');}
   const{data:{session}}=await sb.auth.getSession();
   // Hide loader immediately — session check complete
-  ls.ls.style.display='none';
+  ls.style.display='none';
   if(session){
     const isRecovery=session.user?.amr?.some(a=>a.method==='recovery');
     if(isRecovery){
