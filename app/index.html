@@ -39,12 +39,17 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 /* ══ SIDEBAR ══ */
 .sb{width:var(--sw);min-height:100vh;background:var(--navy);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:width .25s cubic-bezier(.4,0,.2,1);overflow:hidden;box-shadow:4px 0 24px rgba(15,32,68,0.25);}
 .sb.col{width:var(--swc);}
-.sb-tog{width:32px;height:32px;border-radius:var(--r);background:rgba(255,255,255,0.08);border:1px solid var(--navyrim);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:rgba(255,255,255,0.7);transition:background .15s;position:static;}
+.sb-tog{width:32px;height:32px;min-width:32px;border-radius:var(--r);background:rgba(255,255,255,0.08);border:1px solid var(--navyrim);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:rgba(255,255,255,0.7);transition:background .15s;}
 .sb-tog:hover{background:rgba(255,255,255,0.15);color:#fff;}
-.sb-tog svg{width:16px;height:16px;transition:transform .25s;}
-.sb.col .sb-tog svg{transform:rotate(180deg);}
-.sb-top{padding:16px 18px;border-bottom:1px solid var(--navyrim);white-space:nowrap;overflow:hidden;}
-.sb-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sb-tog svg{width:16px;height:16px;}
+.sb-top{padding:14px 14px 12px;border-bottom:1px solid var(--navyrim);}
+.sb-top-row{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:36px;}
+/* logo text fades out when collapsed, mark stays visible */
+.sb-logo-text{overflow:hidden;transition:opacity .2s;white-space:nowrap;}
+.sb.col .sb-logo-text{opacity:0;width:0;}
+/* cl-card collapses smoothly */
+.cl-card{background:rgba(255,255,255,0.07);border:1px solid var(--navyrim);border-radius:var(--r);padding:10px 12px;margin-top:10px;transition:opacity .2s,max-height .25s,margin .25s,padding .25s;max-height:80px;overflow:hidden;}
+.sb.col .cl-card{opacity:0;max-height:0;margin-top:0;padding-top:0;padding-bottom:0;pointer-events:none;}
 .nx-logo{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
 .nx-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 4px 12px rgba(59,130,246,0.4);}
 .nx-name{font-size:13px;font-weight:700;color:var(--navytx);}
@@ -451,9 +456,9 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 <aside class="sb app-hidden" id="sb">
   <div class="sb-top">
     <div class="sb-top-row">
-      <div class="nx-logo" style="margin-bottom:0;">
+      <div class="nx-logo" style="margin-bottom:0;gap:8px;">
         <div class="nx-mark">N</div>
-        <div><div class="nx-name">NexaraDash</div><div class="nx-tag">nexaradash.com</div></div>
+        <div class="sb-logo-text"><div class="nx-name">NexaraDash</div><div class="nx-tag">nexaradash.com</div></div>
       </div>
       <div class="sb-tog" onclick="toggleSB()" title="Toggle sidebar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -1205,6 +1210,8 @@ async function loadPNL(){
       }
     }
   }catch(e){console.error('loadPNL exception:',e);}
+  // Always run onboarding check after loadPNL — pnl is now in final state
+  updOnboarding();
 }
 
 async function dbClear(store){
@@ -1230,6 +1237,7 @@ Chart.defaults.font.family="'Inter',system-ui,sans-serif";
 (async()=>{
   const bc=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('nexaradash_auth'):null;
   let recoveryInProgress=false;
+  let sessionHandled=false; // ← blocks duplicate SIGNED_IN event on reload
   if(bc){
     bc.onmessage=(e)=>{
       if(e.data==='PASSWORD_RECOVERY_STARTED'){
@@ -1255,7 +1263,7 @@ Chart.defaults.font.family="'Inter',system-ui,sans-serif";
   const as=document.getElementById('auth-screen');
   if(hasCachedSession){ls.classList.add('show');as.classList.remove('show');}
   const{data:{session}}=await sb.auth.getSession();
-  // Always hide loader immediately after session check resolves
+  // Hide loader immediately — session check complete
   ls.classList.remove('show');ls.classList.add('hide');
   if(session){
     const isRecovery=session.user?.amr?.some(a=>a.method==='recovery');
@@ -1263,6 +1271,7 @@ Chart.defaults.font.family="'Inter',system-ui,sans-serif";
       await sb.auth.signOut();
       as.classList.add('show');
     }else{
+      sessionHandled=true; // mark handled so SIGNED_IN event below is ignored
       currentUser=session.user;
       as.classList.remove('show');
       document.getElementById('sb').classList.remove('app-hidden');
@@ -1275,6 +1284,8 @@ Chart.defaults.font.family="'Inter',system-ui,sans-serif";
     if(event==='PASSWORD_RECOVERY'){recoveryInProgress=true;window.location.href='/reset-password'+window.location.hash;return;}
     if(recoveryInProgress)return;
     if(event==='SIGNED_IN'&&session){
+      // Skip if already handled by getSession() above — prevents reload flicker
+      if(sessionHandled){sessionHandled=false;return;}
       const isRecovery=session.user?.amr?.some(a=>a.method==='recovery');
       if(isRecovery){await sb.auth.signOut();document.getElementById('auth-screen').classList.add('show');document.getElementById('sb').classList.add('app-hidden');document.getElementById('mn').classList.add('app-hidden');return;}
       currentUser=session.user;
@@ -1654,6 +1665,7 @@ function procMap(){
   document.getElementById('imp-ok-t').textContent=rows.length+' orders imported · Revenue: '+c(totRev)+' · Data saved to cloud';
   document.getElementById('imp-ok').classList.add('sh');
   recalc();savePNL();
+  updOnboarding();
   notify('P&L calculated & saved!','ok');
 }
 
@@ -1705,12 +1717,15 @@ function recalc(){
   else sw.classList.remove('sh');
   rndSKU(data);updXP(rv,np,tc,mg);
   rndPeriodTiles();
-  // Auto-hide onboarding when data exists
+}
+
+function updOnboarding(){
   const hasData=Object.keys(pnl).length>0;
   const onboardHd=document.getElementById('onboard-hd');
   const onboardSteps=document.getElementById('onboard-steps');
   if(onboardHd)onboardHd.style.display=hasData?'none':'flex';
   if(onboardSteps)onboardSteps.style.display=hasData?'none':'grid';
+}
 }
 
 function rndSKU(data){
@@ -1999,6 +2014,7 @@ async function clrEverything(){
   document.getElementById('man-ads').value='';
   document.getElementById('man-oth').value='';
   showSaveBadge();notify('All data cleared successfully','ok');
+  updOnboarding();
 }
 
 function resetUp(){
