@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>P&L Dashboard · NexaraDash</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232563eb'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Inter,sans-serif' font-weight='700' font-size='18' fill='white'>N</text></svg>">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
@@ -12,24 +11,19 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
-  /* Navy sidebar palette */
   --navy:#0f2044;--navy2:#162a56;--navy3:#1d3568;--navy4:#1a3060;
   --navyrim:rgba(255,255,255,0.08);--navyrim2:rgba(255,255,255,0.14);
   --navytx:#ffffff;--navytx2:rgba(255,255,255,0.65);--navytx3:rgba(255,255,255,0.35);
-  /* White content palette */
   --bg:#f4f6fb;--bg2:#ffffff;--bg3:#eef1f8;
   --border:#e2e7f0;--border2:#c8d0e7;--border3:#a0aec8;
-  /* Accent colours */
   --blu:#1a56db;--blu2:#2563eb;--blu3:#3b82f6;--blul:#eff6ff;--blubl:#bfdbfe;
   --grn:#059669;--grn2:#10b981;--grnl:#ecfdf5;--grnbl:#a7f3d0;
   --red:#dc2626;--red2:#ef4444;--redl:#fef2f2;--redbl:#fecaca;
   --amb:#d97706;--amb2:#f59e0b;--ambl:#fffbeb;--ambbl:#fde68a;
   --vat:#7c3aed;--vat2:#8b5cf6;--vatl:#f5f3ff;--vatbl:#ddd6fe;
-  /* Text */
   --tx:#0f1729;--tx2:#374365;--tx3:#64748b;--tx4:#94a3b8;
-  /* Layout */
   --sw:260px;--swc:64px;--hh:60px;
-  --fd:'Inter',sans-serif;--fs:'Inter',sans-serif;
+  --fd:'Inter',system-ui,sans-serif;--fs:'Inter',system-ui,sans-serif;
   --r:8px;--r2:12px;--r3:16px;
   --shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);
   --shadow2:0 4px 16px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
@@ -55,7 +49,6 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 .cl-card{background:rgba(255,255,255,0.07);border:1px solid var(--navyrim);border-radius:var(--r);padding:10px 12px;}
 .cl-name{font-size:12px;font-weight:600;color:var(--navytx);line-height:1.3;}
 .cl-sub{font-size:9px;color:var(--navytx3);margin-top:2px;letter-spacing:.04em;text-transform:uppercase;}
-
 .nav{flex:1;padding:10px 10px;overflow-y:auto;overflow-x:hidden;}
 .nl{font-size:9px;font-weight:600;color:var(--navytx3);letter-spacing:.14em;text-transform:uppercase;padding:0 8px;margin:14px 0 4px;}
 .sb.col .nl{opacity:0;}
@@ -93,16 +86,39 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 .dc{font-size:11px;color:var(--tx2);background:var(--bg3);border:1px solid var(--border);padding:5px 12px;border-radius:6px;display:flex;align-items:center;gap:6px;font-weight:500;}
 .gbadge{font-size:10px;font-weight:600;color:var(--grn);background:var(--grnl);border:1px solid var(--grnbl);padding:4px 10px;border-radius:6px;letter-spacing:.02em;}
 
-/* ══ TABS ══ */
+/* ══ USER MENU DROPDOWN ══ */
+.usr-menu{position:relative;}
+.usr-btn{display:flex;align-items:center;gap:7px;cursor:pointer;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);transition:all .15s;user-select:none;}
+.usr-btn:hover{border-color:var(--border3);background:var(--bg3);}
+.usr-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
+.usr-name{font-size:11px;font-weight:600;color:var(--tx2);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.usr-chev{font-size:9px;color:var(--tx3);transition:transform .2s;line-height:1;}
+.usr-btn.open .usr-chev{transform:rotate(180deg);}
+.usr-drop{position:absolute;top:calc(100% + 8px);right:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);box-shadow:var(--shadow3);min-width:210px;z-index:200;display:none;overflow:hidden;animation:fu .15s ease;}
+.usr-drop.show{display:block;}
+.usr-info{padding:12px 14px;}
+.usr-info-name{font-size:12px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.usr-info-sub{font-size:10px;color:var(--tx3);margin-top:2px;}
+.usr-divider{height:1px;background:var(--border);}
+.usr-item{padding:10px 14px;font-size:12px;font-weight:500;color:var(--tx2);cursor:pointer;transition:background .12s;display:flex;align-items:center;gap:8px;}
+.usr-item:hover{background:var(--bg3);color:var(--tx);}
+.usr-logout{color:var(--red)!important;}
+.usr-logout:hover{background:var(--redl)!important;}
+
+/* ══ TABS — Sellerboard style ══ */
 .tabs{display:flex;padding:0 24px;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:var(--hh);z-index:40;overflow-x:auto;gap:0;}
-.tab{padding:12px 16px;font-size:12px;font-weight:500;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
+.tab{padding:10px 16px;font-size:12px;font-weight:500;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px;}
 .tab:hover{color:var(--tx2);}
+.tab:hover .tab-ic{opacity:.75;}
 .tab.act{color:var(--blu2);border-bottom-color:var(--blu2);font-weight:600;}
+.tab.act .tab-ic{opacity:1;color:var(--blu2);}
+.tab-ic{width:14px;height:14px;flex-shrink:0;opacity:.4;transition:opacity .15s;color:currentColor;}
 
 /* ══ PAGE ══ */
 .pg{flex:1;padding:24px;display:none;}
 .pg.act{display:block;animation:fu .2s ease;}
 @keyframes fu{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* ══ FILTER BAR ══ */
 .fbar{display:flex;align-items:center;gap:6px;margin-bottom:20px;flex-wrap:wrap;background:var(--bg2);padding:10px 14px;border-radius:var(--r2);border:1px solid var(--border);box-shadow:var(--shadow);}
@@ -113,6 +129,36 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 .fdt{background:var(--bg2);border:1px solid var(--border);color:var(--tx2);padding:5px 9px;border-radius:6px;font-size:11px;font-family:var(--fd);}
 .fdt:focus{outline:none;border-color:var(--blu3);}
 .flb{font-size:11px;color:var(--tx3);font-weight:500;}
+
+/* ══ PERIOD COMPARISON TILES ══ */
+.ptiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.ptile{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s;cursor:default;}
+.ptile:hover{box-shadow:var(--shadow2);transform:translateY(-1px);}
+.ptile-hd{padding:12px 16px 10px;border-bottom:1px solid var(--border);}
+.ptile-hd-row{display:flex;align-items:center;justify-content:space-between;}
+.ptile-label{font-size:12px;font-weight:700;color:#fff;letter-spacing:.01em;}
+.ptile-date{font-size:10px;color:rgba(255,255,255,0.75);margin-top:2px;}
+.ptile.today .ptile-hd{background:linear-gradient(135deg,#1a56db,#2563eb);}
+.ptile.yesterday .ptile-hd{background:linear-gradient(135deg,#0e7490,#0891b2);}
+.ptile.mtd .ptile-hd{background:linear-gradient(135deg,#059669,#10b981);}
+.ptile.lastmonth .ptile-hd{background:linear-gradient(135deg,#7c3aed,#8b5cf6);}
+.ptile-body{padding:12px 16px 14px;}
+.ptile-sales{font-size:22px;font-weight:800;color:var(--tx);letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1;margin-bottom:2px;}
+.ptile-delta{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-bottom:10px;}
+.ptile-delta.pos{background:var(--grnl);color:var(--grn);border:1px solid var(--grnbl);}
+.ptile-delta.neg{background:var(--redl);color:var(--red);border:1px solid var(--redbl);}
+.ptile-delta.neu{background:var(--bg3);color:var(--tx3);border:1px solid var(--border);}
+.ptile-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;}
+.ptile-row{display:flex;flex-direction:column;gap:1px;}
+/* ▸ CONTRAST FIX — sec-label on dark/light backgrounds */
+.ptile-row-lbl{font-size:9px;font-weight:600;color:#4a5568;letter-spacing:.06em;text-transform:uppercase;}
+.ptile-row-val{font-size:12px;font-weight:700;color:var(--tx);}
+.ptile-row-val.neg{color:var(--red);}
+.ptile-row-val.pos{color:var(--grn);}
+.ptile-divider{height:1px;background:var(--border);margin:8px 0;}
+.ptile-np{display:flex;justify-content:space-between;align-items:center;}
+.ptile-np-lbl{font-size:10px;font-weight:600;color:var(--tx3);}
+.ptile-np-val{font-size:13px;font-weight:800;letter-spacing:-.01em;}
 
 /* ══ KPI CARDS ══ */
 .kg{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px;}
@@ -125,7 +171,8 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 .mg .kc-accent{background:linear-gradient(90deg,var(--amb),var(--amb2));}
 .rf .kc-accent{background:linear-gradient(90deg,var(--red),var(--red2));}
 .kc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:4px;}
-.kl{font-size:10px;font-weight:600;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;}
+/* ▸ CONTRAST FIX — .kl (was .sec-label equivalent on KPI cards) */
+.kl{font-size:10px;font-weight:600;color:#4a5568;letter-spacing:.08em;text-transform:uppercase;}
 .ki2{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;}
 .rv .ki2{background:var(--blul);}
 .pf .ki2{background:var(--grnl);}
@@ -139,13 +186,15 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 
 /* ══ SECTION ══ */
 .sh2{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
-.sh2-txt{font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;}
+/* ▸ CONTRAST FIX — .sh2-txt (section labels) */
+.sh2-txt{font-size:11px;font-weight:700;color:#4a5568;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;}
 .sh2-line{flex:1;height:1px;background:var(--border);}
 
 /* ══ SUMMARY CARDS ══ */
 .sg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
 .sc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px;box-shadow:var(--shadow);}
-.sc-t{font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+/* ▸ CONTRAST FIX — .sc-t (card section titles) */
+.sc-t{font-size:10px;font-weight:700;color:#4a5568;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
 .sr{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bg3);font-size:12px;}
 .sr:last-child{border-bottom:none;}
 .sr .lb{color:var(--tx2);}.sr .vl{color:var(--tx);font-weight:600;}
@@ -160,7 +209,8 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 .vc:hover{box-shadow:var(--shadow2);transform:translateY(-1px);}
 .vc-accent{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--vat),var(--vat2));border-radius:var(--r2) var(--r2) 0 0;}
 .vc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:4px;}
-.vc-lbl{font-size:10px;font-weight:600;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;}
+/* ▸ CONTRAST FIX */
+.vc-lbl{font-size:10px;font-weight:600;color:#4a5568;letter-spacing:.08em;text-transform:uppercase;}
 .vc-icon{width:30px;height:30px;border-radius:8px;background:var(--vatl);display:flex;align-items:center;justify-content:center;font-size:14px;}
 .vc-val{font-size:24px;font-weight:800;color:var(--vat);letter-spacing:-.02em;margin-bottom:4px;font-variant-numeric:tabular-nums;line-height:1.1;}
 .vc-sub{font-size:10px;color:var(--tx4);}
@@ -327,7 +377,6 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 .auth-err{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 12px;font-size:12px;color:#dc2626;margin-bottom:12px;display:none;}
 .auth-reset-msg{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 12px;font-size:12px;color:#16a34a;margin-bottom:12px;display:none;}
 .auth-footer{margin-top:20px;font-size:10px;color:var(--tx4);text-align:center;}
-
 .mob{display:none;position:fixed;top:10px;left:10px;z-index:200;background:var(--navy);border:none;border-radius:var(--r);padding:8px 11px;cursor:pointer;color:#fff;font-size:15px;align-items:center;box-shadow:var(--shadow2);}
 .app-hidden{display:none!important;}
 #loading-screen{position:fixed;inset:0;background:var(--navy);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:99999;}
@@ -337,14 +386,16 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 .ls-mark{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;}
 .ls-name{font-size:17px;font-weight:700;color:#fff;}
 .ls-txt{font-size:12px;color:rgba(255,255,255,0.4);}
+
+@media(max-width:1200px){.ptiles{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:1100px){.kg{grid-template-columns:repeat(3,1fr);}.vat-grid{grid-template-columns:repeat(2,1fr);}.cg{grid-template-columns:1fr;}.cc.full{grid-column:auto;}}
-@media(max-width:768px){.sb{transform:translateX(-100%);}.sb.mop{transform:translateX(0);}.mn{margin-left:0!important;}.mob{display:flex;}.kg,.vat-grid{grid-template-columns:1fr 1fr;}.sg,.stg,.xf,.fg,.vat-settings,.vf-grid{grid-template-columns:1fr;}.mpg{grid-template-columns:1fr;}.pg{padding:16px;}}
+@media(max-width:768px){.sb{transform:translateX(-100%);}.sb.mop{transform:translateX(0);}.mn{margin-left:0!important;}.mob{display:flex;}.kg,.vat-grid{grid-template-columns:1fr 1fr;}.ptiles{grid-template-columns:1fr 1fr;}.sg,.stg,.xf,.fg,.vat-settings,.vf-grid{grid-template-columns:1fr;}.mpg{grid-template-columns:1fr;}.pg{padding:16px;}}
+@media(max-width:480px){.ptiles{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
-<!-- ══ AUTH SCREEN ══ -->
-<!-- LOADING SCREEN -->
+<!-- ══ LOADING SCREEN ══ -->
 <div id="loading-screen">
   <div class="ls-logo">
     <div class="ls-mark">N</div>
@@ -354,6 +405,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
   <div class="ls-txt">Loading your dashboard...</div>
 </div>
 
+<!-- ══ AUTH SCREEN ══ -->
 <div id="auth-screen" class="show">
   <div class="auth-box">
     <div class="auth-logo">
@@ -458,34 +510,190 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     <div class="hr2">
       <div class="dc"><div class="pw-dot"></div><span id="ldate"></span></div>
       <div id="save-badge" class="save-badge">💾 Auto-saved</div>
-      <button class="btn bd bsm" onclick="clrEverything()" title="Clear all products and import data" style="font-size:10px;padding:4px 10px;">🗑 Clear All</button>
-      <button class="btn bd bsm" onclick="signOut()" title="Sign out" style="font-size:10px;padding:4px 10px;">⎋ Sign Out</button>
+      <button class="btn bd bsm" onclick="clrEverything()" title="Clear all data" style="font-size:10px;padding:4px 10px;">🗑 Clear All</button>
       <div class="gbadge">● Live</div>
+      <!-- ══ USER MENU ══ -->
+      <div class="usr-menu" id="usr-menu">
+        <div class="usr-btn" onclick="toggleUsrMenu()" id="usr-btn">
+          <div class="usr-av">N</div>
+          <span class="usr-name" id="usr-display">Account</span>
+          <span class="usr-chev">▾</span>
+        </div>
+        <div class="usr-drop" id="usr-drop">
+          <div class="usr-info">
+            <div class="usr-info-name" id="usr-email-display">—</div>
+            <div class="usr-info-sub">NexaraDash · nexaradash.com</div>
+          </div>
+          <div class="usr-divider"></div>
+          <div class="usr-item" onclick="goTab('settings',null,null);closeUsrMenu()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            Settings
+          </div>
+          <div class="usr-divider"></div>
+          <div class="usr-item usr-logout" onclick="signOut()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Log out
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
+  <!-- ══ TABS — SVG icon style ══ -->
   <div class="tabs">
-    <div class="tab act" onclick="goTab('dashboard',null,this)">📊 Dashboard</div>
-    <div class="tab" onclick="goTab('products',null,this)">📦 Products</div>
-    <div class="tab" onclick="goTab('import',null,this)">📂 Import</div>
-    <div class="tab" onclick="goTab('report',null,this)">📈 P&L Report</div>
-    <div class="tab" onclick="goTab('vat',null,this)">📋 Tax Filing</div>
-    <div class="tab" onclick="goTab('charts',null,this)">📉 Charts</div>
-    <div class="tab" onclick="goTab('export',null,this)">📤 Export</div>
+    <div class="tab act" onclick="goTab('dashboard',null,this)">
+      <svg class="tab-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      Dashboard
+    </div>
+    <div class="tab" onclick="goTab('products',null,this)">
+      <svg class="tab-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      Products
+    </div>
+    <div class="tab" onclick="goTab('import',null,this)">
+      <svg class="tab-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="12 15 12 9"/><polyline points="9 12 12 15 15 12"/></svg>
+      Import
+    </div>
+    <div class="tab" onclick="goTab('report',null,this)">
+      <svg class="tab-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      P&amp;L Report
+    </div>
+    <div class="tab" onclick="goTab('vat',null,this)">
+      <svg class="tab-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Tax Filing
+    </div>
+    <div class="tab" onclick="goTab('charts',null,this)">
+      <svg class="tab-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Charts
+    </div>
+    <div class="tab" onclick="goTab('export',null,this)">
+      <svg class="tab-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export
+    </div>
   </div>
 
-  <!-- DASHBOARD -->
+  <!-- ══ DASHBOARD ══ -->
   <div class="pg act" id="pg-dashboard">
     <div class="fbar">
       <span class="flb">Period:</span>
       <button class="fb2 act" onclick="setF('all',this)">All Time</button>
       <button class="fb2" onclick="setF('today',this)">Today</button>
+      <button class="fb2" onclick="setF('yesterday',this)">Yesterday</button>
       <button class="fb2" onclick="setF('7d',this)">Last 7 Days</button>
-      <button class="fb2" onclick="setF('30d',this)">This Month</button>
+      <button class="fb2" onclick="setF('mtd',this)">This Month</button>
+      <button class="fb2" onclick="setF('lastmonth',this)">Last Month</button>
       <div class="fs2"></div>
       <span class="flb">From:</span><input type="date" class="fdt" id="df" onchange="setF('custom',null)">
       <span class="flb">To:</span><input type="date" class="fdt" id="dt2" onchange="setF('custom',null)">
     </div>
+
+    <!-- ══ PERIOD COMPARISON TILES ══ -->
+    <div class="ptiles" id="ptiles-row">
+      <div class="ptile today">
+        <div class="ptile-hd">
+          <div class="ptile-hd-row">
+            <div>
+              <div class="ptile-label">Today</div>
+              <div class="ptile-date" id="pt-today-date">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="ptile-body">
+          <div class="ptile-sales" id="pt-today-sales">—</div>
+          <div class="ptile-delta neu" id="pt-today-delta">—</div>
+          <div class="ptile-grid">
+            <div class="ptile-row"><div class="ptile-row-lbl">Orders</div><div class="ptile-row-val" id="pt-today-orders">—</div></div>
+            <div class="ptile-row"><div class="ptile-row-lbl">Refunds</div><div class="ptile-row-val neg" id="pt-today-refunds">—</div></div>
+            <div class="ptile-row"><div class="ptile-row-lbl">Units</div><div class="ptile-row-val" id="pt-today-units">—</div></div>
+            <div class="ptile-row"><div class="ptile-row-lbl">Costs</div><div class="ptile-row-val neg" id="pt-today-costs">—</div></div>
+          </div>
+          <div class="ptile-divider"></div>
+          <div class="ptile-np">
+            <span class="ptile-np-lbl">Net Profit</span>
+            <span class="ptile-np-val" id="pt-today-np">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ptile yesterday">
+        <div class="ptile-hd">
+          <div class="ptile-hd-row">
+            <div>
+              <div class="ptile-label">Yesterday</div>
+              <div class="ptile-date" id="pt-yest-date">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="ptile-body">
+          <div class="ptile-sales" id="pt-yest-sales">—</div>
+          <div class="ptile-delta neu" id="pt-yest-delta">—</div>
+          <div class="ptile-grid">
+            <div class="ptile-row"><div class="ptile-row-lbl">Orders</div><div class="ptile-row-val" id="pt-yest-orders">—</div></div>
+            <div class="ptile-row"><div class="ptile-row-lbl">Refunds</div><div class="ptile-row-val neg" id="pt-yest-refunds">—</div></div>
+            <div class="ptile-row"><div class="ptile-row-lbl">Units</div><div class="ptile-row-val" id="pt-yest-units">—</div></div>
+            <div class="ptile-row"><div class="ptile-row-lbl">Costs</div><div class="ptile-row-val neg" id="pt-yest-costs">—</div></div>
+          </div>
+          <div class="ptile-divider"></div>
+          <div class="ptile-np">
+            <span class="ptile-np-lbl">Net Profit</span>
+            <span class="ptile-np-val" id="pt-yest-np">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ptile mtd">
+        <div class="ptile-hd">
+          <div class="ptile-hd-row">
+            <div>
+              <div class="ptile-label">Month to Date</div>
+              <div class="ptile-date" id="pt-mtd-date">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="ptile-body">
+          <div class="ptile-sales" id="pt-mtd-sales">—</div>
+          <div class="ptile-delta neu" id="pt-mtd-delta">—</div>
+          <div class="ptile-grid">
+            <div class="ptile-row"><div class="ptile-row-lbl">Orders</div><div class="ptile-row-val" id="pt-mtd-orders">—</div></div>
+            <div class="ptile-row"><div class="ptile-row-lbl">Refunds</div><div class="ptile-row-val neg" id="pt-mtd-refunds">—</div></div>
+            <div class="ptile-row"><div class="ptile-row-lbl">Units</div><div class="ptile-row-val" id="pt-mtd-units">—</div></div>
+            <div class="ptile-row"><div class="ptile-row-lbl">Costs</div><div class="ptile-row-val neg" id="pt-mtd-costs">—</div></div>
+          </div>
+          <div class="ptile-divider"></div>
+          <div class="ptile-np">
+            <span class="ptile-np-lbl">Net Profit</span>
+            <span class="ptile-np-val" id="pt-mtd-np">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ptile lastmonth">
+        <div class="ptile-hd">
+          <div class="ptile-hd-row">
+            <div>
+              <div class="ptile-label">Last Month</div>
+              <div class="ptile-date" id="pt-lm-date">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="ptile-body">
+          <div class="ptile-sales" id="pt-lm-sales">—</div>
+          <div class="ptile-delta neu" id="pt-lm-delta">—</div>
+          <div class="ptile-grid">
+            <div class="ptile-row"><div class="ptile-row-lbl">Orders</div><div class="ptile-row-val" id="pt-lm-orders">—</div></div>
+            <div class="ptile-row"><div class="ptile-row-lbl">Refunds</div><div class="ptile-row-val neg" id="pt-lm-refunds">—</div></div>
+            <div class="ptile-row"><div class="ptile-row-lbl">Units</div><div class="ptile-row-val" id="pt-lm-units">—</div></div>
+            <div class="ptile-row"><div class="ptile-row-lbl">Costs</div><div class="ptile-row-val neg" id="pt-lm-costs">—</div></div>
+          </div>
+          <div class="ptile-divider"></div>
+          <div class="ptile-np">
+            <span class="ptile-np-lbl">Net Profit</span>
+            <span class="ptile-np-val" id="pt-lm-np">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ KPI CARDS ══ -->
     <div class="kg">
       <div class="kc rv"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Total Revenue</div><div class="ki2">💰</div></div><div class="kv" id="k-rv">£0.00</div><div class="ks" id="k-rv-s">0 orders processed</div></div>
       <div class="kc pf"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Net Profit</div><div class="ki2">📈</div></div><div class="kv" id="k-pf">£0.00</div><div class="ks">After all deductions</div></div>
@@ -493,6 +701,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
       <div class="kc mg"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Net Margin</div><div class="ki2">🎯</div></div><div class="kv" id="k-mg">0.0%</div><div class="ks">Net Profit / Revenue</div></div>
       <div class="kc rf"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Refunds</div><div class="ki2">↩️</div></div><div class="kv" id="k-rf">£0.00</div><div class="ks" id="k-rf-s">0.0% refund rate</div></div>
     </div>
+
     <div class="sg">
       <div class="sc"><div class="sc-t">💷 Revenue Breakdown</div>
         <div class="sr"><span class="lb">Gross Revenue</span><span class="vl" id="sr-rv">£0.00</span></div>
@@ -513,6 +722,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
         <div class="sr tot"><span class="lb">= Net Profit</span><span class="vl" id="sr-np">£0.00</span></div>
       </div>
     </div>
+
     <div class="sh2"><div class="sh2-txt">How To Get Started</div><div class="sh2-line"></div></div>
     <div class="stg">
       <div class="stp"><div class="stn">01</div><div class="stt">Add Your Products</div><div class="std">Go to the Products tab. Enter each SKU with buying price, shipping cost per unit, and Temu commission %.</div></div>
@@ -521,7 +731,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     </div>
   </div>
 
-  <!-- PRODUCTS -->
+  <!-- ══ PRODUCTS ══ -->
   <div class="pg" id="pg-products">
     <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;">
       <div id="ptab-manual" onclick="switchPTab('manual')" style="padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid var(--blu2);color:var(--blu2);">✏️ Manual Entry</div>
@@ -591,14 +801,14 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <div class="tc" id="pc2">0 products</div>
           <button class="btn bs bsm" onclick="expProdsCSV()">📊 Export</button>
-          <button class="btn bd bsm" onclick="clrAll()" style="display:flex;align-items:center;gap:5px;">🗑 Clear All</button>
+          <button class="btn bd bsm" onclick="clrAll()">🗑 Clear All</button>
         </div>
       </div>
       <div class="ts"><table><thead><tr><th>SKU</th><th>Product Name</th><th>Buying Price</th><th>Shipping</th><th>Temu Fee</th><th>Ad Spend</th><th>Unit Cost</th><th></th></tr></thead><tbody id="pb"></tbody></table></div>
     </div>
   </div>
 
-  <!-- IMPORT -->
+  <!-- ══ IMPORT ══ -->
   <div class="pg" id="pg-import">
     <div class="sh2"><div class="sh2-txt">Upload Settlement File</div><div class="sh2-line"></div></div>
     <div class="uz" id="uz" onclick="document.getElementById('fi2').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="onDrop(event)">
@@ -622,7 +832,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     </div>
   </div>
 
-  <!-- P&L REPORT -->
+  <!-- ══ P&L REPORT ══ -->
   <div class="pg" id="pg-report">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
       <div class="sh2" style="margin-bottom:0;flex:1;"><div class="sh2-txt">SKU Profitability Report</div><div class="sh2-line"></div></div>
@@ -644,7 +854,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     </div>
   </div>
 
-  <!-- VAT FILING -->
+  <!-- ══ VAT FILING ══ -->
   <div class="pg" id="pg-vat">
     <div class="sh2"><div class="sh2-txt">Tax Settings</div><div class="sh2-line"></div></div>
     <div class="pf">
@@ -696,7 +906,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     </div>
   </div>
 
-  <!-- CHARTS -->
+  <!-- ══ CHARTS ══ -->
   <div class="pg" id="pg-charts">
     <div class="sh2"><div class="sh2-txt">Visual Analytics</div><div class="sh2-line"></div></div>
     <div class="cg">
@@ -712,7 +922,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     </div>
   </div>
 
-  <!-- EXPORT -->
+  <!-- ══ EXPORT ══ -->
   <div class="pg" id="pg-export">
     <div class="sh2"><div class="sh2-txt">Export Options</div><div class="sh2-line"></div></div>
     <div class="xc">
@@ -746,7 +956,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     </div>
   </div>
 
-  <!-- SETTINGS -->
+  <!-- ══ SETTINGS ══ -->
   <div class="pg" id="pg-settings">
     <div class="sh2"><div class="sh2-txt">Company Settings</div><div class="sh2-line"></div></div>
     <div class="pf">
@@ -800,20 +1010,14 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 let prods=[];
 let raws=[],hdrs=[],pnl={},mAds=0,mOth=0,fMode='all',dFrom=null,dTo=null;
 let CH={};
+let signingOut=false;
 
 // ══ CURRENCY SYSTEM ══
 let cur='£';
 const COUNTRY_CURRENCY={GB:'£',US:'$',AU:'A$',CA:'CA$',IE:'€',NZ:'NZ$',ZA:'R',OTHER:'£'};
-const COUNTRY_TAX={GB:'VAT (20%)',US:'Sales Tax',AU:'GST (10%)',CA:'GST/HST',IE:'VAT (23%)',NZ:'GST (15%)',ZA:'VAT (15%)',OTHER:'Tax'};
 
-function c(n){
-  if(typeof n!=='number'||isNaN(n))return cur+'0.00';
-  return cur+Math.abs(n).toFixed(2);
-}
-function cs(n){
-  if(typeof n!=='number'||isNaN(n))return cur+'0.00';
-  return (n<0?'-':'')+cur+Math.abs(n).toFixed(2);
-}
+function c(n){if(typeof n!=='number'||isNaN(n))return cur+'0.00';return cur+Math.abs(n).toFixed(2);}
+function cs(n){if(typeof n!=='number'||isNaN(n))return cur+'0.00';return(n<0?'-':'')+cur+Math.abs(n).toFixed(2);}
 
 function applyCurrency(){
   document.querySelectorAll('.cur-lbl').forEach(el=>el.textContent=cur);
@@ -838,23 +1042,19 @@ async function saveSettings(){
   if(company){companyName=company;applyCompanyName();}
   if(newCur!==cur){cur=newCur;applyCurrency();}
   if(tenantId){
-    await sb.from('tenants').update({
-      company_name:company||companyName,
-      currency:cur,
-      country:country
-    }).eq('id',tenantId);
+    await sb.from('tenants').update({company_name:company||companyName,currency:cur,country:country}).eq('id',tenantId);
   }
   notify('Settings saved','ok');
 }
 
-// ══ SUPABASE INIT ══
+// ══ SUPABASE ══
 const SB_URL='https://kedzsuclnczlqftakolc.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZHpzdWNsbmN6bHFmdGFrb2xjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjE2MTQsImV4cCI6MjA5NDQzNzYxNH0.tcP_gsRdkJL7e2rWvlChtwTjD8xVWSE9DOHEGuaObAI';
-const {createClient}=supabase;
+const{createClient}=supabase;
 const sb=createClient(SB_URL,SB_KEY);
 let currentUser=null,tenantId=null,companyName='NexaraDash';
 
-// ══ AUTH FUNCTIONS ══
+// ══ AUTH ══
 function showAuthErr(msg){const el=document.getElementById('auth-err');el.textContent=msg;el.style.display='block';}
 function hideAuthErr(){const el=document.getElementById('auth-err');if(el)el.style.display='none';}
 function showForgot(){document.getElementById('auth-form-wrap').style.display='none';document.getElementById('auth-forgot-wrap').style.display='block';hideAuthErr();}
@@ -887,6 +1087,9 @@ async function sendReset(){
 }
 
 async function signOut(){
+  if(signingOut)return;
+  signingOut=true;
+  closeUsrMenu();
   await sb.auth.signOut();
   currentUser=null;tenantId=null;prods=[];pnl={};raws=[];hdrs=[];
   document.getElementById('auth-screen').classList.add('show');
@@ -899,6 +1102,7 @@ async function signOut(){
   document.getElementById('auth-submit').disabled=false;
   document.getElementById('auth-submit').textContent='Continue';
   hideAuthErr();
+  signingOut=false;
 }
 
 async function getProfile(){
@@ -909,13 +1113,17 @@ async function getProfile(){
     if(tenant){
       if(tenant.company_name)companyName=tenant.company_name;
       if(tenant.currency)cur=tenant.currency;
-      if(tenant.country){
-        const cs=document.getElementById('country-select');
-        if(cs)[...cs.options].forEach(o=>{if(o.value===tenant.country)o.selected=true;});
-      }
+      if(tenant.country){const cs=document.getElementById('country-select');if(cs)[...cs.options].forEach(o=>{if(o.value===tenant.country)o.selected=true;});}
     }
     applyCompanyName();
     applyCurrency();
+    // Populate user menu
+    if(currentUser){
+      const emailEl=document.getElementById('usr-email-display');
+      if(emailEl)emailEl.textContent=currentUser.email;
+      const nameEl=document.getElementById('usr-display');
+      if(nameEl)nameEl.textContent=companyName;
+    }
   }
 }
 
@@ -923,7 +1131,25 @@ function applyCompanyName(){
   document.querySelectorAll('[data-company]').forEach(el=>el.textContent=companyName);
   const inp=document.getElementById('client-company-input');
   if(inp)inp.value=companyName;
+  const nameEl=document.getElementById('usr-display');
+  if(nameEl)nameEl.textContent=companyName;
 }
+
+// ══ USER MENU ══
+function toggleUsrMenu(){
+  const btn=document.getElementById('usr-btn');
+  const drop=document.getElementById('usr-drop');
+  btn.classList.toggle('open');
+  drop.classList.toggle('show');
+}
+function closeUsrMenu(){
+  document.getElementById('usr-btn')?.classList.remove('open');
+  document.getElementById('usr-drop')?.classList.remove('show');
+}
+document.addEventListener('click',function(e){
+  const menu=document.getElementById('usr-menu');
+  if(menu&&!menu.contains(e.target))closeUsrMenu();
+});
 
 // ══ SUPABASE STORAGE ══
 async function savP(){
@@ -946,10 +1172,8 @@ async function savePNL(){
   if(!tenantId||!Object.keys(pnl).length)return;
   const payload={tenant_id:tenantId,sku:'__snapshot__',order_date:null,qty:0,revenue:0,fees:0,returns:0,settlement_ref:JSON.stringify({pnl,hdrs,saved:Date.now()})};
   try{
-    // Use upsert instead of delete+insert — atomic, no data loss risk
     const{error}=await sb.from('pnl_data').upsert([payload],{onConflict:'tenant_id,sku'});
     if(error){
-      // Fallback: delete then insert
       await sb.from('pnl_data').delete().eq('tenant_id',tenantId).eq('sku','__snapshot__');
       const{error:err2}=await sb.from('pnl_data').insert([payload]);
       if(err2){console.error('savePNL failed:',err2);return;}
@@ -984,22 +1208,19 @@ function showSaveBadge(){
   const b=document.getElementById('save-badge');
   if(!b)return;
   b.textContent='💾 Saved';b.style.background='var(--grnl)';b.style.color='var(--grn)';b.style.borderColor='var(--grnbl)';
-  clearTimeout(b._t);
-  b._t=setTimeout(()=>{b.textContent='💾 Auto-saved';},1200);
+  clearTimeout(b._t);b._t=setTimeout(()=>{b.textContent='💾 Auto-saved';},1200);
 }
 
 document.getElementById('ldate').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
 document.getElementById('xd').textContent='Report Date: '+new Date().toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'});
 Chart.defaults.color='#94a3b8';
 Chart.defaults.borderColor='rgba(226,231,240,1)';
-Chart.defaults.font.family="'Inter',sans-serif";
+Chart.defaults.font.family="'Inter',system-ui,sans-serif";
 
-// ══ BOOT — Auth gate ══
+// ══ BOOT ══
 (async()=>{
-
   const bc=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('nexaradash_auth'):null;
   let recoveryInProgress=false;
-
   if(bc){
     bc.onmessage=(e)=>{
       if(e.data==='PASSWORD_RECOVERY_STARTED'){
@@ -1010,100 +1231,57 @@ Chart.defaults.font.family="'Inter',sans-serif";
         const wrap=document.getElementById('auth-form-wrap');
         const lockDiv=document.createElement('div');
         lockDiv.id='auth-lock-msg';
-        lockDiv.innerHTML=`
-          <div style="text-align:center;padding:20px 0;">
-            <div style="font-size:36px;margin-bottom:14px;">🔐</div>
-            <div style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:8px;">Password reset in progress</div>
-            <div style="font-size:13px;color:#64748b;line-height:1.6;">Please complete the password reset in the other tab, then log in again here.</div>
-          </div>`;
+        lockDiv.innerHTML=`<div style="text-align:center;padding:20px 0;"><div style="font-size:36px;margin-bottom:14px;">🔐</div><div style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:8px;">Password reset in progress</div><div style="font-size:13px;color:#64748b;line-height:1.6;">Please complete the password reset in the other tab, then log in again here.</div></div>`;
         lockDiv.style.display='block';
         wrap.parentNode.insertBefore(lockDiv,wrap);
       }
-      if(e.data==='PASSWORD_RESET_COMPLETE'){
-        recoveryInProgress=false;
-        window.location.reload();
-      }
+      if(e.data==='PASSWORD_RESET_COMPLETE'){recoveryInProgress=false;window.location.reload();}
     };
   }
-
-  // ── Block recovery token landing on /app ──
   const urlHash=new URLSearchParams(window.location.hash.replace('#',''));
-  if(urlHash.get('type')==='recovery'){
-    window.location.href='/reset-password'+window.location.hash;
-    return;
-  }
-
-  // ── Fast auth check: show loader only if a Supabase session token exists in storage ──
-  const hasCachedSession = Object.keys(localStorage).some(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
-  if(hasCachedSession){
-    // Likely logged in — show loading screen while we verify
-    document.getElementById('loading-screen').classList.add('show');
-    document.getElementById('auth-screen').classList.remove('show');
-  }
-  // else: login form already visible by default — no flash, no delay
-
+  if(urlHash.get('type')==='recovery'){window.location.href='/reset-password'+window.location.hash;return;}
+  const hasCachedSession=Object.keys(localStorage).some(k=>k.startsWith('sb-')&&k.endsWith('-auth-token'));
+  if(hasCachedSession){document.getElementById('loading-screen').classList.add('show');document.getElementById('auth-screen').classList.remove('show');}
   const{data:{session}}=await sb.auth.getSession();
   if(session){
-    // If session came from password recovery, sign out and force fresh login
     const isRecovery=session.user?.amr?.some(a=>a.method==='recovery');
     if(isRecovery){
       await sb.auth.signOut();
       document.getElementById('loading-screen').classList.remove('show');
       document.getElementById('auth-screen').classList.add('show');
-    } else {
+    }else{
       currentUser=session.user;
       document.getElementById('loading-screen').classList.remove('show');
       document.getElementById('loading-screen').classList.add('hide');
       document.getElementById('auth-screen').classList.remove('show');
       document.getElementById('sb').classList.remove('app-hidden');
       document.getElementById('mn').classList.remove('app-hidden');
-      await getProfile();
-      await loadP();
-      await loadPNL();
+      await getProfile();await loadP();await loadPNL();
     }
   }
-  // No session — hide loader, ensure login visible
-  if(!currentUser){
-    document.getElementById('loading-screen').classList.remove('show');
-    document.getElementById('auth-screen').classList.add('show');
-  }
-
+  if(!currentUser){document.getElementById('loading-screen').classList.remove('show');document.getElementById('auth-screen').classList.add('show');}
   sb.auth.onAuthStateChange(async(event,session)=>{
-    if(event==='PASSWORD_RECOVERY'){
-      recoveryInProgress=true;
-      window.location.href='/reset-password'+window.location.hash;
-      return;
-    }
+    if(event==='PASSWORD_RECOVERY'){recoveryInProgress=true;window.location.href='/reset-password'+window.location.hash;return;}
     if(recoveryInProgress)return;
-
     if(event==='SIGNED_IN'&&session){
-      // Also check on SIGNED_IN event — block recovery sessions
       const isRecovery=session.user?.amr?.some(a=>a.method==='recovery');
-      if(isRecovery){
-        await sb.auth.signOut();
-        document.getElementById('auth-screen').classList.add('show');
-        document.getElementById('sb').classList.add('app-hidden');
-        document.getElementById('mn').classList.add('app-hidden');
-        return;
-      }
+      if(isRecovery){await sb.auth.signOut();document.getElementById('auth-screen').classList.add('show');document.getElementById('sb').classList.add('app-hidden');document.getElementById('mn').classList.add('app-hidden');return;}
       currentUser=session.user;
       document.getElementById('loading-screen').classList.add('hide');
       document.getElementById('auth-screen').classList.remove('show');
       document.getElementById('sb').classList.remove('app-hidden');
       document.getElementById('mn').classList.remove('app-hidden');
-      await getProfile();
-      await loadP();
-      await loadPNL();
+      await getProfile();await loadP();await loadPNL();
     }
     if(event==='SIGNED_OUT'){
+      if(signingOut)return;
       currentUser=null;tenantId=null;prods=[];pnl={};raws=[];hdrs=[];
       document.getElementById('auth-screen').classList.add('show');
       document.getElementById('sb').classList.add('app-hidden');
       document.getElementById('mn').classList.add('app-hidden');
       document.getElementById('auth-form-wrap').style.display='block';
       document.getElementById('auth-forgot-wrap').style.display='none';
-      const lock=document.getElementById('auth-lock-msg');
-      if(lock)lock.remove();
+      const lock=document.getElementById('auth-lock-msg');if(lock)lock.remove();
     }
   });
 })();
@@ -1134,12 +1312,7 @@ function notify(msg,t='inf'){
 
 function animateVal(el,target,prefix,suffix,dur){
   const start=performance.now(),from=parseFloat(el.textContent.replace(/[^0-9.-]/g,''))||0;
-  function step(now){
-    const p=Math.min((now-start)/dur,1),ease=1-Math.pow(1-p,3);
-    const cur=from+(target-from)*ease;
-    el.textContent=prefix+cur.toFixed(2)+suffix;
-    if(p<1)requestAnimationFrame(step);
-  }
+  function step(now){const p=Math.min((now-start)/dur,1),ease=1-Math.pow(1-p,3);const cur2=from+(target-from)*ease;el.textContent=prefix+cur2.toFixed(2)+suffix;if(p<1)requestAnimationFrame(step);}
   requestAnimationFrame(step);
 }
 
@@ -1148,8 +1321,10 @@ function setF(m,btn){
   if(btn)btn.classList.add('act');
   const now=new Date(),fmt=d=>d.toISOString().split('T')[0];
   if(m==='today'){dFrom=fmt(now);dTo=fmt(now);}
+  else if(m==='yesterday'){const d=new Date(now);d.setDate(d.getDate()-1);dFrom=fmt(d);dTo=fmt(d);}
   else if(m==='7d'){const d=new Date(now);d.setDate(d.getDate()-7);dFrom=fmt(d);dTo=fmt(now);}
-  else if(m==='30d'){const d=new Date(now);d.setDate(1);dFrom=fmt(d);dTo=fmt(now);}
+  else if(m==='mtd'){const d=new Date(now);d.setDate(1);dFrom=fmt(d);dTo=fmt(now);}
+  else if(m==='lastmonth'){const d=new Date(now);d.setDate(1);d.setMonth(d.getMonth()-1);const e=new Date(now);e.setDate(0);dFrom=fmt(d);dTo=fmt(e);}
   else if(m==='custom'){dFrom=document.getElementById('df').value||null;dTo=document.getElementById('dt2').value||null;}
   else{dFrom=null;dTo=null;}
   recalc();
@@ -1160,6 +1335,95 @@ function pDt(v){
   const m1=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(m1)return new Date(+m1[3],+m1[2]-1,+m1[1]);
   const m2=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m2)return new Date(+m2[1],+m2[2]-1,+m2[3]);
   const d=new Date(s);return isNaN(d)?null:d;
+}
+
+// ══ PERIOD TILE ENGINE ══
+function getPeriodData(fromStr,toStr){
+  const fd=fromStr?new Date(fromStr):null;
+  const td=toStr?new Date(toStr):null;
+  if(td)td.setHours(23,59,59);
+  let rv=0,fe=0,rt=0,cg=0,sh=0,tsh=0,ad=0,od=0,qty=0;
+  Object.values(pnl).forEach(d=>{
+    const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
+    const dates=d.dates.filter(e=>{
+      const dt=pDt(e.date);if(!dt)return(!fd&&!td);
+      if(fd&&dt<fd)return false;if(td&&dt>td)return false;return true;
+    });
+    if(!dates.length)return;
+    const ratio=d.dates.length>0?dates.length/d.dates.length:0;
+    rv+=d.revenue*ratio;fe+=d.fees*ratio;rt+=d.returns*ratio;
+    tsh+=(d.shipping||0)*ratio;od+=dates.length;
+    qty+=Math.round(d.qty*ratio);
+    if(p){cg+=p.cost*Math.round(d.qty*ratio);sh+=p.ship*Math.round(d.qty*ratio);ad+=p.ads;}
+  });
+  const tc=cg+sh+ad+fe+rt+tsh;
+  const np=rv-tc;
+  return{rv,fe,rt,cg,sh,tsh,ad,tc,np,od,qty};
+}
+
+function setTile(prefix,data,deltaVsPrev,dateLabel){
+  const fmt=d=>d.toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('pt-'+prefix+'-date').textContent=dateLabel;
+  document.getElementById('pt-'+prefix+'-sales').textContent=c(data.rv);
+  document.getElementById('pt-'+prefix+'-orders').textContent=data.od;
+  document.getElementById('pt-'+prefix+'-units').textContent=data.qty;
+  document.getElementById('pt-'+prefix+'-refunds').textContent=c(data.rt);
+  document.getElementById('pt-'+prefix+'-costs').textContent=c(data.tc);
+  const npEl=document.getElementById('pt-'+prefix+'-np');
+  npEl.textContent=cs(data.np);
+  npEl.style.color=data.np>=0?'var(--grn)':'var(--red)';
+  const deltaEl=document.getElementById('pt-'+prefix+'-delta');
+  if(deltaVsPrev!==null&&deltaVsPrev!==undefined){
+    const sign=deltaVsPrev>=0?'↑':'↓';
+    deltaEl.textContent=sign+' '+Math.abs(deltaVsPrev).toFixed(1)+'% vs prior';
+    deltaEl.className='ptile-delta '+(deltaVsPrev>=0?'pos':'neg');
+  }else{
+    deltaEl.textContent='No prior data';
+    deltaEl.className='ptile-delta neu';
+  }
+}
+
+function rndPeriodTiles(){
+  const now=new Date();
+  const fmt=d=>d.toISOString().split('T')[0];
+  const fmtLabel=d=>d.toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});
+
+  // Today
+  const todayStr=fmt(now);
+  const todayData=getPeriodData(todayStr,todayStr);
+  const yestD=new Date(now);yestD.setDate(yestD.getDate()-1);
+  const yestStr=fmt(yestD);
+  const yestData=getPeriodData(yestStr,yestStr);
+  const todayDelta=yestData.rv>0?((todayData.rv-yestData.rv)/yestData.rv*100):null;
+  setTile('today',todayData,todayDelta,fmtLabel(now));
+
+  // Yesterday
+  const yest2D=new Date(now);yest2D.setDate(yest2D.getDate()-2);
+  const yest2Str=fmt(yest2D);
+  const yest2Data=getPeriodData(yest2Str,yest2Str);
+  const yestDelta=yest2Data.rv>0?((yestData.rv-yest2Data.rv)/yest2Data.rv*100):null;
+  setTile('yest',yestData,yestDelta,fmtLabel(yestD));
+
+  // MTD
+  const mtdStart=new Date(now.getFullYear(),now.getMonth(),1);
+  const mtdData=getPeriodData(fmt(mtdStart),todayStr);
+  const lastMtdStart=new Date(now.getFullYear(),now.getMonth()-1,1);
+  const lastMtdEnd=new Date(now.getFullYear(),now.getMonth()-1,now.getDate());
+  const lastMtdData=getPeriodData(fmt(lastMtdStart),fmt(lastMtdEnd));
+  const mtdDelta=lastMtdData.rv>0?((mtdData.rv-lastMtdData.rv)/lastMtdData.rv*100):null;
+  const mtdLabel='1–'+now.getDate()+' '+now.toLocaleString('default',{month:'short'})+' '+now.getFullYear();
+  setTile('mtd',mtdData,mtdDelta,mtdLabel);
+
+  // Last Month
+  const lmStart=new Date(now.getFullYear(),now.getMonth()-1,1);
+  const lmEnd=new Date(now.getFullYear(),now.getMonth(),0);
+  const lmData=getPeriodData(fmt(lmStart),fmt(lmEnd));
+  const lm2Start=new Date(now.getFullYear(),now.getMonth()-2,1);
+  const lm2End=new Date(now.getFullYear(),now.getMonth()-1,0);
+  const lm2Data=getPeriodData(fmt(lm2Start),fmt(lm2End));
+  const lmDelta=lm2Data.rv>0?((lmData.rv-lm2Data.rv)/lm2Data.rv*100):null;
+  const lmLabel=lmStart.toLocaleString('default',{month:'long'})+' '+lmStart.getFullYear();
+  setTile('lm',lmData,lmDelta,lmLabel);
 }
 
 function addProd(){
@@ -1185,17 +1449,10 @@ function switchPTab(tab){
 }
 
 function dlTemplate(){
-  const rows=[
-    ['SKU','Product Name','Buying Price','Inbound Shipping Per Unit','Temu Fee %','Monthly Ad Spend'],
-    ['TEM-001','Example Product 1','8.00','1.50','8','5.00'],
-    ['TEM-002','Example Product 2','4.00','1.00','8','3.00'],
-    ['TEM-003','Example Product 3','14.00','2.50','8','7.00'],
-  ];
+  const rows=[['SKU','Product Name','Buying Price','Inbound Shipping Per Unit','Temu Fee %','Monthly Ad Spend'],['TEM-001','Example Product 1','8.00','1.50','8','5.00'],['TEM-002','Example Product 2','4.00','1.00','8','3.00'],['TEM-003','Example Product 3','14.00','2.50','8','7.00']];
   const csv=rows.map(r=>r.map(v=>'"'+String(v)+'"').join(',')).join('\n');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download='NexaraDash-Product-Template.csv';a.click();
-  notify('Template downloaded — fill it in and upload below','inf');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='NexaraDash-Product-Template.csv';a.click();
+  notify('Template downloaded','inf');
 }
 
 let bulkPreview=[];
@@ -1221,19 +1478,15 @@ function rdBulk(f){
     if(sc<0||nc<0){notify('Could not find SKU and Name columns. Use the template.','er');return;}
     bulkPreview=[];
     j.slice(1).forEach(row=>{
-      const sku=String(row[sc]||'').trim();
-      const name=String(row[nc]||'').trim();
+      const sku=String(row[sc]||'').trim();const name=String(row[nc]||'').trim();
       if(!sku||!name)return;
-      const cost=cc>=0?parseFloat(row[cc])||0:0;
-      const ship=shc>=0?parseFloat(row[shc])||0:0;
-      const fee=fc>=0?parseFloat(row[fc])||0:0;
-      const ads=ac>=0?parseFloat(row[ac])||0:0;
+      const cost=cc>=0?parseFloat(row[cc])||0:0;const ship=shc>=0?parseFloat(row[shc])||0:0;
+      const fee=fc>=0?parseFloat(row[fc])||0:0;const ads=ac>=0?parseFloat(row[ac])||0:0;
       const exists=prods.find(p=>p.sku.toLowerCase()===sku.toLowerCase());
       bulkPreview.push({sku,name,cost,ship,fee,ads,exists:!!exists});
     });
     if(!bulkPreview.length){notify('No valid rows found','er');return;}
-    rndBulkPreview();
-    notify(bulkPreview.length+' products found — review and confirm','ok');
+    rndBulkPreview();notify(bulkPreview.length+' products found — review and confirm','ok');
   }catch(e){notify('Could not read file','er');}};
   r.readAsArrayBuffer(f);
 }
@@ -1241,15 +1494,7 @@ function rdBulk(f){
 function rndBulkPreview(){
   const b=document.getElementById('bulk-body');
   document.getElementById('bulk-cnt').textContent=bulkPreview.length+' rows';
-  b.innerHTML=bulkPreview.map(p=>`<tr>
-    <td class="tsk">${p.sku}</td>
-    <td>${p.name}</td>
-    <td>${c(p.cost)}</td>
-    <td>${c(p.ship)}</td>
-    <td>${p.fee}%</td>
-    <td>${c(p.ads)}</td>
-    <td>${p.exists?'<span style="color:var(--amb);font-size:11px;font-weight:600;">⚠ Skip (exists)</span>':'<span style="color:var(--grn);font-size:11px;font-weight:600;">✓ New</span>'}</td>
-  </tr>`).join('');
+  b.innerHTML=bulkPreview.map(p=>`<tr><td class="tsk">${p.sku}</td><td>${p.name}</td><td>${c(p.cost)}</td><td>${c(p.ship)}</td><td>${p.fee}%</td><td>${c(p.ads)}</td><td>${p.exists?'<span style="color:var(--amb);font-size:11px;font-weight:600;">⚠ Skip</span>':'<span style="color:var(--grn);font-size:11px;font-weight:600;">✓ New</span>'}</td></tr>`).join('');
   const newCount=bulkPreview.filter(p=>!p.exists).length;
   const skipCount=bulkPreview.filter(p=>p.exists).length;
   document.getElementById('bulk-ok-t').textContent=newCount+' new products to import · '+skipCount+' duplicates will be skipped';
@@ -1260,26 +1505,18 @@ async function confirmBulk(){
   const replaceAll=document.getElementById('replace-all').checked;
   const newProds=replaceAll?bulkPreview:bulkPreview.filter(p=>!p.exists);
   if(!newProds.length){notify('No new products to add','inf');return;}
-  if(replaceAll){
-    if(!confirm('This will DELETE all '+prods.length+' existing products and replace with '+newProds.length+' new ones. Are you sure?'))return;
-    prods=[];
-  }
+  if(replaceAll){if(!confirm('This will DELETE all '+prods.length+' existing products and replace with '+newProds.length+' new ones. Are you sure?'))return;prods=[];}
   newProds.forEach(p=>prods.push({sku:p.sku,name:p.name,cost:p.cost,ship:p.ship,fee:p.fee,ads:p.ads}));
   savP();rndProds();recalc();
   document.getElementById('bulk-preview').style.display='none';
   document.getElementById('bulk-fi').value='';
   document.getElementById('replace-all').checked=false;
   bulkPreview=[];
-  notify('✓ '+newProds.length+' products '+(replaceAll?'replaced':'imported')+' successfully!','ok');
+  notify('✓ '+newProds.length+' products '+(replaceAll?'replaced':'imported')+'!','ok');
   switchPTab('manual');
 }
 
-function cancelBulk(){
-  bulkPreview=[];
-  document.getElementById('bulk-preview').style.display='none';
-  document.getElementById('bulk-fi').value='';
-  notify('Bulk import cancelled','inf');
-}
+function cancelBulk(){bulkPreview=[];document.getElementById('bulk-preview').style.display='none';document.getElementById('bulk-fi').value='';notify('Bulk import cancelled','inf');}
 
 function expProdsCSV(){
   if(!prods.length){notify('No products to export','er');return;}
@@ -1318,16 +1555,11 @@ function rdFile(f){
 
 function bldMap(){
   const fields=[
-    {k:'sku',l:'SKU ID (Unique Key)'},
-    {k:'skuname',l:'SKU / Product Name'},
-    {k:'revenue',l:'Subtotal / Net Revenue'},
-    {k:'fees',l:'Service Fee (Platform Commission)'},
-    {k:'shipping',l:'Shipping Fee'},
-    {k:'shipping_tax',l:'Shipping Tax'},
-    {k:'product_tax',l:'Product Tax'},
-    {k:'returns',l:'Refund / Return Amount'},
-    {k:'qty',l:'Quantity / Units'},
-    {k:'date',l:'Order Date'},
+    {k:'sku',l:'SKU ID (Unique Key)'},{k:'skuname',l:'SKU / Product Name'},
+    {k:'revenue',l:'Subtotal / Net Revenue'},{k:'fees',l:'Service Fee (Platform Commission)'},
+    {k:'shipping',l:'Shipping Fee'},{k:'shipping_tax',l:'Shipping Tax'},
+    {k:'product_tax',l:'Product Tax'},{k:'returns',l:'Refund / Return Amount'},
+    {k:'qty',l:'Quantity / Units'},{k:'date',l:'Order Date'},
     {k:'txtype',l:'Transaction Type (for refunds)'}
   ];
   const pri={
@@ -1336,8 +1568,7 @@ function bldMap(){
     revenue:['subtotal','net amount','net revenue','sale amount','order amount','revenue'],
     fees:['service fee','commission fee','platform commission','commission','platform fee','temu fee','fee'],
     shipping:['shipping','ship fee','shipping fee','freight'],
-    shipping_tax:['shipping tax','ship tax'],
-    product_tax:['product tax','item tax'],
+    shipping_tax:['shipping tax','ship tax'],product_tax:['product tax','item tax'],
     returns:['refund amount','return amount','refund','return'],
     qty:['order quantity','units sold','unit sold','quantity','qty','units'],
     date:['order date','created date','order_date','date','settlement date','date/time'],
@@ -1358,42 +1589,21 @@ function procMap(){
   const shc=gc('shipping'),stc=gc('shipping_tax'),ptc=gc('product_tax'),ttc=gc('txtype');
   if(sc<0||rc<0){notify('SKU and Revenue columns are required','er');return;}
   pnl={};const rows=[];
-
-  // ── Pass 1: find the "Others" and "Total" column indices from headers ──
-  // These are needed for shipping label costs and refund totals
   const othersCol=hdrs.findIndex(h=>h.toLowerCase()==='others');
   const totalCol=hdrs.findIndex(h=>h.toLowerCase()==='total');
-
-  // ── Pass 2: accumulate shipping label costs per order ID ──
-  // Temu charges shipping labels as separate rows — we spread the cost
-  // across all SKUs proportionally (stored in a global pool)
   let totalShippingLabelCost=0;
   raws.forEach(row=>{
     const tx=ttc>=0?String(row[ttc]||'').trim().toLowerCase():'';
-    // Shipping label purchase = outbound shipping cost charged by Temu
     if(tx==='shipping label purchase'||tx==='shipping label purchase adjustment'){
       const cost=othersCol>=0?parseFloat(row[othersCol])||0:0;
-      totalShippingLabelCost+=Math.abs(cost); // always positive cost
+      totalShippingLabelCost+=Math.abs(cost);
     }
   });
-
-  // ── Pass 3: process order payment and refund rows ──
   raws.forEach(row=>{
     const tx=ttc>=0?String(row[ttc]||'').trim().toLowerCase():'';
-
-    // Skip rows that are not P&L relevant
-    if(
-      tx==='transfer'||
-      tx==='shipping label purchase'||
-      tx==='shipping label purchase adjustment'||
-      tx==='shipping label for return purchase covered by platform'||
-      tx==='shipping label for return purchase adjustment covered by platform'||
-      tx==='return shipping credit'||
-      tx==='shipping label for return purchase'
-    ) return;
-
-    const sku=sc>=0?String(row[sc]||'').trim():'UNK'; // SKU ID — unique key
-    const skuName=nc>=0?String(row[nc]||'').trim():'';  // Product name — display label
+    if(tx==='transfer'||tx==='shipping label purchase'||tx==='shipping label purchase adjustment'||tx==='shipping label for return purchase covered by platform'||tx==='shipping label for return purchase adjustment covered by platform'||tx==='return shipping credit'||tx==='shipping label for return purchase')return;
+    const sku=sc>=0?String(row[sc]||'').trim():'UNK';
+    const skuName=nc>=0?String(row[nc]||'').trim():'';
     const isRefund=tx==='refund';
     const rawRev=rc>=0?parseFloat(row[rc])||0:0;
     const rawFee=fc>=0?parseFloat(row[fc])||0:0;
@@ -1403,61 +1613,25 @@ function procMap(){
     const rawTotal=totalCol>=0?parseFloat(row[totalCol])||0:0;
     const qty=qc>=0?Math.abs(parseFloat(row[qc])||1):1;
     const date=dc>=0?row[dc]:'';
-
     if(!sku)return;
-
     let rev=0,fee=0,ship=0,shipTax=0,prodTax=0,ret=0;
-
-    if(isRefund){
-      // Refund row: Total column holds the negative refund amount
-      ret=Math.abs(rawTotal);
-      if(ret===0)return;
-    } else {
-      // Order Payment row
-      rev=rawRev; // Subtotal = net revenue after platform discounts
-      fee=Math.abs(rawFee); // Service fee (already negative in file)
-      ship=Math.abs(rawShip); // Temu shipping credited to seller
-      shipTax=Math.abs(rawShipTax);
-      prodTax=Math.abs(rawProdTax);
-      if(rev===0)return;
-    }
-
-    const totalFee=fee+shipTax+prodTax; // ship is revenue, not cost here
+    if(isRefund){ret=Math.abs(rawTotal);if(ret===0)return;}
+    else{rev=rawRev;fee=Math.abs(rawFee);ship=Math.abs(rawShip);shipTax=Math.abs(rawShipTax);prodTax=Math.abs(rawProdTax);if(rev===0)return;}
+    const totalFee=fee+shipTax+prodTax;
     if(!pnl[sku])pnl[sku]={sku,name:skuName||sku,revenue:0,fees:0,returns:0,qty:0,orders:0,dates:[],shipping:0,taxes:0,shippingLabels:0};
-    // Update name if we get a better one (non-empty)
     if(skuName&&pnl[sku].name===sku)pnl[sku].name=skuName;
-    pnl[sku].revenue+=rev;
-    pnl[sku].fees+=fee;
-    pnl[sku].shipping+=shipTax;
-    pnl[sku].taxes+=prodTax;
-    pnl[sku].returns+=ret;
-    pnl[sku].qty+=isRefund?0:qty;
-    pnl[sku].orders++;
-    pnl[sku].dates.push({date,rev});
+    pnl[sku].revenue+=rev;pnl[sku].fees+=fee;pnl[sku].shipping+=shipTax;pnl[sku].taxes+=prodTax;
+    pnl[sku].returns+=ret;pnl[sku].qty+=isRefund?0:qty;pnl[sku].orders++;pnl[sku].dates.push({date,rev});
     rows.push({sku,rev,fee:totalFee,ship:0,ret,qty,date,isRefund});
   });
-
-  // ── Pass 4: distribute shipping label costs across SKUs by revenue share ──
-  // This correctly attributes the real outbound shipping cost to each SKU
   if(totalShippingLabelCost>0){
     const totalRev=Object.values(pnl).reduce((a,d)=>a+d.revenue,0);
-    if(totalRev>0){
-      Object.values(pnl).forEach(d=>{
-        const share=d.revenue/totalRev;
-        d.shippingLabels=totalShippingLabelCost*share;
-        d.shipping+=d.shippingLabels; // add to shipping so recalc picks it up
-      });
-    }
+    if(totalRev>0){Object.values(pnl).forEach(d=>{const share=d.revenue/totalRev;d.shippingLabels=totalShippingLabelCost*share;d.shipping+=d.shippingLabels;});}
   }
   let autoAdded=0;
   Object.keys(pnl).forEach(sku=>{
     const exists=prods.find(p=>p.sku.trim().toLowerCase()===sku.trim().toLowerCase());
-    if(!exists){
-      // Use the product name already captured in pnl object
-      const productName=pnl[sku].name&&pnl[sku].name!==sku?pnl[sku].name:sku;
-      prods.push({sku,name:productName.substring(0,80),cost:0,ship:0,fee:0,ads:0,autoAdded:true});
-      autoAdded++;
-    }
+    if(!exists){const productName=pnl[sku].name&&pnl[sku].name!==sku?pnl[sku].name:sku;prods.push({sku,name:productName.substring(0,80),cost:0,ship:0,fee:0,ads:0,autoAdded:true});autoAdded++;}
   });
   if(autoAdded>0){savP();rndProds();notify(autoAdded+' new SKUs auto-registered — add COGS to calculate profit','inf');}
   document.getElementById('imp-th').innerHTML='<th>SKU</th><th>Revenue</th><th>Temu Fee</th><th>Shipping</th><th>Returns</th><th>Qty</th><th>Date</th>';
@@ -1467,8 +1641,7 @@ function procMap(){
   const totRev=Object.values(pnl).reduce((a,d)=>a+d.revenue,0);
   document.getElementById('imp-ok-t').textContent=rows.length+' orders imported · Revenue: '+c(totRev)+' · Data saved to cloud';
   document.getElementById('imp-ok').classList.add('sh');
-  recalc();
-  savePNL();
+  recalc();savePNL();
   notify('P&L calculated & saved!','ok');
 }
 
@@ -1491,7 +1664,7 @@ function recalc(){
   let rv=0,fe=0,rt=0,cg=0,sh=0,tsh=0,ad=0,od=0,mt=0;
   skus.forEach(d=>{const p=prods.find(p=>p.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());rv+=d.revenue;fe+=d.fees;rt+=d.returns;od+=d.orders;tsh+=(d.shipping||0);if(p){mt++;cg+=p.cost*d.qty;sh+=p.ship*d.qty;ad+=p.ads;}});
   ad+=mAds;const tc=cg+sh+ad+fe+rt+mOth+tsh,nr=rv-fe-rt-tsh,np=rv-tc,mg=rv>0?(np/rv*100):0,gm=rv>0?(nr/rv*100):0;
-  const f=n=>c(n),fp=n=>n.toFixed(1)+'%';
+  const fp=n=>n.toFixed(1)+'%';
   const kp=document.getElementById('k-pf'),km=document.getElementById('k-mg');
   animateVal(document.getElementById('k-rv'),rv,cur,'',500);
   animateVal(kp,np,cur,'',500);kp.className='kv '+(np>=0?'pos':'neg');
@@ -1503,16 +1676,17 @@ function recalc(){
   krs.textContent=rfRate.toFixed(1)+'% refund rate';
   kr.className='kv '+(rfRate>5?'neg':rfRate>2?'tw2':'');
   document.getElementById('k-rv-s').textContent=od+' orders processed';
-  document.getElementById('sr-rv').textContent=f(rv);document.getElementById('sr-fe').textContent=f(fe);
-  document.getElementById('sr-rt').textContent=f(rt);document.getElementById('sr-nr').textContent=f(nr);
-  document.getElementById('sr-cg').textContent=f(cg);document.getElementById('sr-sh').textContent=f(sh+tsh);
-  document.getElementById('sr-ad').textContent=f(ad);document.getElementById('sr-tc').textContent=f(tc);
+  document.getElementById('sr-rv').textContent=c(rv);document.getElementById('sr-fe').textContent=c(fe);
+  document.getElementById('sr-rt').textContent=c(rt);document.getElementById('sr-nr').textContent=c(nr);
+  document.getElementById('sr-cg').textContent=c(cg);document.getElementById('sr-sh').textContent=c(sh+tsh);
+  document.getElementById('sr-ad').textContent=c(ad);document.getElementById('sr-tc').textContent=c(tc);
   document.getElementById('sr-od').textContent=od;document.getElementById('sr-pm').textContent=mt+' / '+skus.length;
-  document.getElementById('sr-gm').textContent=fp(gm);document.getElementById('sr-np').textContent=f(np);
+  document.getElementById('sr-gm').textContent=fp(gm);document.getElementById('sr-np').textContent=c(np);
   const unm=skus.filter(d=>!prods.find(p=>p.sku.trim().toLowerCase()===d.sku.trim().toLowerCase())).map(d=>d.sku);
   const sw=document.getElementById('sw2');
-  if(unm.length){sw.textContent='⚠️ '+unm.length+' SKU(s) need COGS — hover the COGS cell in P&L to enter cost: '+unm.join(', ');sw.classList.add('sh');}else sw.classList.remove('sh');
+  if(unm.length){sw.textContent='⚠️ '+unm.length+' SKU(s) need COGS: '+unm.join(', ');sw.classList.add('sh');}else sw.classList.remove('sh');
   rndSKU(data);updXP(rv,np,tc,mg);
+  rndPeriodTiles();
 }
 
 function rndSKU(data){
@@ -1531,9 +1705,7 @@ function rndSKU(data){
   b.innerHTML=rows.map((r,i)=>{
     const rkc=i===0?'r1':i===1?'r2':i===2?'r3':'rn',pc=r.np>=0?'tp':'tn2';
     const mgColor=r.mg>=20?'var(--grn)':r.mg>=0?'var(--amb)':'var(--red)';
-    const cogsCell=r.hasCOGS
-      ? `<td class="tn2 cogs-cell" data-sku="${r.d.sku}" title="Click to edit COGS">${c(r.cg)}</td>`
-      : `<td class="tw2 cogs-cell cogs-missing" data-sku="${r.d.sku}" title="Click to enter your cost of goods">✏️ Enter COGS</td>`;
+    const cogsCell=r.hasCOGS?`<td class="tn2 cogs-cell" data-sku="${r.d.sku}" title="Click to edit COGS">${c(r.cg)}</td>`:`<td class="tw2 cogs-cell cogs-missing" data-sku="${r.d.sku}" title="Click to enter cost">✏️ Enter COGS</td>`;
     const refundBadge=r.refundRate>5?`<span style="font-size:9px;background:var(--redl);color:var(--red);border:1px solid var(--redbl);padding:1px 5px;border-radius:4px;margin-left:4px;">${r.refundRate.toFixed(1)}% ret</span>`:'';
     const topBadge=r.d.sku===topSKU?`<span style="font-size:9px;background:var(--grnl);color:var(--grn);border:1px solid var(--grnbl);padding:1px 5px;border-radius:4px;margin-left:4px;">⭐ Top</span>`:'';
     return`<tr><td><span class="rk ${rkc}">${i+1}</span></td><td class="tsk">${r.d.sku}${topBadge}</td><td class="tnm" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;">${r.nm}${refundBadge}</td><td>${r.d.qty}</td><td>${c(r.d.revenue)}</td>${cogsCell}<td class="tn2">${c(r.d.fees)}</td><td class="tn2">${c(r.tsh)}</td><td class="tn2">${c(r.sh)}</td><td class="tn2">${c(r.ad)}</td><td class="tw2">${c(r.d.returns)}</td><td class="${pc}">${cs(r.np)}</td><td style="color:${mgColor};font-weight:700;">${r.mg.toFixed(1)}%</td></tr>`;
@@ -1550,11 +1722,7 @@ function rndSKU(data){
       input.placeholder='Enter unit cost ('+cur+')';
       input.style.cssText='width:110px;padding:4px 8px;border:2px solid var(--blu2);border-radius:6px;font-size:12px;font-family:var(--fd);background:#fff;color:var(--tx);';
       this.innerHTML='';this.appendChild(input);input.focus();input.select();
-      const save=()=>{
-        const val=parseFloat(input.value)||0;
-        if(p){p.cost=val;}else{prods.push({sku,name:sku,cost:val,ship:0,fee:0,ads:0});}
-        savP();rndProds();recalc();notify('COGS updated for '+sku,'ok');
-      };
+      const save=()=>{const val=parseFloat(input.value)||0;if(p){p.cost=val;}else{prods.push({sku,name:sku,cost:val,ship:0,fee:0,ads:0});}savP();rndProds();recalc();notify('COGS updated for '+sku,'ok');};
       input.addEventListener('keydown',e=>{if(e.key==='Enter')save();if(e.key==='Escape')recalc();});
       input.addEventListener('blur',save);
     });
@@ -1645,8 +1813,7 @@ function expVATPDF(){
     doc.text(box[1],40,y+3.5);
     doc.setFont('helvetica','bold');
     if(isKey){doc.setTextColor(255,255,255);}else{doc.setTextColor(...box[3]);}
-    doc.text(box[2],196,y+3.5,'right');
-    y+=13;
+    doc.text(box[2],196,y+3.5,'right');y+=13;
   });
   y+=6;
   doc.setFillColor(245,243,255);doc.rect(14,y,182,8,'F');
@@ -1659,12 +1826,10 @@ function expVATPDF(){
     if(y>274){doc.addPage();y=20;}
     const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
     const nm=p?p.name.substring(0,35):'-';
-    const vat=d.revenue*(vatRateOut/(1+vatRateOut));
-    const net=d.revenue-vat;
+    const vat=d.revenue*(vatRateOut/(1+vatRateOut));const net=d.revenue-vat;
     if(ri%2===0){doc.setFillColor(250,248,255);doc.rect(14,y-3,182,8,'F');}
     doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(50,60,80);
-    cx=16;[d.sku,nm,c(d.revenue),c(vat),c(net)].forEach((v,i)=>{doc.text(String(v),cx,y+2);cx+=cw[i];});
-    y+=9;
+    cx=16;[d.sku,nm,c(d.revenue),c(vat),c(net)].forEach((v,i)=>{doc.text(String(v),cx,y+2);cx+=cw[i];});y+=9;
   });
   const pg=doc.internal.getNumberOfPages();
   for(let i=1;i<=pg;i++){doc.setPage(i);doc.setFillColor(15,32,68);doc.rect(0,286,210,12,'F');doc.setFontSize(7);doc.setTextColor(160,190,220);doc.text('Powered by NexaraDash · nexaradash.com · info@nexaradash.com · Confidential',14,293);doc.text('Page '+i+' of '+pg,196,293,'right');}
@@ -1709,8 +1874,7 @@ function rndCharts(){
       const unitFee=d.fees*unitShare,unitRet=d.returns*unitShare;
       const unitCog=p?(p.cost+p.ship)*unitShare*d.qty/Math.max(d.qty,1):0;
       const unitAds=p?p.ads/Math.max(Object.keys(mm).length||1,1):0;
-      mm[k].rv+=unitRev;
-      mm[k].np+=unitRev-unitFee-unitRet-unitCog-unitAds;
+      mm[k].rv+=unitRev;mm[k].np+=unitRev-unitFee-unitRet-unitCog-unitAds;
     });
   });
   const mkeys=Object.keys(mm).sort();
@@ -1720,25 +1884,13 @@ function rndCharts(){
   const gradPf=moCtx.createLinearGradient(0,0,0,240);gradPf.addColorStop(0,'rgba(5,150,105,0.12)');gradPf.addColorStop(1,'rgba(5,150,105,0)');
   CH['ch-mo']=new Chart(document.getElementById('ch-mo'),{type:'line',data:{labels:mkeys,datasets:[{label:'Revenue',data:mkeys.map(k=>mm[k].rv),borderColor:'#2563eb',backgroundColor:gradMo,fill:true,tension:0.4,pointBackgroundColor:'#2563eb',pointRadius:4,pointHoverRadius:7,borderWidth:2.5},{label:'Profit',data:mkeys.map(k=>mm[k].np),borderColor:'#059669',backgroundColor:gradPf,fill:true,tension:0.4,pointBackgroundColor:'#059669',pointRadius:4,pointHoverRadius:7,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:11},color:'#64748b'}},tooltip:{callbacks:{label:cv=>cur+cv.raw.toFixed(2)}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>cur+v.toFixed(0),color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8'}}}}});
   const byUnits=[...skus].sort((a,b)=>b.qty-a.qty).slice(0,10);
-  dCh('ch-un');
-  CH['ch-un']=new Chart(document.getElementById('ch-un'),{type:'bar',data:{labels:byUnits.map(d=>(d.name&&d.name!==d.sku?d.name:d.sku).substring(0,20)),datasets:[{label:'Units',data:byUnits.map(d=>d.qty),backgroundColor:'#dbeafe',borderColor:'#2563eb',borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw+' units'}}},scales:{x:{grid:{color:gridColor},ticks:{color:'#94a3b8'}},y:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
+  dCh('ch-un');CH['ch-un']=new Chart(document.getElementById('ch-un'),{type:'bar',data:{labels:byUnits.map(d=>(d.name&&d.name!==d.sku?d.name:d.sku).substring(0,20)),datasets:[{label:'Units',data:byUnits.map(d=>d.qty),backgroundColor:'#dbeafe',borderColor:'#2563eb',borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw+' units'}}},scales:{x:{grid:{color:gridColor},ticks:{color:'#94a3b8'}},y:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
   const rfData=skus.map(d=>({sku:d.sku,rate:d.revenue>0?(d.returns/d.revenue*100):0})).filter(d=>d.rate>0).sort((a,b)=>b.rate-a.rate).slice(0,15);
   dCh('ch-rf');
-  if(rfData.length){
-    CH['ch-rf']=new Chart(document.getElementById('ch-rf'),{type:'bar',data:{labels:rfData.map(d=>{const sk=skus.find(s=>s.sku===d.sku);return(sk&&sk.name&&sk.name!==sk.sku?sk.name:d.sku).substring(0,20);}),datasets:[{label:'Refund Rate',data:rfData.map(d=>d.rate),backgroundColor:rfData.map(d=>d.rate>10?'#fee2e2':'#fef3c7'),borderColor:rfData.map(d=>d.rate>10?'#dc2626':'#d97706'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v.toFixed(0)+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
-  }else{
-    const cv=document.getElementById('ch-rf');const x=cv.getContext('2d');x.clearRect(0,0,cv.width,cv.height);x.fillStyle='#cbd5e1';x.font='13px Inter';x.textAlign='center';x.fillText('No refunds recorded',cv.width/2,cv.height/2);
-  }
-  const roiData=skus.map(d=>{
-    const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
-    const cg2=p?p.cost*d.qty:0,sh2=p?p.ship*d.qty:0,ad2=p?p.ads:0;
-    const cost=cg2+sh2+ad2+d.fees+d.returns;
-    const profit=d.revenue-cost;
-    const roi=cost>0?(profit/cost*100):null;
-    return{sku:d.sku,roi};
-  }).filter(d=>d.roi!==null).sort((a,b)=>b.roi-a.roi).slice(0,15);
-  dCh('ch-roi');
-  CH['ch-roi']=new Chart(document.getElementById('ch-roi'),{type:'bar',data:{labels:roiData.map(d=>{const sk=skus.find(s=>s.sku===d.sku);return(sk&&sk.name&&sk.name!==sk.sku?sk.name:d.sku).substring(0,20);}),datasets:[{label:'ROI %',data:roiData.map(d=>d.roi),backgroundColor:roiData.map(d=>d.roi>=0?'#d1fae5':'#fee2e2'),borderColor:roiData.map(d=>d.roi>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v.toFixed(0)+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
+  if(rfData.length){CH['ch-rf']=new Chart(document.getElementById('ch-rf'),{type:'bar',data:{labels:rfData.map(d=>{const sk=skus.find(s=>s.sku===d.sku);return(sk&&sk.name&&sk.name!==sk.sku?sk.name:d.sku).substring(0,20);}),datasets:[{label:'Refund Rate',data:rfData.map(d=>d.rate),backgroundColor:rfData.map(d=>d.rate>10?'#fee2e2':'#fef3c7'),borderColor:rfData.map(d=>d.rate>10?'#dc2626':'#d97706'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v.toFixed(0)+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});}
+  else{const cv=document.getElementById('ch-rf');const x=cv.getContext('2d');x.clearRect(0,0,cv.width,cv.height);x.fillStyle='#cbd5e1';x.font='13px Inter';x.textAlign='center';x.fillText('No refunds recorded',cv.width/2,cv.height/2);}
+  const roiData=skus.map(d=>{const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());const cg2=p?p.cost*d.qty:0,sh2=p?p.ship*d.qty:0,ad2=p?p.ads:0;const cost=cg2+sh2+ad2+d.fees+d.returns;const profit=d.revenue-cost;const roi=cost>0?(profit/cost*100):null;return{sku:d.sku,roi};}).filter(d=>d.roi!==null).sort((a,b)=>b.roi-a.roi).slice(0,15);
+  dCh('ch-roi');CH['ch-roi']=new Chart(document.getElementById('ch-roi'),{type:'bar',data:{labels:roiData.map(d=>{const sk=skus.find(s=>s.sku===d.sku);return(sk&&sk.name&&sk.name!==sk.sku?sk.name:d.sku).substring(0,20);}),datasets:[{label:'ROI %',data:roiData.map(d=>d.roi),backgroundColor:roiData.map(d=>d.roi>=0?'#d1fae5':'#fee2e2'),borderColor:roiData.map(d=>d.roi>=0?'#059669':'#dc2626'),borderWidth:2,borderRadius:5,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:cv=>cv.raw.toFixed(1)+'%'}}},scales:{y:{grid:{color:gridColor},ticks:{callback:v=>v.toFixed(0)+'%',color:'#94a3b8'}},x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}}}}});
 }
 
 function updXP(rv,np,tc,mg){
@@ -1806,34 +1958,23 @@ function expCSV(){
 
 function clrAll(){
   if(!prods.length){notify('No products to clear','inf');return;}
-  if(confirm('Delete all '+prods.length+' products? This cannot be undone.')){
-    prods=[];savP();rndProds();recalc();
-    notify('All products cleared','ok');
-  }
+  if(confirm('Delete all '+prods.length+' products?')){prods=[];savP();rndProds();recalc();notify('All products cleared','ok');}
 }
 
 async function clrEverything(){
   if(!confirm('Clear ALL data — products, import and P&L? This cannot be undone.'))return;
-  // Clear memory first
   prods=[];raws=[];hdrs=[];pnl={};mAds=0;mOth=0;
-  // Clear Supabase — both tables
   try{await sb.from('products').delete().eq('tenant_id',tenantId);}catch(e){console.error('clear products:',e);}
   try{await sb.from('pnl_data').delete().eq('tenant_id',tenantId);}catch(e){console.error('clear pnl:',e);}
-  // Clear localStorage fallback
   localStorage.removeItem('nx_p');
-  // Reset all UI elements
-  rndProds();
-  recalc();
+  rndProds();recalc();
   document.getElementById('mpr').classList.remove('sh');
   document.getElementById('imp-ok').classList.remove('sh');
   document.getElementById('imp-tw').style.display='none';
   document.getElementById('fi2').value='';
-  // Reset manual adjustments
   document.getElementById('man-ads').value='';
   document.getElementById('man-oth').value='';
-  // Show save badge
-  showSaveBadge();
-  notify('All data cleared successfully','ok');
+  showSaveBadge();notify('All data cleared successfully','ok');
 }
 
 function resetUp(){
