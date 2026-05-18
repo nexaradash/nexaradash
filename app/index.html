@@ -39,9 +39,12 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 /* ══ SIDEBAR ══ */
 .sb{width:var(--sw);min-height:100vh;background:var(--navy);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:width .25s cubic-bezier(.4,0,.2,1);overflow:hidden;box-shadow:4px 0 24px rgba(15,32,68,0.25);}
 .sb.col{width:var(--swc);}
-.sb-tog{position:absolute;top:22px;right:-13px;width:26px;height:26px;border-radius:50%;background:var(--blu2);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;font-size:10px;color:#fff;transition:transform .25s;box-shadow:0 2px 8px rgba(37,99,235,0.4);}
-.sb.col .sb-tog{transform:rotate(180deg);}
-.sb-top{padding:20px 18px 16px;border-bottom:1px solid var(--navyrim);white-space:nowrap;overflow:hidden;}
+.sb-tog{width:32px;height:32px;border-radius:var(--r);background:rgba(255,255,255,0.08);border:1px solid var(--navyrim);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:rgba(255,255,255,0.7);transition:background .15s;position:static;}
+.sb-tog:hover{background:rgba(255,255,255,0.15);color:#fff;}
+.sb-tog svg{width:16px;height:16px;transition:transform .25s;}
+.sb.col .sb-tog svg{transform:rotate(180deg);}
+.sb-top{padding:16px 18px;border-bottom:1px solid var(--navyrim);white-space:nowrap;overflow:hidden;}
+.sb-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .nx-logo{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
 .nx-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 4px 12px rgba(59,130,246,0.4);}
 .nx-name{font-size:13px;font-weight:700;color:var(--navytx);}
@@ -380,7 +383,9 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 .mob{display:none;position:fixed;top:10px;left:10px;z-index:200;background:var(--navy);border:none;border-radius:var(--r);padding:8px 11px;cursor:pointer;color:#fff;font-size:15px;align-items:center;box-shadow:var(--shadow2);}
 .app-hidden{display:none!important;}
 #loading-screen{position:fixed;inset:0;background:var(--navy);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:99999;}
-#loading-screen.hide{display:none;}#loading-screen.show{display:flex;}
+#loading-screen.show{display:flex;}
+/* No transition on hide to prevent flicker */
+#loading-screen.hide{display:none!important;}
 .ls-spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,0.15);border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite;margin-bottom:16px;}
 .ls-logo{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
 .ls-mark{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;}
@@ -444,11 +449,15 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 
 <!-- ══ SIDEBAR ══ -->
 <aside class="sb app-hidden" id="sb">
-  <div class="sb-tog" onclick="toggleSB()" title="Collapse">◀</div>
   <div class="sb-top">
-    <div class="nx-logo">
-      <div class="nx-mark">N</div>
-      <div><div class="nx-name">NexaraDash</div><div class="nx-tag">nexaradash.com</div></div>
+    <div class="sb-top-row">
+      <div class="nx-logo" style="margin-bottom:0;">
+        <div class="nx-mark">N</div>
+        <div><div class="nx-name">NexaraDash</div><div class="nx-tag">nexaradash.com</div></div>
+      </div>
+      <div class="sb-tog" onclick="toggleSB()" title="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </div>
     </div>
     <div class="cl-card">
       <div class="cl-name" data-company>NexaraDash</div>
@@ -723,8 +732,8 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
       </div>
     </div>
 
-    <div class="sh2"><div class="sh2-txt">How To Get Started</div><div class="sh2-line"></div></div>
-    <div class="stg">
+    <div class="sh2" id="onboard-hd" style="display:none;"><div class="sh2-txt">How To Get Started</div><div class="sh2-line"></div></div>
+    <div class="stg" id="onboard-steps" style="display:none;">
       <div class="stp"><div class="stn">01</div><div class="stt">Add Your Products</div><div class="std">Go to the Products tab. Enter each SKU with buying price, shipping cost per unit, and Temu commission %.</div></div>
       <div class="stp"><div class="stn">02</div><div class="stt">Import Settlement File</div><div class="std">Download your Settlement file from Temu Seller Central and upload it in the Import tab.</div></div>
       <div class="stp"><div class="stn">03</div><div class="stt">View P&L & VAT</div><div class="std">Dashboard calculates revenue, costs, net profit, and tax liability instantly in your local currency.</div></div>
@@ -1240,26 +1249,28 @@ Chart.defaults.font.family="'Inter',system-ui,sans-serif";
   }
   const urlHash=new URLSearchParams(window.location.hash.replace('#',''));
   if(urlHash.get('type')==='recovery'){window.location.href='/reset-password'+window.location.hash;return;}
+  // Only show loader if we have a cached session token — avoids flicker for logged-out users
   const hasCachedSession=Object.keys(localStorage).some(k=>k.startsWith('sb-')&&k.endsWith('-auth-token'));
-  if(hasCachedSession){document.getElementById('loading-screen').classList.add('show');document.getElementById('auth-screen').classList.remove('show');}
+  const ls=document.getElementById('loading-screen');
+  const as=document.getElementById('auth-screen');
+  if(hasCachedSession){ls.classList.add('show');as.classList.remove('show');}
   const{data:{session}}=await sb.auth.getSession();
+  // Always hide loader immediately after session check resolves
+  ls.classList.remove('show');ls.classList.add('hide');
   if(session){
     const isRecovery=session.user?.amr?.some(a=>a.method==='recovery');
     if(isRecovery){
       await sb.auth.signOut();
-      document.getElementById('loading-screen').classList.remove('show');
-      document.getElementById('auth-screen').classList.add('show');
+      as.classList.add('show');
     }else{
       currentUser=session.user;
-      document.getElementById('loading-screen').classList.remove('show');
-      document.getElementById('loading-screen').classList.add('hide');
-      document.getElementById('auth-screen').classList.remove('show');
+      as.classList.remove('show');
       document.getElementById('sb').classList.remove('app-hidden');
       document.getElementById('mn').classList.remove('app-hidden');
       await getProfile();await loadP();await loadPNL();
     }
   }
-  if(!currentUser){document.getElementById('loading-screen').classList.remove('show');document.getElementById('auth-screen').classList.add('show');}
+  if(!currentUser){as.classList.add('show');}
   sb.auth.onAuthStateChange(async(event,session)=>{
     if(event==='PASSWORD_RECOVERY'){recoveryInProgress=true;window.location.href='/reset-password'+window.location.hash;return;}
     if(recoveryInProgress)return;
@@ -1410,7 +1421,8 @@ function rndPeriodTiles(){
   const lastMtdStart=new Date(now.getFullYear(),now.getMonth()-1,1);
   const lastMtdEnd=new Date(now.getFullYear(),now.getMonth()-1,now.getDate());
   const lastMtdData=getPeriodData(fmt(lastMtdStart),fmt(lastMtdEnd));
-  const mtdDelta=lastMtdData.rv>0?((mtdData.rv-lastMtdData.rv)/lastMtdData.rv*100):null;
+  // Only show delta if prior period had meaningful revenue (>0) — avoids -100% on new accounts
+  const mtdDelta=(lastMtdData.rv>0&&mtdData.rv>0)?((mtdData.rv-lastMtdData.rv)/lastMtdData.rv*100):null;
   const mtdLabel='1–'+now.getDate()+' '+now.toLocaleString('default',{month:'short'})+' '+now.getFullYear();
   setTile('mtd',mtdData,mtdDelta,mtdLabel);
 
@@ -1683,10 +1695,22 @@ function recalc(){
   document.getElementById('sr-od').textContent=od;document.getElementById('sr-pm').textContent=mt+' / '+skus.length;
   document.getElementById('sr-gm').textContent=fp(gm);document.getElementById('sr-np').textContent=c(np);
   const unm=skus.filter(d=>!prods.find(p=>p.sku.trim().toLowerCase()===d.sku.trim().toLowerCase())).map(d=>d.sku);
+  const zeroCogs=prods.filter(p=>p.cost===0&&!p.autoAdded===false).length;
   const sw=document.getElementById('sw2');
-  if(unm.length){sw.textContent='⚠️ '+unm.length+' SKU(s) need COGS: '+unm.join(', ');sw.classList.add('sh');}else sw.classList.remove('sh');
+  if(unm.length){sw.textContent='⚠️ '+unm.length+' SKU(s) need COGS: '+unm.join(', ');sw.classList.add('sh');}
+  else if(prods.filter(p=>p.cost===0).length>0&&skus.length>0){
+    sw.textContent='💡 '+prods.filter(p=>p.cost===0).length+' products have £0.00 COGS — go to P&L Report to enter buying prices for accurate profit calculation.';
+    sw.classList.add('sh');
+  }
+  else sw.classList.remove('sh');
   rndSKU(data);updXP(rv,np,tc,mg);
   rndPeriodTiles();
+  // Auto-hide onboarding when data exists
+  const hasData=Object.keys(pnl).length>0;
+  const onboardHd=document.getElementById('onboard-hd');
+  const onboardSteps=document.getElementById('onboard-steps');
+  if(onboardHd)onboardHd.style.display=hasData?'none':'flex';
+  if(onboardSteps)onboardSteps.style.display=hasData?'none':'grid';
 }
 
 function rndSKU(data){
