@@ -1025,6 +1025,7 @@ let prods=[];
 let raws=[],hdrs=[],pnl={},mAds=0,mOth=0,fMode='all',dFrom=null,dTo=null;
 let CH={};
 let signingOut=false;
+let sessionHandled=false; // top-level — used by signIn() and boot IIFE
 
 // ══ CURRENCY SYSTEM ══
 let cur='£';
@@ -1065,7 +1066,12 @@ async function saveSettings(){
 const SB_URL='https://kedzsuclnczlqftakolc.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZHpzdWNsbmN6bHFmdGFrb2xjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjE2MTQsImV4cCI6MjA5NDQzNzYxNH0.tcP_gsRdkJL7e2rWvlChtwTjD8xVWSE9DOHEGuaObAI';
 const{createClient}=supabase;
-const sb=createClient(SB_URL,SB_KEY);
+// Use sessionStorage fallback so login works in Incognito mode
+// sessionStorage is allowed in Incognito; localStorage is blocked
+let _sbStorage;
+try{localStorage.setItem('_nx_test','1');localStorage.removeItem('_nx_test');_sbStorage=localStorage;}
+catch(e){_sbStorage=sessionStorage;}
+const sb=createClient(SB_URL,SB_KEY,{auth:{storage:_sbStorage,persistSession:true,autoRefreshToken:true}});
 let currentUser=null,tenantId=null,companyName='NexaraDash';
 
 // ══ AUTH ══
@@ -1082,8 +1088,18 @@ async function signIn(){
   const btn=document.getElementById('auth-submit');
   btn.disabled=true;btn.textContent='Signing in...';
   hideAuthErr();
-  const{error}=await sb.auth.signInWithPassword({email,password});
+  const{data,error}=await sb.auth.signInWithPassword({email,password});
   if(error){btn.disabled=false;btn.textContent='Continue';showAuthErr(error.message);return;}
+  if(!data?.session){btn.disabled=false;btn.textContent='Continue';showAuthErr('Sign-in blocked by browser privacy settings. Try a normal window.');return;}
+  // ── Directly reveal app — do not rely on onAuthStateChange firing ──
+  sessionHandled=true;
+  currentUser=data.session.user;
+  document.getElementById('auth-screen').classList.remove('show');
+  document.getElementById('sb').classList.remove('app-hidden');
+  document.getElementById('mn').classList.remove('app-hidden');
+  await getProfile();
+  await loadP();
+  await loadPNL();
 }
 
 async function sendReset(){
@@ -1237,7 +1253,6 @@ Chart.defaults.font.family="'Inter',system-ui,sans-serif";
 (async()=>{
   const bc=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('nexaradash_auth'):null;
   let recoveryInProgress=false;
-  let sessionHandled=false; // ← blocks duplicate SIGNED_IN event on reload
   if(bc){
     bc.onmessage=(e)=>{
       if(e.data==='PASSWORD_RECOVERY_STARTED'){
@@ -1257,8 +1272,8 @@ Chart.defaults.font.family="'Inter',system-ui,sans-serif";
   }
   const urlHash=new URLSearchParams(window.location.hash.replace('#',''));
   if(urlHash.get('type')==='recovery'){window.location.href='/reset-password'+window.location.hash;return;}
-  // Only show loader if we have a cached session token — avoids flicker for logged-out users
-  const hasCachedSession=Object.keys(localStorage).some(k=>k.startsWith('sb-')&&k.endsWith('-auth-token'));
+  // Only show loader if cached session token exists — avoids flicker for logged-out users
+  const hasCachedSession=Object.keys(_sbStorage).some(k=>k.startsWith('sb-')&&k.endsWith('-auth-token'));
   const ls=document.getElementById('loading-screen');
   const as=document.getElementById('auth-screen');
   if(hasCachedSession){ls.classList.add('show');as.classList.remove('show');}
