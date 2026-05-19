@@ -94,6 +94,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 .ptile-grid{grid-template-columns:1fr 1fr!important;}
 .ptile-row{grid-template-columns:1fr 1fr!important;}
 .vat-section{grid-template-columns:1fr!important;}
+}
 
 /* ══ HEADER ══ */
 .hdr{height:var(--hh);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow);}
@@ -1046,6 +1047,7 @@ const COUNTRY_CURRENCY={GB:'£',US:'$',AU:'A$',CA:'CA$',IE:'€',NZ:'NZ$',ZA:'R'
 
 function c(n){if(typeof n!=='number'||isNaN(n))return cur+'0.00';return cur+Math.abs(n).toFixed(2);}
 function cs(n){if(typeof n!=='number'||isNaN(n))return cur+'0.00';return(n<0?'-':'')+cur+Math.abs(n).toFixed(2);}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 function applyCurrency(){
   document.querySelectorAll('.cur-lbl').forEach(el=>el.textContent=cur);
@@ -1356,7 +1358,7 @@ function goTab(id,nv,tb){
 function notify(msg,t='inf'){
   const n=document.getElementById('nf');
   const icons={ok:'✓',er:'✕',inf:'ℹ',vt:'🏛'};
-  n.innerHTML=(icons[t]||'ℹ')+' '+msg;
+  n.textContent=(icons[t]||'ℹ')+' '+msg;
   n.className='nf '+t+' sh';
   setTimeout(()=>n.classList.remove('sh'),3200);
 }
@@ -1546,7 +1548,7 @@ function rdBulk(f){
 function rndBulkPreview(){
   const b=document.getElementById('bulk-body');
   document.getElementById('bulk-cnt').textContent=bulkPreview.length+' rows';
-  b.innerHTML=bulkPreview.map(p=>`<tr><td class="tsk">${p.sku}</td><td>${p.name}</td><td>${c(p.cost)}</td><td>${c(p.ship)}</td><td>${p.fee}%</td><td>${c(p.ads)}</td><td>${p.exists?'<span style="color:var(--amb);font-size:11px;font-weight:600;">⚠ Skip</span>':'<span style="color:var(--grn);font-size:11px;font-weight:600;">✓ New</span>'}</td></tr>`).join('');
+  b.innerHTML=bulkPreview.map(p=>`<tr><td class="tsk">${esc(p.sku)}</td><td>${esc(p.name)}</td><td>${c(p.cost)}</td><td>${c(p.ship)}</td><td>${p.fee}%</td><td>${c(p.ads)}</td><td>${p.exists?'<span style="color:var(--amb);font-size:11px;font-weight:600;">⚠ Skip</span>':'<span style="color:var(--grn);font-size:11px;font-weight:600;">✓ New</span>'}</td></tr>`).join('');
   const newCount=bulkPreview.filter(p=>!p.exists).length;
   const skipCount=bulkPreview.filter(p=>p.exists).length;
   document.getElementById('bulk-ok-t').textContent=newCount+' new products to import · '+skipCount+' duplicates will be skipped';
@@ -1584,7 +1586,7 @@ function rndProds(){
   const b=document.getElementById('pb');
   document.getElementById('pc2').textContent=prods.length+' products';
   if(!prods.length){b.innerHTML='<tr><td colspan="8"><div class="em"><div class="em-i">📦</div><div class="em-t">No products yet. Add your first product above.</div></div></td></tr>';return;}
-  b.innerHTML=prods.map((p,i)=>`<tr><td class="tsk">${p.sku}</td><td class="tnm">${p.name}</td><td>${c(p.cost)}</td><td>${c(p.ship)}</td><td>${p.fee}%</td><td>${c(p.ads)}</td><td style="color:var(--amb);font-weight:600;">${c(p.cost+p.ship)}</td><td><button class="btn bd bsm" onclick="delProd(${i})">✕</button></td></tr>`).join('');
+  b.innerHTML=prods.map((p,i)=>`<tr><td class="tsk">${esc(p.sku)}</td><td class="tnm">${esc(p.name)}</td><td>${c(p.cost)}</td><td>${c(p.ship)}</td><td>${p.fee}%</td><td>${c(p.ads)}</td><td style="color:var(--amb);font-weight:600;">${c(p.cost+p.ship)}</td><td><button class="btn bd bsm" onclick="delProd(${i})">✕</button></td></tr>`).join('');
 }
 
 function onDrop(e){e.preventDefault();document.getElementById('uz').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)rdFile(f);}
@@ -1630,7 +1632,7 @@ function bldMap(){
   function best(k){const kws=pri[k];let bi=-1,bs=999;hl.forEach((h,ci)=>{kws.forEach((kw,ki)=>{if(h===kw&&ki<bs){bs=ki;bi=ci;}});});if(bi===-1)hl.forEach((h,ci)=>{kws.forEach((kw,ki)=>{if(h.includes(kw)&&ki<bs){bs=ki;bi=ci;}});});return bi;}
   const g=document.getElementById('mpg');
   g.innerHTML=fields.map(f=>{const m=best(f.k);
-    return`<div class="mr2"><label class="ml">${f.l}${m>=0?' <span class="at">✓ AUTO</span>':''}</label><select class="fi" id="map-${f.k}" style="padding:8px 12px;cursor:pointer;"><option value="-1">— Skip —</option>${hdrs.map((h,i)=>`<option value="${i}"${i===m?' selected':''}>${h}</option>`).join('')}</select></div>`;
+    return`<div class="mr2"><label class="ml">${esc(f.l)}${m>=0?' <span class="at">✓ AUTO</span>':''}</label><select class="fi" id="map-${f.k}" style="padding:8px 12px;cursor:pointer;"><option value="-1">— Skip —</option>${hdrs.map((h,i)=>`<option value="${i}"${i===m?' selected':''}>${esc(h)}</option>`).join('')}</select></div>`;
   }).join('');
   document.getElementById('mpr').classList.add('sh');
 }
@@ -1687,7 +1689,7 @@ function procMap(){
   });
   if(autoAdded>0){savP();rndProds();notify(autoAdded+' new SKUs auto-registered — add COGS to calculate profit','inf');}
   document.getElementById('imp-th').innerHTML='<th>SKU</th><th>Revenue</th><th>Temu Fee</th><th>Shipping</th><th>Returns</th><th>Qty</th><th>Date</th>';
-  document.getElementById('imp-tb').innerHTML=rows.slice(0,300).map(r=>`<tr><td class="tsk">${r.sku}</td><td>${c(r.rev)}</td><td class="tn2">${c(r.fee)}</td><td class="tn2">${c(r.ship)}</td><td class="tw2">${c(r.ret)}</td><td>${r.qty}</td><td style="color:var(--tx3)">${r.date}</td></tr>`).join('');
+  document.getElementById('imp-tb').innerHTML=rows.slice(0,300).map(r=>`<tr><td class="tsk">${esc(r.sku)}</td><td>${c(r.rev)}</td><td class="tn2">${c(r.fee)}</td><td class="tn2">${c(r.ship)}</td><td class="tw2">${c(r.ret)}</td><td>${r.qty}</td><td style="color:var(--tx3)">${esc(r.date)}</td></tr>`).join('');
   document.getElementById('imp-cnt').textContent=rows.length+' rows';
   document.getElementById('imp-tw').style.display='block';
   const totRev=Object.values(pnl).reduce((a,d)=>a+d.revenue,0);
@@ -1776,7 +1778,7 @@ function rndSKU(data){
     const cogsCell=r.hasCOGS?`<td class="tn2 cogs-cell" data-sku="${r.d.sku}" title="Click to edit COGS">${c(r.cg)}</td>`:`<td class="tw2 cogs-cell cogs-missing" data-sku="${r.d.sku}" title="Click to enter cost">✏️ Enter COGS</td>`;
     const refundBadge=r.refundRate>5?`<span style="font-size:9px;background:var(--redl);color:var(--red);border:1px solid var(--redbl);padding:1px 5px;border-radius:4px;margin-left:4px;">${r.refundRate.toFixed(1)}% ret</span>`:'';
     const topBadge=r.d.sku===topSKU?`<span style="font-size:9px;background:var(--grnl);color:var(--grn);border:1px solid var(--grnbl);padding:1px 5px;border-radius:4px;margin-left:4px;">⭐ Top</span>`:'';
-    return`<tr><td><span class="rk ${rkc}">${i+1}</span></td><td class="tsk">${r.d.sku}${topBadge}</td><td class="tnm" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;">${r.nm}${refundBadge}</td><td>${r.d.qty}</td><td>${c(r.d.revenue)}</td>${cogsCell}<td class="tn2">${c(r.d.fees)}</td><td class="tn2">${c(r.tsh)}</td><td class="tn2">${c(r.sh)}</td><td class="tn2">${c(r.ad)}</td><td class="tw2">${c(r.d.returns)}</td><td class="${pc}">${cs(r.np)}</td><td style="color:${mgColor};font-weight:700;">${r.mg.toFixed(1)}%</td></tr>`;
+    return`<tr><td><span class="rk ${rkc}">${i+1}</span></td><td class="tsk">${esc(r.d.sku)}${topBadge}</td><td class="tnm" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;">${esc(r.nm)}${refundBadge}</td><td>${r.d.qty}</td><td>${c(r.d.revenue)}</td>${cogsCell}<td class="tn2">${c(r.d.fees)}</td><td class="tn2">${c(r.tsh)}</td><td class="tn2">${c(r.sh)}</td><td class="tn2">${c(r.ad)}</td><td class="tw2">${c(r.d.returns)}</td><td class="${pc}">${cs(r.np)}</td><td style="color:${mgColor};font-weight:700;">${r.mg.toFixed(1)}%</td></tr>`;
   }).join('');
   b.querySelectorAll('.cogs-cell').forEach(cell=>{
     cell.style.cursor='pointer';
@@ -1831,7 +1833,7 @@ function calcVAT(){
     const nm=p?p.name:d.sku;
     const vat=d.revenue*(vatRateOut/(1+vatRateOut));
     const net=d.revenue-vat;
-    return`<div class="vtr"><div class="vtc"><span style="font-weight:600;color:var(--vat)">${d.sku}</span><br><span style="font-size:10px;color:var(--tx3)">${nm}</span></div><div class="vtc">£${d.revenue.toFixed(2)}</div><div class="vtc" style="color:var(--vat);font-weight:600;">£${vat.toFixed(2)}</div><div class="vtc">£${net.toFixed(2)}</div></div>`;
+    return`<div class="vtr"><div class="vtc"><span style="font-weight:600;color:var(--vat)">${esc(d.sku)}</span><br><span style="font-size:10px;color:var(--tx3)">${esc(nm)}</span></div><div class="vtc">£${d.revenue.toFixed(2)}</div><div class="vtc" style="color:var(--vat);font-weight:600;">£${vat.toFixed(2)}</div><div class="vtc">£${net.toFixed(2)}</div></div>`;
   }).join('');
   if(rv>0)notify('Tax calculated · Payable: '+c(vatPayable),'vt');
   else notify('Add sales data first to calculate VAT','inf');
