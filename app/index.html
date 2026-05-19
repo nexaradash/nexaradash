@@ -1133,6 +1133,7 @@ async function signOut(){
   closeUsrMenu();
   await sb.auth.signOut();
   currentUser=null;tenantId=null;prods=[];pnl={};raws=[];hdrs=[];
+  localStorage.clear();sessionStorage.clear();
   document.getElementById('auth-screen').classList.add('show');
   document.getElementById('sb').classList.add('app-hidden');
   document.getElementById('mn').classList.add('app-hidden');
