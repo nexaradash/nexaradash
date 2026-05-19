@@ -82,7 +82,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 .sb.col .pw .pwt{opacity:0;}
 .sb.col .sb-bot{overflow:hidden;white-space:nowrap;}
 .sb.col .sb-bot span{opacity:0;width:0;display:inline-block;overflow:hidden;}
-
+@media(max-width:768px){.sb{width:var(--swc);}.sb .sb-logo-text,.sb .cl-card,.sb .ntx{opacity:0;pointer-events:none;}.mn{margin-left:var(--swc);}}
 /* ══ MAIN ══ */
 .mn{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;transition:margin-left .25s cubic-bezier(.4,0,.2,1);}
 .mn.exp{margin-left:var(--swc);}
