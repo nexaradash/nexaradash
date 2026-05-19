@@ -302,7 +302,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 /* ══ UPLOAD ══ */
 .uz{border:2px dashed var(--border2);border-radius:var(--r2);padding:40px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg2);margin-bottom:20px;box-shadow:var(--shadow);}
 .uz:hover,.uz.drag{border-color:var(--blu2);background:var(--blul);}
-.ui{font-size:36px;margin-bottom:10px;}
+.ui{width:48px;height:48px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;}
 .ut{font-size:16px;font-weight:700;color:var(--tx);margin-bottom:6px;letter-spacing:-.01em;}
 .ud{font-size:12px;color:var(--tx3);margin-bottom:16px;line-height:1.6;}
 .un{font-size:10px;color:var(--tx4);margin-top:10px;display:flex;align-items:center;justify-content:center;gap:5px;}
@@ -794,7 +794,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
         ondragover="event.preventDefault();this.classList.add('drag')"
         ondragleave="this.classList.remove('drag')"
         ondrop="onBulkDrop(event)" style="padding:32px 24px;">
-        <div class="ui" style="font-size:28px;">📤</div>
+        <div class="ui"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
         <div class="ut" style="font-size:14px;">Step 2 — Drop Your Product List Here</div>
         <div class="ud" style="font-size:11px;margin-bottom:12px;">Upload filled template or any Excel/CSV with SKU and cost columns<br>Supports .xlsx, .xls and .csv files</div>
         <button class="btn bp bsm" onclick="event.stopPropagation();document.getElementById('bulk-fi').click()">Choose File</button>
@@ -839,7 +839,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
   <div class="pg" id="pg-import">
     <div class="sh2"><div class="sh2-txt">Upload Settlement File</div><div class="sh2-line"></div></div>
     <div class="uz" id="uz" onclick="document.getElementById('fi2').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="onDrop(event)">
-      <div class="ui">📂</div>
+      <div class="ui"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div>
       <div class="ut">Drop Your Temu Settlement File Here</div>
       <div class="ud">Temu Seller Central → Finance → Settlement Management → Export<br>Supports .xlsx, .xls and .csv files</div>
       <button class="btn bp" onclick="event.stopPropagation();document.getElementById('fi2').click()">Choose File</button>
