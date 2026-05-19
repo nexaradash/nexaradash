@@ -204,6 +204,12 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 .kv.pos{color:var(--grn);}
 .kv.neg{color:var(--red);}
 .ks{font-size:10px;color:var(--tx4);}
+.spark{position:absolute;bottom:0;left:0;width:100%;height:50px;z-index:1;pointer-events:none;}
+.kpi-footer{position:absolute;bottom:18px;left:20px;right:20px;display:flex;align-items:center;justify-content:space-between;z-index:2;}
+.trend-badge{display:inline-flex;align-items:center;padding:2px 6px;border-radius:4px;font-weight:600;font-size:10px;}
+.trend-up{background:var(--grnl);color:var(--grn);}
+.trend-down{background:var(--redl);color:var(--red);}
+.trend-neutral{background:var(--bg3);color:var(--tx3);}
 
 /* ══ SECTION ══ */
 .sh2{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
@@ -723,11 +729,11 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 
     <!-- ══ KPI CARDS ══ -->
     <div class="kg">
-      <div class="kc rv"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Total Revenue</div><div class="ki2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div></div><div class="kv" id="k-rv">£0.00</div><div class="ks" id="k-rv-s">0 orders processed</div></div>
-      <div class="kc pf"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Net Profit</div><div class="ki2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div></div><div class="kv" id="k-pf">£0.00</div><div class="ks">After all deductions</div></div>
-      <div class="kc ct"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Total Costs</div><div class="ki2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div></div><div class="kv" id="k-ct">£0.00</div><div class="ks">COGS + Fees + Ads</div></div>
-      <div class="kc mg"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Net Margin</div><div class="ki2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div></div><div class="kv" id="k-mg">0.0%</div><div class="ks">Net Profit / Revenue</div></div>
-      <div class="kc rf"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Refunds</div><div class="ki2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg></div></div><div class="kv" id="k-rf">£0.00</div><div class="ks" id="k-rf-s">0.0% refund rate</div></div>
+      <div class="kc rv" data-delta="+12.4" data-spark="[10, 12, 14, 11, 15, 18, 22]"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Total Revenue</div><div class="ki2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div></div><div class="kv" id="k-rv">£0.00</div><canvas class="spark"></canvas><div class="kpi-footer"><div class="ks" id="k-rv-s">0 orders processed</div></div></div>
+      <div class="kc pf" data-delta="+6.1" data-spark="[5, 7, 6, 9, 8, 12, 14]"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Net Profit</div><div class="ki2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div></div><div class="kv" id="k-pf">£0.00</div><canvas class="spark"></canvas><div class="kpi-footer"><div class="ks">After all deductions</div></div></div>
+      <div class="kc ct" data-delta="-3.8" data-spark="[20, 18, 19, 16, 17, 14, 12]"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Total Costs</div><div class="ki2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div></div><div class="kv" id="k-ct">£0.00</div><canvas class="spark"></canvas><div class="kpi-footer"><div class="ks">COGS + Fees + Ads</div></div></div>
+      <div class="kc mg" data-delta="+0.0" data-spark="[15, 15, 15, 15, 15, 15, 15]"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Net Margin</div><div class="ki2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div></div><div class="kv" id="k-mg">0.0%</div><canvas class="spark"></canvas><div class="kpi-footer"><div class="ks">Net Profit / Revenue</div></div></div>
+      <div class="kc rf" data-delta="-1.2" data-spark="[8, 7, 6, 5, 4, 3, 2]"><div class="kc-accent"></div><div class="kc-top"><div class="kl">Refunds</div><div class="ki2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg></div></div><div class="kv" id="k-rf">£0.00</div><canvas class="spark"></canvas><div class="kpi-footer"><div class="ks" id="k-rf-s">0.0% refund rate</div></div></div>
     </div>
 
     <div class="sg">
@@ -1037,6 +1043,125 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 <script>
 let prods=[];
 let raws=[],hdrs=[],pnl={},mAds=0,mOth=0,fMode='all',dFrom=null,dTo=null;
+
+function initKPISparklines() {
+  const cards = document.querySelectorAll('.kc');
+  cards.forEach(card => {
+    const deltaStr = card.getAttribute('data-delta');
+    const sparkStr = card.getAttribute('data-spark');
+    if (!deltaStr || !sparkStr) return;
+
+    const delta = parseFloat(deltaStr);
+    const data = JSON.parse(sparkStr);
+
+    let footer = card.querySelector('.kpi-footer');
+    if (!footer) return;
+
+    let badge = footer.querySelector('.trend-badge');
+    if (!badge) {
+        badge = document.createElement('div');
+        badge.className = 'trend-badge';
+        footer.appendChild(badge);
+    }
+
+    if (delta > 0) {
+        badge.innerHTML = '↑ ' + delta + '%';
+        badge.classList.remove('trend-down', 'trend-neutral');
+        badge.classList.add('trend-up');
+    } else if (delta < 0) {
+        badge.innerHTML = '↓ ' + Math.abs(delta) + '%';
+        badge.classList.remove('trend-up', 'trend-neutral');
+        badge.classList.add('trend-down');
+    } else {
+        badge.innerHTML = '− ' + delta + '%';
+        badge.classList.remove('trend-up', 'trend-down');
+        badge.classList.add('trend-neutral');
+    }
+
+    const canvas = card.querySelector('.spark');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    // KC card computed width might be 260px minus paddings, or just measure it.
+    // wait until layout is done, but clientWidth is usually accessible immediately
+    // if not hidden.
+    let w = card.clientWidth;
+    if (w === 0) w = 260; // fallback width
+    const h = 50;
+
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    ctx.scale(dpr, dpr);
+
+    let strokeColor = '#64748b';
+    let rgb = '100, 116, 139';
+    if (card.classList.contains('rv')) { strokeColor = '#2563eb'; rgb = '37, 99, 235'; }
+    else if (card.classList.contains('pf')) { strokeColor = '#059669'; rgb = '5, 150, 105'; }
+    else if (card.classList.contains('ct')) { strokeColor = '#dc2626'; rgb = '220, 38, 38'; }
+    else if (card.classList.contains('mg')) { strokeColor = '#d97706'; rgb = '217, 119, 6'; }
+    else if (card.classList.contains('rf')) { strokeColor = '#dc2626'; rgb = '220, 38, 38'; }
+
+    const padding = 5;
+    const max = Math.max(...data);
+    const min = Math.min(...data);
+    const range = max - min || 1;
+    // ensure rightmost point is not clipped (padding right)
+    const stepX = (w - padding) / (data.length - 1);
+
+    const points = data.map((val, i) => {
+        const x = (i === data.length - 1) ? w - padding : i * stepX;
+        const y = padding + (h - 2 * padding) * (1 - (val - min) / range);
+        return {x, y};
+    });
+
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+        const cp1x = points[i-1].x + stepX / 2;
+        const cp1y = points[i-1].y;
+        const cp2x = points[i-1].x + stepX / 2;
+        const cp2y = points[i].y;
+        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, points[i].x, points[i].y);
+    }
+
+    ctx.save();
+    const gradient = ctx.createLinearGradient(0, 0, 0, h);
+    gradient.addColorStop(0, `rgba(${rgb}, 0.2)`);
+    gradient.addColorStop(1, `rgba(${rgb}, 0)`);
+
+    ctx.lineTo(w, h);
+    ctx.lineTo(0, h);
+    ctx.closePath();
+    ctx.fillStyle = gradient;
+    ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+        const cp1x = points[i-1].x + stepX / 2;
+        const cp1y = points[i-1].y;
+        const cp2x = points[i-1].x + stepX / 2;
+        const cp2y = points[i].y;
+        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, points[i].x, points[i].y);
+    }
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    const lastPoint = points[points.length - 1];
+    ctx.beginPath();
+    ctx.arc(lastPoint.x, lastPoint.y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = strokeColor;
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+}
 let CH={};
 let signingOut=false;
 let sessionHandled=false; // top-level — used by signIn() and boot IIFE
@@ -1261,6 +1386,7 @@ function showSaveBadge(){
 
 document.getElementById('ldate').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
 document.getElementById('xd').textContent='Report Date: '+new Date().toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'});
+initKPISparklines();
 Chart.defaults.color='#94a3b8';
 Chart.defaults.borderColor='rgba(226,231,240,1)';
 Chart.defaults.font.family="'Inter',system-ui,sans-serif";
