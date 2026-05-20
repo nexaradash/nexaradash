@@ -85,12 +85,12 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 .sb.col .pw .pwt{opacity:0;}
 .sb.col .sb-bot{overflow:hidden;white-space:nowrap;}
 .sb.col .sb-bot span{opacity:0;width:0;display:inline-block;overflow:hidden;}
-@media(max-width:768px){.sb{width:var(--swc);}.sb .sb-logo-text,.sb .cl-card,.sb .ntx{opacity:0;pointer-events:none;}.mn{margin-left:var(--swc);}}
+@media(max-width:768px){.sb .sb-logo-text,.sb .cl-card,.sb .ntx{opacity:0;pointer-events:none;}.mn{margin-left:var(--swc);}}
 /* ══ MAIN ══ */
 .mn{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;transition:margin-left .25s cubic-bezier(.4,0,.2,1);}
 .mn.exp{margin-left:var(--swc);}
 @media(max-width:768px){
-.mn{margin-left:var(--swc)!important;}
+
 .hdr{padding:0 12px;}
 .tabs{overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;}
 .tab{font-size:11px;padding:6px 10px;}
@@ -422,8 +422,52 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 
 @media(max-width:1200px){.ptiles{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:1100px){.kg{grid-template-columns:repeat(3,1fr);}.vat-grid{grid-template-columns:repeat(2,1fr);}.cg{grid-template-columns:1fr;}.cc.full{grid-column:auto;}}
-@media(max-width:768px){.sb{transform:translateX(-100%);}.sb.mop{transform:translateX(0);}.mn{margin-left:0!important;}.mob{display:flex;}.kg,.vat-grid{grid-template-columns:1fr 1fr;}.ptiles{grid-template-columns:1fr 1fr;}.sg,.stg,.xf,.fg,.vat-settings,.vf-grid{grid-template-columns:1fr;}.mpg{grid-template-columns:1fr;}.pg{padding:16px;}}
+@media(max-width:768px){.mob{display:flex;}.kg,.vat-grid{grid-template-columns:1fr 1fr;}.ptiles{grid-template-columns:1fr 1fr;}.sg,.stg,.xf,.fg,.vat-settings,.vf-grid{grid-template-columns:1fr;}.mpg{grid-template-columns:1fr;}.pg{padding:16px;}}
 @media(max-width:480px){.ptiles{grid-template-columns:1fr;}}
+
+.mob-bar { display: none; }
+@media(max-width:1023px){
+  .sb {
+    position:fixed;
+    left: calc(-1 * var(--sw)) !important;
+    top:0;
+    height:100vh;
+    width:var(--sw) !important;
+    z-index:200;
+    transition:left .25s ease;
+  }
+  .sb.mop { left:0 !important; }
+  .mn { margin-left:0 !important; padding-top: 52px; }
+  .hdr { top: 52px; }
+  .tabs { top: calc(var(--hh) + 52px); }
+
+  .mob-bar { display: flex; position: fixed; top: 0; left: 0; right: 0; height: 52px; background: var(--navy); z-index: 200; justify-content: space-between; align-items: center; padding: 0 14px; box-shadow: var(--shadow2); border-bottom: 1px solid var(--navyrim); }
+  .mob-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; color: #fff; }
+  .mob-tog { background: rgba(255,255,255,0.08); border: 1px solid var(--navyrim); border-radius: var(--r); padding: 6px 10px; cursor: pointer; color: #fff; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+  .mob-tog:hover { background: rgba(255,255,255,0.15); }
+
+  .kg { grid-template-columns: repeat(2,1fr); gap:10px; }
+}
+
+@media(max-width:767px){
+  .pt-wrap { display:flex; flex-wrap: wrap; gap:8px; }
+  .ptile { min-width:calc(50% - 4px); flex:1 1 calc(50% - 4px); }
+}
+
+@media(max-width:479px){
+  .kg { grid-template-columns: 1fr 1fr; gap:8px; }
+  .kc { height:auto; min-height:110px; padding:14px 16px; }
+  .kv { font-size:20px; }
+}
+
+@media(max-width:359px){
+  .kg { grid-template-columns: 1fr; }
+  .ptile { min-width:100%; }
+}
+
+.mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45); z-index:199;}
+body.overlay-vis .mob-overlay{display:block;}
+
 </style>
 </head>
 <body>
@@ -473,14 +517,20 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
   </div>
 </div>
 
-<button class="mob" onclick="document.querySelector('.sb').classList.toggle('mop')">☰</button>
+<div class="mob-bar">
+  <div class="mob-logo">
+    <img src="assets/logo.svg" alt="NexaraDash" style="width:24px;height:24px;border-radius:4px;object-fit:contain;">
+    <span>NexaraDash</span>
+  </div>
+  <button class="mob-tog" onclick="document.querySelector('.sb').classList.toggle('mop'); document.body.classList.toggle('overlay-vis');">☰</button>
+</div>
 
 <!-- ══ SIDEBAR ══ -->
 <aside class="sb app-hidden" id="sb">
   <div class="sb-top">
     <div class="sb-top-row">
       <div class="nx-logo" style="margin-bottom:0;gap:8px;">
-        <div class="nx-mark">N</div>
+        <img src="assets/logo.svg" alt="NexaraDash" style="width:32px;height:32px;border-radius:6px;object-fit:contain;">
         <div class="sb-logo-text"><div class="nx-name">NexaraDash</div><div class="nx-tag">nexaradash.com</div></div>
       </div>
         </div>
@@ -624,7 +674,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     </div>
 
     <!-- ══ PERIOD COMPARISON TILES ══ -->
-    <div class="ptiles" id="ptiles-row">
+    <div class="ptiles pt-wrap" id="ptiles-row">
       <div class="ptile today">
         <div class="ptile-hd">
           <div class="ptile-hd-row">
@@ -2187,5 +2237,6 @@ function resetUp(){
   recalc();notify('Import reset','inf');
 }
 </script>
+<div class="mob-overlay" onclick="document.querySelector('.sb').classList.remove('mop'); document.body.classList.remove('overlay-vis');"></div>
 </body>
 </html>
