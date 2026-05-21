@@ -156,16 +156,39 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 
 /* ══ PERIOD COMPARISON TILES ══ */
 .ptiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
-.ptile{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s;cursor:default;}
+.ptile {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--r2);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: box-shadow .2s, transform .2s;
+  cursor: default;
+}
 .ptile:hover{box-shadow:var(--shadow2);transform:translateY(-1px);}
-.ptile-hd{padding:12px 16px 10px;border-bottom:1px solid var(--border);}
+.ptile-hd {
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid #E2E8F0;
+  background: transparent;
+}
 .ptile-hd-row{display:flex;align-items:center;justify-content:space-between;}
-.ptile-label{font-size:12px;font-weight:700;color:#fff;letter-spacing:.01em;}
-.ptile-date{font-size:10px;color:rgba(255,255,255,0.75);margin-top:2px;}
-.ptile.today .ptile-hd{background:linear-gradient(135deg,#1a56db,#2563eb);}
-.ptile.yesterday .ptile-hd{background:linear-gradient(135deg,#0e7490,#0891b2);}
-.ptile.mtd .ptile-hd{background:linear-gradient(135deg,#059669,#10b981);}
-.ptile.lastmonth .ptile-hd{background:linear-gradient(135deg,#7c3aed,#8b5cf6);}
+.ptile-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0D1421;
+  letter-spacing: .01em;
+}
+.ptile-date {
+  font-size: 10px;
+  color: #64748B;
+  margin-top: 2px;
+}
+.ptile.today .ptile-hd,
+.ptile.yesterday .ptile-hd,
+.ptile.mtd .ptile-hd,
+.ptile.lastmonth .ptile-hd {
+  background: transparent;
+}
 .ptile-body{padding:12px 16px 14px;}
 .ptile-sales{font-size:22px;font-weight:800;color:var(--tx);letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1;margin-bottom:2px;}
 .ptile-delta{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-bottom:10px;}
@@ -519,7 +542,7 @@ body.overlay-vis .mob-overlay{display:block;}
 
 <div class="mob-bar">
   <div class="mob-logo">
-    <img src="nexaradash_logo_svg.svg" alt="NexaraDash" style="width:24px;height:24px;border-radius:4px;object-fit:contain;">
+    <img src="../assets/logo.png" alt="NexaraDash" style="height: 32px; width: auto; object-fit: contain; display: block;">
     <span>NexaraDash</span>
   </div>
   <button class="mob-tog" onclick="document.querySelector('.sb').classList.toggle('mop'); document.body.classList.toggle('overlay-vis');">☰</button>
@@ -530,7 +553,7 @@ body.overlay-vis .mob-overlay{display:block;}
   <div class="sb-top">
     <div class="sb-top-row">
       <div class="nx-logo" style="margin-bottom:0;gap:8px;">
-        <img src="nexaradash_logo_svg.svg" alt="NexaraDash" style="width:32px;height:32px;border-radius:6px;object-fit:contain;">
+        <img src="../assets/logo.png" alt="NexaraDash" style="height: 32px; width: auto; object-fit: contain; display: block;">
         <div class="sb-logo-text"><div class="nx-name">NexaraDash</div><div class="nx-tag">nexaradash.com</div></div>
       </div>
         </div>
