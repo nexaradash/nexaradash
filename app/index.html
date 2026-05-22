@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232563eb'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Inter,sans-serif' font-weight='700' font-size='18' fill='white'>N</text></svg>">
+<link rel="icon" type="image/png" href="../favicon.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -113,7 +113,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 .usr-menu{position:relative;}
 .usr-btn{display:flex;align-items:center;gap:7px;cursor:pointer;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);transition:all .15s;user-select:none;}
 .usr-btn:hover{border-color:var(--border3);background:var(--bg3);}
-.usr-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
+.usr-av{width:26px;height:26px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden;border:1.5px solid var(--border2);}
 .usr-name{font-size:11px;font-weight:600;color:var(--tx2);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .usr-chev{font-size:9px;color:var(--tx3);transition:transform .2s;line-height:1;}
 .usr-btn.open .usr-chev{transform:rotate(180deg);}
@@ -557,7 +557,7 @@ body.overlay-vis .mob-overlay{display:block;}
   <div class="sb-top">
     <div class="sb-top-row">
       <div class="nx-logo" style="margin-bottom:0;gap:8px;">
-        <img src="nexaradash_logo_svg.svg" alt="NexaraDash" style="height: 32px; width: auto; object-fit: contain; display: block;">
+        <img src="nexaradash_logo_svg.svg" alt="NexaraDash" style="height: 32px; width: auto; object-fit: contain; display: block;" id="sb-logo-img">
         <div class="sb-logo-text"><div class="nx-name">NexaraDash</div><div class="nx-tag">nexaradash.com</div></div>
       </div>
         </div>
@@ -629,7 +629,7 @@ body.overlay-vis .mob-overlay{display:block;}
       <!-- ══ USER MENU ══ -->
       <div class="usr-menu" id="usr-menu">
         <div class="usr-btn" onclick="toggleUsrMenu()" id="usr-btn">
-          <div class="usr-av">N</div>
+          <img src="nexaradash_logo_svg.svg" alt="NexaraDash" class="usr-av" style="width:26px;height:26px;border-radius:50%;object-fit:cover;display:block;">
           <span class="usr-name" id="usr-display">Account</span>
           <span class="usr-chev">▾</span>
         </div>
