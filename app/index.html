@@ -473,8 +473,12 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 }
 
 @media(max-width:767px){
-  .pt-wrap { display:flex; flex-wrap: wrap; gap:8px; }
-  .ptile { min-width:calc(50% - 4px); flex:1 1 calc(50% - 4px); }
+  .ptiles {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .ptile { min-width: 0; flex: none; }
 }
 
 @media(max-width:479px){
@@ -542,7 +546,7 @@ body.overlay-vis .mob-overlay{display:block;}
 
 <div class="mob-bar">
   <div class="mob-logo">
-    <img src="../assets/logo.png" alt="NexaraDash" style="height: 32px; width: auto; object-fit: contain; display: block;">
+    <img src="nexaradash_logo_svg.svg" alt="NexaraDash" style="height: 32px; width: auto; object-fit: contain; display: block;">
     <span>NexaraDash</span>
   </div>
   <button class="mob-tog" onclick="document.querySelector('.sb').classList.toggle('mop'); document.body.classList.toggle('overlay-vis');">☰</button>
@@ -553,7 +557,7 @@ body.overlay-vis .mob-overlay{display:block;}
   <div class="sb-top">
     <div class="sb-top-row">
       <div class="nx-logo" style="margin-bottom:0;gap:8px;">
-        <img src="../assets/logo.png" alt="NexaraDash" style="height: 32px; width: auto; object-fit: contain; display: block;">
+        <img src="nexaradash_logo_svg.svg" alt="NexaraDash" style="height: 32px; width: auto; object-fit: contain; display: block;">
         <div class="sb-logo-text"><div class="nx-name">NexaraDash</div><div class="nx-tag">nexaradash.com</div></div>
       </div>
         </div>
