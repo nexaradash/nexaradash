@@ -503,11 +503,15 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
   .ct-head,.ct-row{grid-template-columns:1.8fr 1fr 1fr 1fr 1fr;}
   .t-grid{grid-template-columns:1fr 1fr;}
 }
-@media(max-width:768px){
+@media(max-width:767px){
   nav{padding:0 20px;}.nav-mid{display:none;}
   .hero,.trust-bar,.stats,.features,.hiw,.pricing,.testi,.final-cta,.faq-sec{padding:80px 20px;}
   .demo-band{padding:28px 20px;}.demo-band-in{flex-wrap:wrap;}.demo-btn{margin-left:0;width:100%;}
-  .h1-thin{font-size:20px;}.h1-bold,.h1-blue{font-size:46px;}
+  /* Hero mobile: stack right column below text */
+  .hero-in{display:flex;flex-direction:column;}
+  .hero-r{display:block !important;max-width:100%;margin-top:24px;}
+  .mockup-outer{max-width:100%;}
+  .h1-thin{font-size:20px;}.h1-bold,.h1-blue{font-size:36px;}
   .hero-desc{font-size:15px;}
   .stats-in{grid-template-columns:repeat(2,1fr);}
   .stat{border-right:none;padding:20px;}
@@ -1034,7 +1038,8 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
     </div>
 
     <!-- COMPARISON TABLE -->
-    <div class="comp-table">
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+    <div class="comp-table" style="min-width:500px;">
       <div class="ct-head">
         <div class="ct-h">Feature</div>
         <div class="ct-h">Starter</div>
@@ -1051,6 +1056,7 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
       <div class="ct-row"><div class="ct-c feat-name">White Label</div><div class="ct-c no">—</div><div class="ct-c no feat-col">—</div><div class="ct-c no">—</div><div class="ct-c yes">✓</div></div>
       <div class="ct-row"><div class="ct-c feat-name">Support</div><div class="ct-c val">Email</div><div class="ct-c feat-val">Priority Email</div><div class="ct-c val">Dedicated</div><div class="ct-c val">Phone + Email</div></div>
       <div class="ct-row"><div class="ct-c feat-name" style="font-weight:700;">Price / month</div><div class="ct-c val">£9</div><div class="ct-c feat-val" style="font-size:17px;font-family:var(--font-display);font-weight:800;">£19</div><div class="ct-c val">£39</div><div class="ct-c val">£79</div></div>
+    </div>
     </div>
 
     <!-- Security badges -->
