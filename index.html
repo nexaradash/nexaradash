@@ -23,7 +23,7 @@
 
 <!-- JSON-LD Structured Data -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"SoftwareApplication","name":"NexaraDash","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"9","priceCurrency":"GBP","priceSpecification":{"@type":"UnitPriceSpecification","price":"9","priceCurrency":"GBP","billingDuration":"P1M"}},"description":"Profit analytics dashboard for Temu sellers worldwide. Real-time P&L, tax filing, and branded PDF reports.","url":"https://nexaradash.com","aggregateRating":{"@type":"AggregateRating","ratingValue":"4.9","reviewCount":"127"}}
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"NexaraDash","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"9","priceCurrency":"USD","priceSpecification":{"@type":"UnitPriceSpecification","price":"9","priceCurrency":"USD","billingDuration":"P1M"}},"description":"Profit analytics dashboard for Temu sellers worldwide. Real-time P&L, tax filing, and branded PDF reports.","url":"https://nexaradash.com","aggregateRating":{"@type":"AggregateRating","ratingValue":"4.9","reviewCount":"127"}}
 </script>
 
 <!-- Fonts: system stack — zero network cost, instant render -->
@@ -255,7 +255,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:999;height:64px;display:flex;ali
 .save-badge{display:inline-block;background:#dcfce7;color:#166534;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:8px;border:1px solid #bbf7d0;}
 
 /* Plan cards */
-.plans{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:48px;}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px;}
 .plan{border:1.5px solid var(--ltb);border-radius:24px;padding:28px;background:#fff;position:relative;transition:all .2s;overflow:hidden;}
 .plan:hover{border-color:var(--ltb2);box-shadow:0 8px 32px rgba(0,0,0,0.08);transform:translateY(-2px);}
 .plan.featured{border-color:var(--blu);background:linear-gradient(160deg,#eff6ff 0%,#fff 100%);box-shadow:0 0 0 1px rgba(37,99,235,0.15),0 16px 48px rgba(37,99,235,0.12);transform:scale(1.02);}
@@ -299,10 +299,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:999;height:64px;display:flex;ali
 
 /* Comparison table */
 .comp-table{border:1px solid var(--ltb);border-radius:14px;overflow:hidden;}
-.ct-head{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 1fr;background:var(--lt);border-bottom:1px solid var(--ltb);}
+.ct-head{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr;background:var(--lt);border-bottom:1px solid var(--ltb);}
 .ct-h{padding:14px 18px;font-size:11px;font-weight:700;color:var(--lttx3);text-transform:uppercase;letter-spacing:.1em;}
 .ct-h.feat-h-col{color:var(--blu);background:rgba(37,99,235,0.04);}
-.ct-row{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 1fr;border-bottom:1px solid var(--ltb);}
+.ct-row{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr;border-bottom:1px solid var(--ltb);}
 .ct-row:last-child{border-bottom:none;}
 .ct-row:hover{background:rgba(37,99,235,0.02);}
 .ct-c{padding:13px 18px;font-size:13.5px;color:var(--lttx2);display:flex;align-items:center;}
@@ -505,6 +505,8 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
 }
 @media(max-width:767px){
   nav{padding:0 20px;}.nav-mid{display:none;}
+  .nav-login{display:none;}
+  .nav-cta{white-space:nowrap;padding:8px 14px;font-size:12px;}
   .hero,.trust-bar,.stats,.features,.hiw,.pricing,.testi,.final-cta,.faq-sec{padding:80px 20px;}
   .demo-band{padding:28px 20px;}.demo-band-in{flex-wrap:wrap;}.demo-btn{margin-left:0;width:100%;}
   /* Hero mobile: stack right column below text */
@@ -614,7 +616,7 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
       <div class="mockup-outer">
         <div class="price-tag">
           <div class="pt-from">Starting at</div>
-          <div class="pt-price">£9</div>
+          <div class="pt-price">$9</div>
           <div class="pt-mo">Monthly</div>
         </div>
         <div class="stat-float">
@@ -622,7 +624,7 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
           <div class="sf-row">
             <div class="sf-lbl">Net Profit</div>
             <div style="display:flex;align-items:center;gap:7px;">
-              <div class="sf-val" style="color:#10b981;">£1,204</div>
+              <div class="sf-val" style="color:#10b981;">$1,204</div>
               <div class="sf-badge">+18.3%</div>
             </div>
           </div>
@@ -658,16 +660,16 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
             <!-- P&L Panel -->
             <div class="dm-panel active" id="tab-pl">
             <div class="dm-kpis">
-              <div class="dm-kpi rv"><div class="dm-kl">Revenue</div><div class="dm-kv">£4,832</div><div class="dm-ks">+12.4% vs last mo</div></div>
-              <div class="dm-kpi pf"><div class="dm-kl">Net Profit</div><div class="dm-kv pos">£1,204</div><div class="dm-ks">After deductions</div></div>
-              <div class="dm-kpi ct"><div class="dm-kl">Total Costs</div><div class="dm-kv neg">£3,628</div><div class="dm-ks">COGS+Fees+Ads</div></div>
+              <div class="dm-kpi rv"><div class="dm-kl">Revenue</div><div class="dm-kv">$4,832</div><div class="dm-ks">+12.4% vs last mo</div></div>
+              <div class="dm-kpi pf"><div class="dm-kl">Net Profit</div><div class="dm-kv pos">$1,204</div><div class="dm-ks">After deductions</div></div>
+              <div class="dm-kpi ct"><div class="dm-kl">Total Costs</div><div class="dm-kv neg">$3,628</div><div class="dm-ks">COGS+Fees+Ads</div></div>
               <div class="dm-kpi mg"><div class="dm-kl">Margin</div><div class="dm-kv pos">24.9%</div><div class="dm-ks">Net/Revenue</div></div>
             </div>
             <div class="dm-sec">Top SKUs by Profit</div>
             <div class="dm-rows">
-              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">SKU-0042</div><div class="sku-nm">Wireless Earbuds Pro</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#10b981;">£482.30</div><div class="sku-mg">38.2% margin</div></div></div>
-              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">SKU-0018</div><div class="sku-nm">Phone Stand Adjustable</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#10b981;">£316.80</div><div class="sku-mg">42.1% margin</div></div></div>
-              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">SKU-0091</div><div class="sku-nm">LED Desk Lamp USB</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#f59e0b;">£98.40</div><div class="sku-mg">18.6% margin</div></div></div>
+              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">SKU-0042</div><div class="sku-nm">Wireless Earbuds Pro</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#10b981;">$482.30</div><div class="sku-mg">38.2% margin</div></div></div>
+              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">SKU-0018</div><div class="sku-nm">Phone Stand Adjustable</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#10b981;">$316.80</div><div class="sku-mg">42.1% margin</div></div></div>
+              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">SKU-0091</div><div class="sku-nm">LED Desk Lamp USB</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#f59e0b;">$98.40</div><div class="sku-mg">18.6% margin</div></div></div>
             </div>
             <div class="dm-chart">
               <div class="dm-bars">
@@ -702,10 +704,10 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
             <div class="dm-panel" id="tab-vat">
             <div class="dm-sec">Tax Return — Q1 2026</div>
             <div class="dm-rows">
-              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">Box 1</div><div class="sku-nm">Output VAT (sales)</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#ef4444;">£966.40</div></div></div>
-              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">Box 4</div><div class="sku-nm">Input VAT (purchases)</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#10b981;">£242.18</div></div></div>
-              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">Box 5</div><div class="sku-nm">Net VAT payable</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#f59e0b;">£724.22</div></div></div>
-              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">Box 6</div><div class="sku-nm">Total sales ex-VAT</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#fff;">£4,832.00</div></div></div>
+              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">Box 1</div><div class="sku-nm">Output VAT (sales)</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#ef4444;">$966.40</div></div></div>
+              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">Box 4</div><div class="sku-nm">Input VAT (purchases)</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#10b981;">$242.18</div></div></div>
+              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">Box 5</div><div class="sku-nm">Net VAT payable</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#f59e0b;">$724.22</div></div></div>
+              <div class="dm-row"><div class="dm-row-l"><div class="sku-id">Box 6</div><div class="sku-nm">Total sales ex-VAT</div></div><div class="dm-row-r"><div class="sku-pf" style="color:#fff;">$4,832.00</div></div></div>
             </div>
             <div style="margin-top:10px;padding:8px 11px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:7px;font-size:10px;color:#10b981;font-weight:600;">✓ ✓ Ready to export as tax-compliant PDF</div>
             </div>
@@ -735,9 +737,9 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
 <div class="stats">
   <div class="stats-in">
     <div class="stat"><div class="stat-n">9<em>+</em></div><div class="stat-l">Analytics Charts</div></div>
-    <div class="stat"><div class="stat-n"><em>£</em>0</div><div class="stat-l">Hidden Fees</div></div>
+    <div class="stat"><div class="stat-n"><em>$</em>0</div><div class="stat-l">Hidden Fees</div></div>
     <div class="stat"><div class="stat-n">5<em>min</em></div><div class="stat-l">Setup Time</div></div>
-    <div class="stat"><div class="stat-n">100<em>%</em></div><div class="stat-l">Temu UK Focused</div></div>
+    <div class="stat"><div class="stat-n">100<em>%</em></div><div class="stat-l">Temu Focused</div></div>
   </div>
 </div>
 
@@ -766,9 +768,9 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
           <div class="mini-bar"><div class="mini-dots"><span></span><span></span><span></span></div><div class="mini-url">nexaradash.com · P&L Dashboard</div></div>
           <div class="mini-body">
             <div class="mini-kpis">
-              <div class="mini-kpi"><div class="mini-kl">Revenue</div><div class="mini-kv" style="color:var(--lttx);">£4,832</div><div class="mini-ks up">↑ 12.4%</div></div>
-              <div class="mini-kpi" style="border-top:2px solid var(--grn)"><div class="mini-kl">Net Profit</div><div class="mini-kv" style="color:var(--grn);">£1,204</div><div class="mini-ks up">↑ 18.3%</div></div>
-              <div class="mini-kpi" style="border-top:2px solid var(--red2)"><div class="mini-kl">Total Costs</div><div class="mini-kv" style="color:var(--red2);">£3,628</div><div class="mini-ks dn">COGS+Fees</div></div>
+              <div class="mini-kpi"><div class="mini-kl">Revenue</div><div class="mini-kv" style="color:var(--lttx);">$4,832</div><div class="mini-ks up">↑ 12.4%</div></div>
+              <div class="mini-kpi" style="border-top:2px solid var(--grn)"><div class="mini-kl">Net Profit</div><div class="mini-kv" style="color:var(--grn);">$1,204</div><div class="mini-ks up">↑ 18.3%</div></div>
+              <div class="mini-kpi" style="border-top:2px solid var(--red2)"><div class="mini-kl">Total Costs</div><div class="mini-kv" style="color:var(--red2);">$3,628</div><div class="mini-ks dn">COGS+Fees</div></div>
               <div class="mini-kpi" style="border-top:2px solid var(--amb)"><div class="mini-kl">Margin</div><div class="mini-kv" style="color:var(--amb);">24.9%</div><div class="mini-ks up">Net/Rev</div></div>
             </div>
             <div class="mini-sec">Monthly trend</div>
@@ -797,10 +799,10 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
             <div class="mini-sec">SKU performance — this month</div>
             <div class="mini-table">
               <div class="mini-th"><span>Product</span><span>Revenue</span><span>Profit</span><span>Margin</span><span>ROI</span></div>
-              <div class="mini-tr green-row"><span class="sku-chip blu">SKU-0042</span><span>£1,240</span><span style="color:var(--grn);font-weight:700;">£482</span><span>38.2%</span><span class="roi-badge good">142%</span></div>
-              <div class="mini-tr"><span class="sku-chip blu">SKU-0018</span><span>£753</span><span style="color:var(--grn);font-weight:700;">£317</span><span>42.1%</span><span class="roi-badge good">98%</span></div>
-              <div class="mini-tr"><span class="sku-chip blu">SKU-0055</span><span>£412</span><span style="color:var(--amb2);font-weight:700;">£84</span><span>20.4%</span><span class="roi-badge mid">31%</span></div>
-              <div class="mini-tr"><span class="sku-chip blu">SKU-0091</span><span>£298</span><span style="color:var(--red2);font-weight:700;">-£12</span><span style="color:var(--red2);">-4.0%</span><span class="roi-badge bad">-4%</span></div>
+              <div class="mini-tr green-row"><span class="sku-chip blu">SKU-0042</span><span>$1,240</span><span style="color:var(--grn);font-weight:700;">$482</span><span>38.2%</span><span class="roi-badge good">142%</span></div>
+              <div class="mini-tr"><span class="sku-chip blu">SKU-0018</span><span>$753</span><span style="color:var(--grn);font-weight:700;">$317</span><span>42.1%</span><span class="roi-badge good">98%</span></div>
+              <div class="mini-tr"><span class="sku-chip blu">SKU-0055</span><span>$412</span><span style="color:var(--amb2);font-weight:700;">$84</span><span>20.4%</span><span class="roi-badge mid">31%</span></div>
+              <div class="mini-tr"><span class="sku-chip blu">SKU-0091</span><span>$298</span><span style="color:var(--red2);font-weight:700;">-$12</span><span style="color:var(--red2);">-4.0%</span><span class="roi-badge bad">-4%</span></div>
             </div>
             <div style="margin-top:10px;padding:7px 10px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;font-size:10px;color:var(--red2);font-weight:600;">⚠ SKU-0091 is unprofitable after fees — consider repricing</div>
           </div>
@@ -841,12 +843,12 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
               <div style="font-size:9px;background:#ecfdf5;color:var(--grn);border:1px solid #a7f3d0;border-radius:4px;padding:2px 7px;font-weight:700;">Ready</div>
             </div>
             <div class="vat-rows">
-              <div class="vat-row"><div class="vat-box">Box 1</div><div class="vat-desc">VAT due on sales</div><div class="vat-val" style="color:var(--red2);">£966.40</div></div>
-              <div class="vat-row"><div class="vat-box">Box 2</div><div class="vat-desc">VAT on EU acquisitions</div><div class="vat-val">£0.00</div></div>
-              <div class="vat-row"><div class="vat-box">Box 3</div><div class="vat-desc">Total VAT charged</div><div class="vat-val" style="color:var(--red2);">£966.40</div></div>
-              <div class="vat-row"><div class="vat-box">Box 4</div><div class="vat-desc">VAT reclaimed</div><div class="vat-val" style="color:var(--grn);">£242.18</div></div>
-              <div class="vat-row highlighted"><div class="vat-box active">Box 5</div><div class="vat-desc" style="font-weight:600;">Net VAT payable</div><div class="vat-val" style="color:var(--amb);font-weight:700;font-size:13px;">£724.22</div></div>
-              <div class="vat-row"><div class="vat-box">Box 6</div><div class="vat-desc">Total sales ex-VAT</div><div class="vat-val">£4,832.00</div></div>
+              <div class="vat-row"><div class="vat-box">Box 1</div><div class="vat-desc">VAT due on sales</div><div class="vat-val" style="color:var(--red2);">$966.40</div></div>
+              <div class="vat-row"><div class="vat-box">Box 2</div><div class="vat-desc">VAT on EU acquisitions</div><div class="vat-val">$0.00</div></div>
+              <div class="vat-row"><div class="vat-box">Box 3</div><div class="vat-desc">Total VAT charged</div><div class="vat-val" style="color:var(--red2);">$966.40</div></div>
+              <div class="vat-row"><div class="vat-box">Box 4</div><div class="vat-desc">VAT reclaimed</div><div class="vat-val" style="color:var(--grn);">$242.18</div></div>
+              <div class="vat-row highlighted"><div class="vat-box active">Box 5</div><div class="vat-desc" style="font-weight:600;">Net VAT payable</div><div class="vat-val" style="color:var(--amb);font-weight:700;font-size:13px;">$724.22</div></div>
+              <div class="vat-row"><div class="vat-box">Box 6</div><div class="vat-desc">Total sales ex-VAT</div><div class="vat-val">$4,832.00</div></div>
             </div>
             <div style="margin-top:10px;display:flex;gap:8px;">
               <div style="flex:1;padding:7px;background:var(--blu);color:#fff;border-radius:6px;font-size:10px;font-weight:700;text-align:center;">Export PDF</div>
@@ -870,14 +872,14 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
               </div>
               <div class="pdf-company">Amicable Technologies Ltd</div>
               <div class="pdf-kpis">
-                <div class="pdf-kpi"><div style="font-size:8px;color:#94a3b8;">Revenue</div><div style="font-size:14px;font-weight:800;color:var(--lttx);">£4,832</div></div>
-                <div class="pdf-kpi"><div style="font-size:8px;color:#94a3b8;">Net Profit</div><div style="font-size:14px;font-weight:800;color:var(--grn);">£1,204</div></div>
+                <div class="pdf-kpi"><div style="font-size:8px;color:#94a3b8;">Revenue</div><div style="font-size:14px;font-weight:800;color:var(--lttx);">$4,832</div></div>
+                <div class="pdf-kpi"><div style="font-size:8px;color:#94a3b8;">Net Profit</div><div style="font-size:14px;font-weight:800;color:var(--grn);">$1,204</div></div>
                 <div class="pdf-kpi"><div style="font-size:8px;color:#94a3b8;">Margin</div><div style="font-size:14px;font-weight:800;color:var(--amb);">24.9%</div></div>
               </div>
               <div style="height:1px;background:var(--ltb);margin:10px 0;"></div>
               <div style="font-size:9px;font-weight:700;color:var(--lttx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Top SKUs</div>
-              <div class="pdf-sku-row"><span style="font-size:10px;color:var(--blu);font-weight:600;">SKU-0042 — Earbuds Pro</span><span style="font-size:10px;font-weight:700;color:var(--grn);">£482.30</span></div>
-              <div class="pdf-sku-row"><span style="font-size:10px;color:var(--blu);font-weight:600;">SKU-0018 — Phone Stand</span><span style="font-size:10px;font-weight:700;color:var(--grn);">£316.80</span></div>
+              <div class="pdf-sku-row"><span style="font-size:10px;color:var(--blu);font-weight:600;">SKU-0042 — Earbuds Pro</span><span style="font-size:10px;font-weight:700;color:var(--grn);">$482.30</span></div>
+              <div class="pdf-sku-row"><span style="font-size:10px;color:var(--blu);font-weight:600;">SKU-0018 — Phone Stand</span><span style="font-size:10px;font-weight:700;color:var(--grn);">$316.80</span></div>
               <div style="margin-top:10px;padding:6px 8px;background:#eff6ff;border-left:3px solid var(--blu);border-radius:0 4px 4px 0;font-size:9px;color:var(--blu);font-weight:600;">Generated by NexaraDash · info@nexaradash.com</div>
             </div>
           </div>
@@ -950,112 +952,91 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
       </div>
     </div>
 
-    <div class="plans">
-      <!-- STARTER -->
-      <div class="plan reveal reveal-d1">
-        <div class="plan-bar s"></div>
-        <div class="plan-name s">Starter</div>
-        <div class="plan-tagline">New sellers getting started with profit tracking.</div>
-        <div class="plan-price"><div class="plan-sym">£</div><div class="plan-amt lg" id="s-price">9</div><div class="plan-mo">/mo</div></div>
-        <div class="plan-annual" id="s-annual">&nbsp;</div>
-        <div class="plan-div"></div>
-        <div class="plan-feats">
-          <div class="plf"><div class="plf-y">✓</div>P&L Dashboard</div>
-          <div class="plf"><div class="plf-y">✓</div>Up to 25 SKUs</div>
-          <div class="plf"><div class="plf-y">✓</div>Settlement Import</div>
-          <div class="plf"><div class="plf-y">✓</div>4 Basic Charts</div>
-          <div class="plf"><div class="plf-y">✓</div>CSV Export</div>
-          <div class="plf dim"><div class="plf-n">—</div>Tax Filing</div>
-          <div class="plf dim"><div class="plf-n">—</div>PDF Reports</div>
-        </div>
-        <a href="/app" class="plan-btn s-btn">Start Free Trial</a>
-        <div class="plan-note">14 days free · no credit card</div>
-      </div>
-
-      <!-- PRO FEATURED -->
-      <div class="plan featured reveal reveal-d2">
-        <div class="plan-bar p"></div>
-        <div class="plan-pop">Most Popular</div>
-        <div class="plan-name p">Pro</div>
-        <div class="plan-tagline">Growing sellers who need full analytics & VAT.</div>
-        <div class="plan-price"><div class="plan-sym">£</div><div class="plan-amt featured-lg" id="p-price">19</div><div class="plan-mo">/mo</div></div>
-        <div class="plan-annual" id="p-annual">&nbsp;</div>
-        <div class="plan-div"></div>
-        <div class="plan-feats">
-          <div class="plf"><div class="plf-y">✓</div>Full P&L Dashboard</div>
-          <div class="plf"><div class="plf-y">✓</div>Unlimited SKUs</div>
-          <div class="plf"><div class="plf-y">✓</div>Settlement Import</div>
-          <div class="plf"><div class="plf-y">✓</div>9 Charts & Analytics</div>
-          <div class="plf"><div class="plf-y">✓</div>Tax Filing</div>
-          <div class="plf"><div class="plf-y">✓</div>Branded PDF Reports</div>
-          <div class="plf"><div class="plf-y">✓</div>Priority Support</div>
-        </div>
-        <a href="/app" class="plan-btn p-btn">Start Free Trial</a>
-        <div class="plan-note">14 days free · no credit card</div>
-      </div>
-
-      <!-- BUSINESS -->
-      <div class="plan reveal reveal-d3">
-        <div class="plan-bar b"></div>
-        <div class="plan-name b">Business</div>
-        <div class="plan-tagline">Established sellers with high volume & reporting needs.</div>
-        <div class="plan-price"><div class="plan-sym">£</div><div class="plan-amt lg" id="b-price">39</div><div class="plan-mo">/mo</div></div>
-        <div class="plan-annual" id="b-annual">&nbsp;</div>
-        <div class="plan-div"></div>
-        <div class="plan-feats">
-          <div class="plf"><div class="plf-y">✓</div>Everything in Pro</div>
-          <div class="plf"><div class="plf-y">✓</div>3 User Accounts</div>
-          <div class="plf"><div class="plf-y">✓</div>Advanced Reports</div>
-          <div class="plf"><div class="plf-y">✓</div>Multi-period Analysis</div>
-          <div class="plf"><div class="plf-y">✓</div>Scheduled PDF Reports</div>
-          <div class="plf"><div class="plf-y">✓</div>Dedicated Support</div>
-          <div class="plf"><div class="plf-y">✓</div>Custom Branding</div>
-        </div>
-        <a href="/app" class="plan-btn b-btn">Start Free Trial</a>
-        <div class="plan-note">14 days free · no credit card</div>
-      </div>
-
-      <!-- AGENCY -->
-      <div class="plan reveal reveal-d4">
-        <div class="plan-bar a"></div>
-        <div class="plan-name a">Agency</div>
-        <div class="plan-tagline">Accountants managing multiple Temu seller clients.</div>
-        <div class="plan-price"><div class="plan-sym">£</div><div class="plan-amt lg" id="a-price">79</div><div class="plan-mo">/mo</div></div>
-        <div class="plan-annual" id="a-annual">&nbsp;</div>
-        <div class="plan-div"></div>
-        <div class="plan-feats">
-          <div class="plf"><div class="plf-y">✓</div>Everything in Business</div>
-          <div class="plf"><div class="plf-y">✓</div>Up to 10 Client Accounts</div>
-          <div class="plf"><div class="plf-y">✓</div>Isolated Client Data</div>
-          <div class="plf"><div class="plf-y">✓</div>White Label Option</div>
-          <div class="plf"><div class="plf-y">✓</div>Admin Dashboard</div>
-          <div class="plf"><div class="plf-y">✓</div>Bulk Client Reports</div>
-          <div class="plf"><div class="plf-y">✓</div>Phone + Email Support</div>
-        </div>
-        <a href="mailto:info@nexaradash.com" class="plan-btn a-btn">Contact Us</a>
-        <div class="plan-note">Custom onboarding included</div>
-      </div>
+<div class="plans">
+  <!-- STARTER -->
+  <div class="plan reveal reveal-d1">
+    <div class="plan-bar s"></div>
+    <div class="plan-name s">Starter</div>
+    <div class="plan-tagline">New sellers getting started with profit tracking.</div>
+    <div class="plan-price"><div class="plan-sym">$</div><div class="plan-amt lg" id="s-price">9</div><div class="plan-mo">/mo</div></div>
+    <div class="plan-annual" id="s-annual">&nbsp;</div>
+    <div class="plan-div"></div>
+    <div class="plan-feats">
+      <div class="plf"><div class="plf-y">✓</div>P&amp;L Dashboard</div>
+      <div class="plf"><div class="plf-y">✓</div>Up to 25 SKUs</div>
+      <div class="plf"><div class="plf-y">✓</div>Settlement Import</div>
+      <div class="plf"><div class="plf-y">✓</div>4 Basic Charts</div>
+      <div class="plf"><div class="plf-y">✓</div>CSV Export</div>
+      <div class="plf dim"><div class="plf-n">—</div>Tax Filing</div>
+      <div class="plf dim"><div class="plf-n">—</div>PDF Reports</div>
     </div>
+    <a href="/app" class="plan-btn s-btn">Start Free Trial</a>
+    <div class="plan-note">14 days free · no credit card</div>
+  </div>
+  <!-- PRO FEATURED -->
+  <div class="plan featured reveal reveal-d2">
+    <div class="plan-bar p"></div>
+    <div class="plan-pop">Most Popular</div>
+    <div class="plan-name p">Pro</div>
+    <div class="plan-tagline">Growing sellers who need full analytics &amp; VAT.</div>
+    <div class="plan-price"><div class="plan-sym">$</div><div class="plan-amt featured-lg" id="p-price">19</div><div class="plan-mo">/mo</div></div>
+    <div class="plan-annual" id="p-annual">&nbsp;</div>
+    <div class="plan-div"></div>
+    <div class="plan-feats">
+      <div class="plf"><div class="plf-y">✓</div>Full P&amp;L Dashboard</div>
+      <div class="plf"><div class="plf-y">✓</div>Unlimited SKUs</div>
+      <div class="plf"><div class="plf-y">✓</div>Settlement Import</div>
+      <div class="plf"><div class="plf-y">✓</div>9 Charts &amp; Analytics</div>
+      <div class="plf"><div class="plf-y">✓</div>Tax Filing</div>
+      <div class="plf"><div class="plf-y">✓</div>Branded PDF Reports</div>
+      <div class="plf"><div class="plf-y">✓</div>Priority Support</div>
+    </div>
+    <a href="/app" class="plan-btn p-btn">Start Free Trial</a>
+    <div class="plan-note">14 days free · no credit card</div>
+  </div>
+  <!-- BUSINESS -->
+  <div class="plan reveal reveal-d3">
+    <div class="plan-bar b"></div>
+    <div class="plan-name b">Business</div>
+    <div class="plan-tagline">High-volume sellers needing team access &amp; reporting.</div>
+    <div class="plan-price"><div class="plan-sym">$</div><div class="plan-amt lg" id="b-price">39</div><div class="plan-mo">/mo</div></div>
+    <div class="plan-annual" id="b-annual">&nbsp;</div>
+    <div class="plan-div"></div>
+    <div class="plan-feats">
+      <div class="plf"><div class="plf-y">✓</div>Everything in Pro</div>
+      <div class="plf"><div class="plf-y">✓</div>Up to 3 Team Members</div>
+      <div class="plf"><div class="plf-y">✓</div>Multi-Currency</div>
+      <div class="plf"><div class="plf-y">✓</div>Google Sheets Export</div>
+      <div class="plf"><div class="plf-y">✓</div>Weekly Email Reports</div>
+      <div class="plf"><div class="plf-y">✓</div>Phone + Email Support</div>
+      <div class="plf"><div class="plf-y">✓</div>Custom Onboarding</div>
+    </div>
+    <a href="/app" class="plan-btn b-btn">Start Free Trial</a>
+    <div class="plan-note">14 days free · no credit card</div>
+  </div>
+</div>
 
-    <!-- COMPARISON TABLE -->
-    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-    <div class="comp-table" style="min-width:500px;">
+<!-- COMPARISON TABLE -->
+<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+    <div class="comp-table">
       <div class="ct-head">
         <div class="ct-h">Feature</div>
         <div class="ct-h">Starter</div>
         <div class="ct-h feat-h-col">Pro ⭐</div>
         <div class="ct-h">Business</div>
-        <div class="ct-h">Agency</div>
       </div>
-      <div class="ct-row"><div class="ct-c feat-name">SKU Limit</div><div class="ct-c val">25</div><div class="ct-c feat-val">Unlimited</div><div class="ct-c val">Unlimited</div><div class="ct-c val">Unlimited</div></div>
-      <div class="ct-row"><div class="ct-c feat-name">P&L Dashboard</div><div class="ct-c yes">✓</div><div class="ct-c yes feat-col">✓</div><div class="ct-c yes">✓</div><div class="ct-c yes">✓</div></div>
-      <div class="ct-row"><div class="ct-c feat-name">Charts</div><div class="ct-c val">4</div><div class="ct-c feat-val">9</div><div class="ct-c val">9</div><div class="ct-c val">9</div></div>
-      <div class="ct-row"><div class="ct-c feat-name">Tax Filing</div><div class="ct-c no">—</div><div class="ct-c yes feat-col">✓</div><div class="ct-c yes">✓</div><div class="ct-c yes">✓</div></div>
-      <div class="ct-row"><div class="ct-c feat-name">Branded PDF Reports</div><div class="ct-c no">—</div><div class="ct-c yes feat-col">✓</div><div class="ct-c yes">✓</div><div class="ct-c yes">✓</div></div>
-      <div class="ct-row"><div class="ct-c feat-name">User Accounts</div><div class="ct-c val">1</div><div class="ct-c feat-val">1</div><div class="ct-c val">3</div><div class="ct-c val">10+</div></div>
-      <div class="ct-row"><div class="ct-c feat-name">White Label</div><div class="ct-c no">—</div><div class="ct-c no feat-col">—</div><div class="ct-c no">—</div><div class="ct-c yes">✓</div></div>
-      <div class="ct-row"><div class="ct-c feat-name">Support</div><div class="ct-c val">Email</div><div class="ct-c feat-val">Priority Email</div><div class="ct-c val">Dedicated</div><div class="ct-c val">Phone + Email</div></div>
-      <div class="ct-row"><div class="ct-c feat-name" style="font-weight:700;">Price / month</div><div class="ct-c val">£9</div><div class="ct-c feat-val" style="font-size:17px;font-family:var(--font-display);font-weight:800;">£19</div><div class="ct-c val">£39</div><div class="ct-c val">£79</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">Price / month</div><div class="ct-c val">$9</div><div class="ct-c feat-val">$19</div><div class="ct-c val">$39</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">SKU Limit</div><div class="ct-c val">25</div><div class="ct-c feat-val">Unlimited</div><div class="ct-c val">Unlimited</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">P&amp;L Dashboard</div><div class="ct-c yes">✓</div><div class="ct-c yes feat-col">✓</div><div class="ct-c yes">✓</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">Settlement Import</div><div class="ct-c yes">✓</div><div class="ct-c yes feat-col">✓</div><div class="ct-c yes">✓</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">Analytics Charts</div><div class="ct-c val">4</div><div class="ct-c feat-val">9</div><div class="ct-c val">9</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">Tax Filing (VAT/GST)</div><div class="ct-c no">—</div><div class="ct-c yes feat-col">✓</div><div class="ct-c yes">✓</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">Branded PDF Reports</div><div class="ct-c no">—</div><div class="ct-c yes feat-col">✓</div><div class="ct-c yes">✓</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">Team Members</div><div class="ct-c val">1</div><div class="ct-c feat-val">1</div><div class="ct-c val">Up to 3</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">Multi-Currency</div><div class="ct-c no">—</div><div class="ct-c no feat-col">—</div><div class="ct-c yes">✓</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">Google Sheets Export</div><div class="ct-c no">—</div><div class="ct-c no feat-col">—</div><div class="ct-c yes">✓</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">Weekly Email Reports</div><div class="ct-c no">—</div><div class="ct-c no feat-col">—</div><div class="ct-c yes">✓</div></div>
+      <div class="ct-row"><div class="ct-c feat-name">Support</div><div class="ct-c val">Email</div><div class="ct-c feat-val">Priority Email</div><div class="ct-c val">Phone + Email</div></div>
     </div>
     </div>
 
@@ -1169,26 +1150,24 @@ footer{background:rgba(0,0,0,0.3);border-top:1px solid var(--dkb);padding:44px 6
 
 <script>
 // ── Monthly/Annual toggle ──
-const prices = {
-  mo: {s:9, p:19, b:39, a:79},
-  yr: {s:7, p:15, b:31, a:63}
-};
-const annualNote = {
-  mo: {s:'', p:'', b:'', a:''},
-  yr: {
-    s:'<strong>£84/year</strong> — save £24',
-    p:'<strong>£180/year</strong> — save £48',
-    b:'<strong>£372/year</strong> — save £96',
-    a:'<strong>£756/year</strong> — save £192'
-  }
-};
 function setToggle(mode){
-  document.getElementById('btn-mo').classList.toggle('act', mode==='mo');
-  document.getElementById('btn-yr').classList.toggle('act', mode==='yr');
-  ['s','p','b','a'].forEach(k=>{
-    document.getElementById(k+'-price').textContent = prices[mode][k];
-    document.getElementById(k+'-annual').innerHTML = annualNote[mode][k] || '&nbsp;';
-  });
+  document.querySelectorAll('.ptb').forEach(b=>b.classList.remove('act'));
+  document.getElementById('btn-'+mode).classList.add('act');
+  if(mode==='mo'){
+    document.getElementById('s-price').textContent='9';
+    document.getElementById('p-price').textContent='19';
+    document.getElementById('b-price').textContent='39';
+    document.getElementById('s-annual').innerHTML='&nbsp;';
+    document.getElementById('p-annual').innerHTML='&nbsp;';
+    document.getElementById('b-annual').innerHTML='&nbsp;';
+  } else {
+    document.getElementById('s-price').textContent='7';
+    document.getElementById('p-price').textContent='15';
+    document.getElementById('b-price').textContent='31';
+    document.getElementById('s-annual').innerHTML='<strong>Save $24/yr</strong> · billed $84 annually';
+    document.getElementById('p-annual').innerHTML='<strong>Save $48/yr</strong> · billed $180 annually';
+    document.getElementById('b-annual').innerHTML='<strong>Save $96/yr</strong> · billed $372 annually';
+  }
 }
 
 // ── Scroll progress bar ──
@@ -1239,7 +1218,7 @@ const statsObs = new IntersectionObserver(entries=>{
       statsObs.unobserve(e.target);
       const counters = e.target.querySelectorAll('.stat');
       counters[0]?.querySelector('.stat-n') && animateCount(counters[0].querySelector('.stat-n'), 9, '', '<em>+</em>');
-      counters[1]?.querySelector('.stat-n') && animateCount(counters[1].querySelector('.stat-n'), 0, '<em>£</em>', '');
+      counters[1]?.querySelector('.stat-n') && animateCount(counters[1].querySelector('.stat-n'), 0, '<em>$</em>', '');
       counters[2]?.querySelector('.stat-n') && animateCount(counters[2].querySelector('.stat-n'), 5, '', '<em>min</em>');
       counters[3]?.querySelector('.stat-n') && animateCount(counters[3].querySelector('.stat-n'), 100, '', '<em>%</em>');
     }
