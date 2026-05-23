@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="../favicon.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230f2044'/><rect x='3' y='22' width='6' height='7' rx='1.5' fill='%231D9E75'/><rect x='10' y='17' width='6' height='12' rx='1.5' fill='%2319b589'/><rect x='17' y='11' width='6' height='18' rx='1.5' fill='%2317c99d'/><rect x='24' y='4' width='5' height='25' rx='1.5' fill='%2300C9A7'/></svg>">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -55,7 +55,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 .cl-card{background:rgba(255,255,255,0.07);border:1px solid var(--navyrim);border-radius:var(--r);padding:10px 12px;margin-top:10px;transition:opacity .2s,max-height .25s,margin .25s,padding .25s;max-height:80px;overflow:hidden;}
 .sb.col .cl-card{opacity:0;max-height:0;margin-top:0;padding-top:0;padding-bottom:0;pointer-events:none;}
 .nx-logo{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
-.nx-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 4px 12px rgba(59,130,246,0.4);}
+.nx-mark{width:34px;height:34px;border-radius:9px;background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:1px;}
 .nx-name{font-size:13px;font-weight:700;color:var(--navytx);}
 .nx-tag{font-size:9px;color:var(--navytx3);letter-spacing:.08em;text-transform:uppercase;margin-top:1px;}
 .cl-card{background:rgba(255,255,255,0.07);border:1px solid var(--navyrim);border-radius:var(--r);padding:10px 12px;}
@@ -85,12 +85,12 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 .sb.col .pw .pwt{opacity:0;}
 .sb.col .sb-bot{overflow:hidden;white-space:nowrap;}
 .sb.col .sb-bot span{opacity:0;width:0;display:inline-block;overflow:hidden;}
-@media(max-width:768px){.sb .sb-logo-text,.sb .cl-card,.sb .ntx{opacity:0;pointer-events:none;}.mn{margin-left:var(--swc);}}
+@media(max-width:768px){.sb{width:var(--swc);}.sb .sb-logo-text,.sb .cl-card,.sb .ntx{opacity:0;pointer-events:none;}.mn{margin-left:var(--swc);}}
 /* ══ MAIN ══ */
 .mn{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;transition:margin-left .25s cubic-bezier(.4,0,.2,1);}
 .mn.exp{margin-left:var(--swc);}
 @media(max-width:768px){
-
+.mn{margin-left:var(--swc)!important;}
 .hdr{padding:0 12px;}
 .tabs{overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;}
 .tab{font-size:11px;padding:6px 10px;}
@@ -113,7 +113,7 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 .usr-menu{position:relative;}
 .usr-btn{display:flex;align-items:center;gap:7px;cursor:pointer;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);transition:all .15s;user-select:none;}
 .usr-btn:hover{border-color:var(--border3);background:var(--bg3);}
-.usr-av{width:26px;height:26px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden;border:1.5px solid var(--border2);}
+.usr-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
 .usr-name{font-size:11px;font-weight:600;color:var(--tx2);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .usr-chev{font-size:9px;color:var(--tx3);transition:transform .2s;line-height:1;}
 .usr-btn.open .usr-chev{transform:rotate(180deg);}
@@ -156,39 +156,16 @@ body{font-family:var(--fd);background:var(--bg);color:var(--tx);min-height:100vh
 
 /* ══ PERIOD COMPARISON TILES ══ */
 .ptiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
-.ptile {
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
-  border-radius: var(--r2);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  transition: box-shadow .2s, transform .2s;
-  cursor: default;
-}
+.ptile{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s;cursor:default;}
 .ptile:hover{box-shadow:var(--shadow2);transform:translateY(-1px);}
-.ptile-hd {
-  padding: 12px 16px 10px;
-  border-bottom: 1px solid #E2E8F0;
-  background: transparent;
-}
+.ptile-hd{padding:12px 16px 10px;border-bottom:1px solid var(--border);}
 .ptile-hd-row{display:flex;align-items:center;justify-content:space-between;}
-.ptile-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: #0D1421;
-  letter-spacing: .01em;
-}
-.ptile-date {
-  font-size: 10px;
-  color: #64748B;
-  margin-top: 2px;
-}
-.ptile.today .ptile-hd,
-.ptile.yesterday .ptile-hd,
-.ptile.mtd .ptile-hd,
-.ptile.lastmonth .ptile-hd {
-  background: transparent;
-}
+.ptile-label{font-size:12px;font-weight:700;color:#fff;letter-spacing:.01em;}
+.ptile-date{font-size:10px;color:rgba(255,255,255,0.75);margin-top:2px;}
+.ptile.today .ptile-hd{background:linear-gradient(135deg,#1a56db,#2563eb);}
+.ptile.yesterday .ptile-hd{background:linear-gradient(135deg,#0e7490,#0891b2);}
+.ptile.mtd .ptile-hd{background:linear-gradient(135deg,#059669,#10b981);}
+.ptile.lastmonth .ptile-hd{background:linear-gradient(135deg,#7c3aed,#8b5cf6);}
 .ptile-body{padding:12px 16px 14px;}
 .ptile-sales{font-size:22px;font-weight:800;color:var(--tx);letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1;margin-bottom:2px;}
 .ptile-delta{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-bottom:10px;}
@@ -412,7 +389,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 #auth-screen.show{display:flex;}
 .auth-box{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,0.3);}
 .auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
-.auth-mark{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;box-shadow:0 4px 12px rgba(59,130,246,0.4);}
+.auth-mark{width:42px;height:42px;border-radius:11px;background:transparent;display:flex;align-items:center;justify-content:center;padding:2px;}
 .auth-title{font-size:20px;font-weight:800;color:var(--tx);}
 .auth-sub{font-size:11px;color:var(--tx3);margin-top:1px;}
 .auth-h{font-size:16px;font-weight:700;color:var(--tx);margin-bottom:6px;}
@@ -439,62 +416,14 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
 #loading-screen.hide{display:none!important;}
 .ls-spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,0.15);border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite;margin-bottom:16px;}
 .ls-logo{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
-.ls-mark{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;}
+.ls-mark{width:40px;height:40px;border-radius:10px;background:transparent;display:flex;align-items:center;justify-content:center;padding:1px;}
 .ls-name{font-size:17px;font-weight:700;color:#fff;}
 .ls-txt{font-size:12px;color:rgba(255,255,255,0.4);}
 
 @media(max-width:1200px){.ptiles{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:1100px){.kg{grid-template-columns:repeat(3,1fr);}.vat-grid{grid-template-columns:repeat(2,1fr);}.cg{grid-template-columns:1fr;}.cc.full{grid-column:auto;}}
-@media(max-width:768px){.mob{display:flex;}.kg,.vat-grid{grid-template-columns:1fr 1fr;}.ptiles{grid-template-columns:1fr 1fr;}.sg,.stg,.xf,.fg,.vat-settings,.vf-grid{grid-template-columns:1fr;}.mpg{grid-template-columns:1fr;}.pg{padding:16px;}}
+@media(max-width:768px){.sb{transform:translateX(-100%);}.sb.mop{transform:translateX(0);}.mn{margin-left:0!important;}.mob{display:flex;}.kg,.vat-grid{grid-template-columns:1fr 1fr;}.ptiles{grid-template-columns:1fr 1fr;}.sg,.stg,.xf,.fg,.vat-settings,.vf-grid{grid-template-columns:1fr;}.mpg{grid-template-columns:1fr;}.pg{padding:16px;}}
 @media(max-width:480px){.ptiles{grid-template-columns:1fr;}}
-
-.mob-bar { display: none; }
-@media(max-width:1023px){
-  .sb {
-    position:fixed;
-    left: calc(-1 * var(--sw)) !important;
-    top:0;
-    height:100vh;
-    width:var(--sw) !important;
-    z-index:200;
-    transition:left .25s ease;
-  }
-  .sb.mop { left:0 !important; }
-  .mn { margin-left:0 !important; padding-top: 52px; }
-  .hdr { top: 52px; }
-  .tabs { top: calc(var(--hh) + 52px); }
-
-  .mob-bar { display: flex; position: fixed; top: 0; left: 0; right: 0; height: 52px; background: var(--navy); z-index: 200; justify-content: space-between; align-items: center; padding: 0 14px; box-shadow: var(--shadow2); border-bottom: 1px solid var(--navyrim); }
-  .mob-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; color: #fff; }
-  .mob-tog { background: rgba(255,255,255,0.08); border: 1px solid var(--navyrim); border-radius: var(--r); padding: 6px 10px; cursor: pointer; color: #fff; font-size: 16px; display: flex; align-items: center; justify-content: center; }
-  .mob-tog:hover { background: rgba(255,255,255,0.15); }
-
-  .kg { grid-template-columns: repeat(2,1fr); gap:10px; }
-}
-
-@media(max-width:767px){
-  .ptiles {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
-  }
-  .ptile { min-width: 0; flex: none; }
-}
-
-@media(max-width:479px){
-  .kg { grid-template-columns: 1fr 1fr; gap:8px; }
-  .kc { height:auto; min-height:110px; padding:14px 16px; }
-  .kv { font-size:20px; }
-}
-
-@media(max-width:359px){
-  .kg { grid-template-columns: 1fr; }
-  .ptile { min-width:100%; }
-}
-
-.mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45); z-index:199;}
-body.overlay-vis .mob-overlay{display:block;}
-
 </style>
 </head>
 <body>
@@ -502,7 +431,7 @@ body.overlay-vis .mob-overlay{display:block;}
 <!-- ══ LOADING SCREEN ══ -->
 <div id="loading-screen">
   <div class="ls-logo">
-    <div class="ls-mark">N</div>
+    <div class="ls-mark"><svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;"><defs><linearGradient id="nd-g1" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#1D9E75"/><stop offset="100%" stop-color="#00C9A7"/></linearGradient></defs><rect x="1" y="19" width="5.5" height="8" rx="1.5" fill="url(#nd-g1)"/><rect x="8" y="14" width="5.5" height="13" rx="1.5" fill="url(#nd-g1)"/><rect x="15" y="8" width="5.5" height="19" rx="1.5" fill="url(#nd-g1)"/><rect x="22" y="2" width="5.5" height="25" rx="1.5" fill="url(#nd-g1)"/></svg></div>
     <div class="ls-name">NexaraDash</div>
   </div>
   <div class="ls-spinner"></div>
@@ -513,7 +442,7 @@ body.overlay-vis .mob-overlay{display:block;}
 <div id="auth-screen" class="show">
   <div class="auth-box">
     <div class="auth-logo">
-      <div class="auth-mark">N</div>
+      <div class="auth-mark"><svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;"><defs><linearGradient id="nd-g2" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#1D9E75"/><stop offset="100%" stop-color="#00C9A7"/></linearGradient></defs><rect x="1" y="19" width="5.5" height="8" rx="1.5" fill="url(#nd-g2)"/><rect x="8" y="14" width="5.5" height="13" rx="1.5" fill="url(#nd-g2)"/><rect x="15" y="8" width="5.5" height="19" rx="1.5" fill="url(#nd-g2)"/><rect x="22" y="2" width="5.5" height="25" rx="1.5" fill="url(#nd-g2)"/></svg></div>
       <div><div class="auth-title">NexaraDash</div><div class="auth-sub">nexaradash.com</div></div>
     </div>
     <div id="auth-err" class="auth-err"></div>
@@ -544,20 +473,14 @@ body.overlay-vis .mob-overlay{display:block;}
   </div>
 </div>
 
-<div class="mob-bar">
-  <div class="mob-logo">
-    <img src="nexaradash_logo_svg.svg" alt="NexaraDash" style="height: 32px; width: auto; object-fit: contain; display: block;">
-    <span>NexaraDash</span>
-  </div>
-  <button class="mob-tog" onclick="document.querySelector('.sb').classList.toggle('mop'); document.body.classList.toggle('overlay-vis');">☰</button>
-</div>
+<button class="mob" onclick="document.querySelector('.sb').classList.toggle('mop')">☰</button>
 
 <!-- ══ SIDEBAR ══ -->
 <aside class="sb app-hidden" id="sb">
   <div class="sb-top">
     <div class="sb-top-row">
       <div class="nx-logo" style="margin-bottom:0;gap:8px;">
-        <img src="nexaradash_logo_svg.svg" alt="NexaraDash" style="height: 32px; width: auto; object-fit: contain; display: block;" id="sb-logo-img">
+        <div class="nx-mark"><svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;"><defs><linearGradient id="nd-g3" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#1D9E75"/><stop offset="100%" stop-color="#00C9A7"/></linearGradient></defs><rect x="1" y="19" width="5.5" height="8" rx="1.5" fill="url(#nd-g3)"/><rect x="8" y="14" width="5.5" height="13" rx="1.5" fill="url(#nd-g3)"/><rect x="15" y="8" width="5.5" height="19" rx="1.5" fill="url(#nd-g3)"/><rect x="22" y="2" width="5.5" height="25" rx="1.5" fill="url(#nd-g3)"/></svg></div>
         <div class="sb-logo-text"><div class="nx-name">NexaraDash</div><div class="nx-tag">nexaradash.com</div></div>
       </div>
         </div>
@@ -629,7 +552,7 @@ body.overlay-vis .mob-overlay{display:block;}
       <!-- ══ USER MENU ══ -->
       <div class="usr-menu" id="usr-menu">
         <div class="usr-btn" onclick="toggleUsrMenu()" id="usr-btn">
-          <img src="nexaradash_logo_svg.svg" alt="NexaraDash" class="usr-av" style="width:26px;height:26px;border-radius:50%;object-fit:cover;display:block;">
+          <div class="usr-av">N</div>
           <span class="usr-name" id="usr-display">Account</span>
           <span class="usr-chev">▾</span>
         </div>
@@ -701,7 +624,7 @@ body.overlay-vis .mob-overlay{display:block;}
     </div>
 
     <!-- ══ PERIOD COMPARISON TILES ══ -->
-    <div class="ptiles pt-wrap" id="ptiles-row">
+    <div class="ptiles" id="ptiles-row">
       <div class="ptile today">
         <div class="ptile-hd">
           <div class="ptile-hd-row">
@@ -2264,6 +2187,5 @@ function resetUp(){
   recalc();notify('Import reset','inf');
 }
 </script>
-<div class="mob-overlay" onclick="document.querySelector('.sb').classList.remove('mop'); document.body.classList.remove('overlay-vis');"></div>
 </body>
 </html>
