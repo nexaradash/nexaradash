@@ -1727,7 +1727,8 @@ function pDt(v){
 function getPeriodData(fromStr,toStr){
   const fd=fromStr?new Date(fromStr):null;
   const td=toStr?new Date(toStr):null;
-  if(td)td.setHours(23,59,59);
+  if(fd)fd.setHours(0,0,0,0);
+  if(td)td.setHours(23,59,59,999);
   let rv=0,fe=0,rt=0,cg=0,sh=0,tsh=0,ad=0,od=0,qty=0;
   Object.values(pnl).forEach(d=>{
     const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
