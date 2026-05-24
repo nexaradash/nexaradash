@@ -1561,6 +1561,7 @@ async function loadPNL(){
       const stored=JSON.parse(data.settlement_ref);
       if(stored.pnl&&Object.keys(stored.pnl).length){
         pnl=stored.pnl;hdrs=stored.hdrs||[];
+        Object.values(pnl).forEach(d=>{d.dates=d.dates.filter(e=>e.rev>0);});
         recalc();
         notify('✓ Cloud data restored — '+Object.keys(pnl).length+' SKUs loaded','ok');
       }
