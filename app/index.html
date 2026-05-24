@@ -511,6 +511,57 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
   .skuf{padding:10px 12px;gap:6px;}
   .flt-label,.sku-vis,.sort-select{display:none;}
 }
+
+/* ══ STICKY PERIOD TILES ══ */
+.ptiles-wrap{position:sticky;top:calc(var(--hh) + 44px);z-index:30;background:var(--bg);padding-bottom:14px;margin-bottom:6px;}
+
+/* ══ DATE RANGE PICKER ══ */
+.drp-wrap{position:relative;}
+.drp-btn{display:flex;align-items:center;gap:7px;padding:5px 12px;border-radius:6px;border:1.5px solid var(--border);background:var(--bg2);color:var(--tx2);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--fd);transition:all .15s;white-space:nowrap;}
+.drp-btn:hover{border-color:var(--blu3);color:var(--blu2);}
+.drp-btn.act{border-color:var(--blu2);background:var(--blul);color:var(--blu2);}
+.drp-txt{max-width:160px;overflow:hidden;text-overflow:ellipsis;}
+.drp-panel{position:absolute;top:calc(100% + 8px);left:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);box-shadow:var(--shadow3);z-index:500;width:580px;display:none;flex-direction:column;animation:fu .15s ease;}
+.drp-panel.show{display:flex;}
+.drp-top{display:flex;gap:0;}
+.drp-quick{width:140px;border-right:1px solid var(--border);padding:12px 0;flex-shrink:0;}
+.drp-q-item{padding:8px 14px;font-size:12px;font-weight:500;color:var(--tx2);cursor:pointer;transition:background .12s;}
+.drp-q-item:hover{background:var(--bg3);color:var(--tx);}
+.drp-q-item.act{background:var(--blul);color:var(--blu2);font-weight:600;}
+.drp-cals{display:flex;gap:0;padding:16px;flex:1;}
+.drp-cal{flex:1;}
+.drp-cal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.drp-cal-title{font-size:13px;font-weight:700;color:var(--tx);}
+.drp-nav{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--tx3);transition:all .12s;font-size:14px;line-height:1;}
+.drp-nav:hover{border-color:var(--blu3);color:var(--blu2);}
+.drp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.drp-dow{font-size:9px;font-weight:700;color:var(--tx4);text-align:center;padding:4px 0;letter-spacing:.06em;text-transform:uppercase;}
+.drp-day{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;cursor:pointer;color:var(--tx2);transition:all .12s;position:relative;margin:0 auto;}
+.drp-day:hover{background:var(--blul);color:var(--blu2);}
+.drp-day.other-mo{color:var(--tx4);}
+.drp-day.is-today{font-weight:700;color:var(--blu2);}
+.drp-day.is-today::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--blu2);}
+.drp-day.sel-start,.drp-day.sel-end{background:var(--blu2);color:#fff;font-weight:700;}
+.drp-day.sel-start{border-radius:6px 0 0 6px;}
+.drp-day.sel-end{border-radius:0 6px 6px 0;}
+.drp-day.sel-start.sel-end{border-radius:6px;}
+.drp-day.in-range{background:var(--blul);color:var(--blu2);border-radius:0;}
+.drp-cal-div{width:1px;background:var(--border);margin:0 8px;flex-shrink:0;}
+.drp-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border);background:var(--bg3);border-radius:0 0 var(--r2) var(--r2);}
+.drp-range-lbl{font-size:11px;color:var(--tx3);font-weight:500;}
+.drp-range-lbl strong{color:var(--tx);font-weight:700;}
+.drp-actions{display:flex;gap:8px;}
+.drp-clr-btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--tx3);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--fd);}
+.drp-apply-btn{padding:6px 16px;border-radius:6px;border:none;background:var(--blu2);color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fd);box-shadow:0 2px 6px rgba(37,99,235,0.3);}
+.drp-apply-btn:hover{background:var(--blu);}
+@media(max-width:767px){
+  .drp-panel{width:300px;left:auto;right:0;}
+  .drp-cals{flex-direction:column;}
+  .drp-cal-div{display:none;}
+  .drp-quick{width:100%;border-right:none;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;padding:8px;}
+  .drp-q-item{padding:4px 10px;font-size:11px;}
+  .ptiles-wrap{top:calc(var(--hh) + 90px);}
+}
 </style>
 </head>
 <body>
@@ -707,12 +758,45 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
       <button class="fb2" onclick="setF('mtd',this)">This Month</button>
       <button class="fb2" onclick="setF('lastmonth',this)">Last Month</button>
       <div class="fs2"></div>
-      <span class="flb">From:</span><input type="date" class="fdt" id="df" onchange="setF('custom',null)">
-      <span class="flb">To:</span><input type="date" class="fdt" id="dt2" onchange="setF('custom',null)">
+<div class="drp-wrap" id="drp-wrap">
+  <button class="drp-btn" id="drp-btn" onclick="toggleDRP()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span class="drp-txt" id="drp-label">Custom Range</span>
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+  <div class="drp-panel" id="drp-panel">
+    <div class="drp-top">
+      <div class="drp-quick">
+        <div class="drp-q-item" onclick="drpQuick('this-week',this)">This week</div>
+        <div class="drp-q-item" onclick="drpQuick('last-week',this)">Last week</div>
+        <div class="drp-q-item" onclick="drpQuick('last-7',this)">Last 7 days</div>
+        <div class="drp-q-item" onclick="drpQuick('last-30',this)">Last 30 days</div>
+        <div class="drp-q-item" onclick="drpQuick('this-month',this)">This month</div>
+        <div class="drp-q-item" onclick="drpQuick('last-month',this)">Last month</div>
+        <div class="drp-q-item" onclick="drpQuick('this-quarter',this)">This quarter</div>
+        <div class="drp-q-item" onclick="drpQuick('this-year',this)">This year</div>
+      </div>
+      <div class="drp-cals">
+        <div class="drp-cal" id="drp-cal-left"></div>
+        <div class="drp-cal-div"></div>
+        <div class="drp-cal" id="drp-cal-right"></div>
+      </div>
+    </div>
+    <div class="drp-footer">
+      <div class="drp-range-lbl" id="drp-range-lbl">Select a start date</div>
+      <div class="drp-actions">
+        <button class="drp-clr-btn" onclick="drpClear()">Clear</button>
+        <button class="drp-apply-btn" onclick="drpApply()">Apply Range</button>
+      </div>
+    </div>
+  </div>
+</div>
+      <input type="hidden" id="df">
+      <input type="hidden" id="dt2">
     </div>
 
     <!-- ══ PERIOD COMPARISON TILES ══ -->
-    <div class="ptiles" id="ptiles-row">
+    <div class="ptiles-wrap"><div class="ptiles" id="ptiles-row">
       <div class="ptile today">
         <div class="ptile-hd">
           <div class="ptile-hd-row">
@@ -816,7 +900,7 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
           </div>
         </div>
       </div>
-    </div>
+    </div></div><!-- end ptiles-wrap -->
 
     <!-- ══ KPI CARDS ══ -->
     <div class="kg">
@@ -2409,6 +2493,95 @@ function skuClrF(){
   if(ss) ss.value='default';
   skuSetF('all');
 }
+
+/* ══ DATE RANGE PICKER ══ */
+var _drpOpen=false,_drpS=null,_drpE=null;
+var _drpLM,_drpLY,_drpRM,_drpRY;
+var _DRP_MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var _DRP_DAYS=['Su','Mo','Tu','We','Th','Fr','Sa'];
+function _drpInitMonths(){var n=new Date();_drpLM=n.getMonth();_drpLY=n.getFullYear();_drpRM=(_drpLM+1)%12;_drpRY=_drpLM===11?_drpLY+1:_drpLY;}
+_drpInitMonths();
+function toggleDRP(){
+  _drpOpen=!_drpOpen;
+  document.getElementById('drp-panel').className='drp-panel'+(_drpOpen?' show':'');
+  document.getElementById('drp-btn').className='drp-btn'+(_drpOpen?' act':'');
+  if(_drpOpen)_drpRender();
+}
+function _drpClose(){_drpOpen=false;document.getElementById('drp-panel').className='drp-panel';document.getElementById('drp-btn').className='drp-btn';}
+function _drpFmt(d){if(!d)return'—';return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
+function _drpRender(){
+  document.getElementById('drp-cal-left').innerHTML=_drpBuildCal(_drpLY,_drpLM,'L');
+  document.getElementById('drp-cal-right').innerHTML=_drpBuildCal(_drpRY,_drpRM,'R');
+  var lbl=document.getElementById('drp-range-lbl');
+  if(!_drpS)lbl.innerHTML='Select a start date';
+  else if(!_drpE)lbl.innerHTML='<strong>'+_drpFmt(_drpS)+'</strong> → select end date';
+  else lbl.innerHTML='<strong>'+_drpFmt(_drpS)+'</strong> → <strong>'+_drpFmt(_drpE)+'</strong>';
+}
+function _drpBuildCal(yr,mo,side){
+  var today=new Date();var fd=new Date(yr,mo,1).getDay();var dim=new Date(yr,mo+1,0).getDate();var pd=new Date(yr,mo,0).getDate();
+  var h='<div class="drp-cal-hd"><button class="drp-nav" onclick="_drpNav(\''+side+'\',-1)">‹</button><div class="drp-cal-title">'+_DRP_MONTHS[mo]+' '+yr+'</div><button class="drp-nav" onclick="_drpNav(\''+side+'\',1)">›</button></div><div class="drp-grid">';
+  _DRP_DAYS.forEach(function(d){h+='<div class="drp-dow">'+d+'</div>';});
+  for(var i=0;i<fd;i++){h+='<div class="drp-day other-mo">'+(pd-fd+1+i)+'</div>';}
+  for(var d=1;d<=dim;d++){
+    var dt=new Date(yr,mo,d);var c='drp-day';
+    if(dt.toDateString()===today.toDateString())c+=' is-today';
+    if(_drpS&&dt.toDateString()===_drpS.toDateString())c+=' sel-start';
+    if(_drpE&&dt.toDateString()===_drpE.toDateString())c+=' sel-end';
+    if(_drpS&&_drpE&&dt>_drpS&&dt<_drpE)c+=' in-range';
+    h+='<div class="'+c+'" onclick="_drpPick('+yr+','+mo+','+d+')">'+d+'</div>';
+  }
+  var rem=(7-((fd+dim)%7))%7;
+  for(var i=1;i<=rem;i++)h+='<div class="drp-day other-mo">'+i+'</div>';
+  return h+'</div>';
+}
+function _drpNav(side,dir){
+  if(side==='L'){_drpLM+=dir;if(_drpLM>11){_drpLM=0;_drpLY++;}if(_drpLM<0){_drpLM=11;_drpLY--;}}
+  else{_drpRM+=dir;if(_drpRM>11){_drpRM=0;_drpRY++;}if(_drpRM<0){_drpRM=11;_drpRY--;}}
+  _drpRender();
+}
+function _drpPick(yr,mo,day){
+  var dt=new Date(yr,mo,day);
+  if(!_drpS||_drpE){_drpS=dt;_drpE=null;}
+  else if(dt<_drpS){_drpE=_drpS;_drpS=dt;}
+  else{_drpE=dt;}
+  _drpRender();
+}
+function drpQuick(q,el){
+  document.querySelectorAll('.drp-q-item').forEach(function(e){e.classList.remove('act');});
+  el.classList.add('act');
+  var n=new Date();var s,e;
+  if(q==='this-week'){s=new Date(n);s.setDate(n.getDate()-n.getDay());e=new Date(n);}
+  else if(q==='last-week'){s=new Date(n);s.setDate(n.getDate()-n.getDay()-7);e=new Date(s);e.setDate(s.getDate()+6);}
+  else if(q==='last-7'){s=new Date(n);s.setDate(n.getDate()-6);e=new Date(n);}
+  else if(q==='last-30'){s=new Date(n);s.setDate(n.getDate()-29);e=new Date(n);}
+  else if(q==='this-month'){s=new Date(n.getFullYear(),n.getMonth(),1);e=new Date(n);}
+  else if(q==='last-month'){s=new Date(n.getFullYear(),n.getMonth()-1,1);e=new Date(n.getFullYear(),n.getMonth(),0);}
+  else if(q==='this-quarter'){var qn=Math.floor(n.getMonth()/3);s=new Date(n.getFullYear(),qn*3,1);e=new Date(n);}
+  else if(q==='this-year'){s=new Date(n.getFullYear(),0,1);e=new Date(n);}
+  _drpS=s;_drpE=e;_drpRender();
+}
+function drpClear(){
+  _drpS=null;_drpE=null;
+  document.querySelectorAll('.drp-q-item').forEach(function(e){e.classList.remove('act');});
+  document.getElementById('drp-label').textContent='Custom Range';
+  document.getElementById('drp-btn').className='drp-btn';
+  _drpRender();
+}
+function drpApply(){
+  if(!_drpS||!_drpE){showNotif('Please select both start and end dates','w');return;}
+  document.querySelectorAll('.fb2').forEach(function(b){b.classList.remove('act');});
+  document.getElementById('drp-label').textContent=_drpFmt(_drpS)+' – '+_drpFmt(_drpE);
+  document.getElementById('drp-btn').className='drp-btn act';
+  var df=document.getElementById('df');var dt2=document.getElementById('dt2');
+  if(df)df.value=_drpS.toISOString().split('T')[0];
+  if(dt2)dt2.value=_drpE.toISOString().split('T')[0];
+  if(typeof setF==='function')setF('custom',null);
+  _drpClose();
+}
+document.addEventListener('click',function(e){
+  var wrap=document.getElementById('drp-wrap');
+  if(_drpOpen&&wrap&&!wrap.contains(e.target))_drpClose();
+});
 </script>
 </body>
 </html>
