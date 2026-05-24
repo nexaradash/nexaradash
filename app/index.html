@@ -1555,10 +1555,10 @@ async function savePNL(){
 async function loadPNL(){
   if(!tenantId)return;
   try{
-    const{data,error}=await sb.from('pnl_data').select('*').eq('tenant_id',tenantId).eq('sku','__snapshot__').maybeSingle();
+    const{data,error}=await sb.from('pnl_data').select('*').eq('tenant_id',tenantId).eq('sku','__snapshot__').order('revenue',{ascending:false}).limit(1);
     if(error){console.error('loadPNL error:',error);return;}
-    if(data&&data.settlement_ref){
-      const stored=JSON.parse(data.settlement_ref);
+    if(data&&data.length&&data[0].settlement_ref){
+      const stored=JSON.parse(data[0].settlement_ref);
       if(stored.pnl&&Object.keys(stored.pnl).length){
         pnl=stored.pnl;hdrs=stored.hdrs||[];
         Object.values(pnl).forEach(d=>{d.dates=d.dates.filter(e=>e.rev>0);});
@@ -1567,7 +1567,6 @@ async function loadPNL(){
       }
     }
   }catch(e){console.error('loadPNL exception:',e);}
-  // Always run onboarding check after loadPNL — pnl is now in final state
   updOnboarding();
 }
 
@@ -1728,7 +1727,8 @@ function pDt(v){
 function getPeriodData(fromStr,toStr){
   const fd=fromStr?new Date(fromStr):null;
   const td=toStr?new Date(toStr):null;
-  if(td)td.setHours(23,59,59);
+  if(fd)fd.setHours(0,0,0,0);
+  if(td)td.setHours(23,59,59,999);
   let rv=0,fe=0,rt=0,cg=0,sh=0,tsh=0,ad=0,od=0,qty=0;
   Object.values(pnl).forEach(d=>{
     const p=prods.find(pr=>pr.sku.trim().toLowerCase()===d.sku.trim().toLowerCase());
