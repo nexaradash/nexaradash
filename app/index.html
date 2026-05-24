@@ -1981,9 +1981,12 @@ function procMap(){
   let totalShippingLabelCost=0;
   raws.forEach(row=>{
     const tx=ttc>=0?String(row[ttc]||'').trim().toLowerCase():'';
-    if(tx==='shipping label purchase'||tx==='shipping label purchase adjustment'){
+    if(tx==='shipping label purchase'){
       const cost=othersCol>=0?parseFloat(row[othersCol])||0:0;
       totalShippingLabelCost+=Math.abs(cost);
+    } else if(tx==='shipping label purchase adjustment'){
+      const credit=othersCol>=0?parseFloat(row[othersCol])||0:0;
+      totalShippingLabelCost-=Math.abs(credit);
     }
   });
   raws.forEach(row=>{
@@ -2007,8 +2010,16 @@ function procMap(){
     const totalFee=fee+shipTax+prodTax;
     if(!pnl[sku])pnl[sku]={sku,name:skuName||sku,revenue:0,fees:0,returns:0,qty:0,orders:0,dates:[],shipping:0,taxes:0,shippingLabels:0};
     if(skuName&&pnl[sku].name===sku)pnl[sku].name=skuName;
-    pnl[sku].revenue+=rev;pnl[sku].fees+=fee;pnl[sku].shipping+=shipTax;pnl[sku].taxes+=prodTax;
-    pnl[sku].returns+=ret;pnl[sku].qty+=isRefund?0:qty;pnl[sku].orders++;pnl[sku].dates.push({date,rev});
+    pnl[sku].revenue+=rev;
+    pnl[sku].fees+=fee+shipTax+prodTax;
+    pnl[sku].shipping+=0;
+    pnl[sku].taxes+=prodTax;
+    pnl[sku].returns+=ret;
+    pnl[sku].qty+=isRefund?0:qty;
+    if(!isRefund){
+      pnl[sku].orders++;
+      pnl[sku].dates.push({date,rev});
+    }
     rows.push({sku,rev,fee:totalFee,ship:0,ret,qty,date,isRefund});
   });
   if(totalShippingLabelCost>0){
