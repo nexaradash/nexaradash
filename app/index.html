@@ -480,6 +480,37 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
   .cg{grid-template-columns:1fr;}
   .cc.full{grid-column:auto;}
 }
+
+/* ══ SKU SEARCH & FILTER ══ */
+.skuf{display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--border);background:var(--bg3);flex-wrap:wrap;}
+.sku-search-wrap{position:relative;flex:1;min-width:180px;}
+.sku-search-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--tx4);pointer-events:none;}
+.sku-search{width:100%;padding:8px 12px 8px 34px;border:1.5px solid var(--border2);border-radius:var(--r);font-size:12px;font-family:var(--fd);color:var(--tx);background:var(--bg2);transition:border-color .15s,box-shadow .15s;}
+.sku-search:focus{outline:none;border-color:var(--blu2);box-shadow:0 0 0 3px rgba(37,99,235,0.08);}
+.sku-search::placeholder{color:var(--tx4);}
+.flt-label{font-size:11px;color:var(--tx3);font-weight:600;white-space:nowrap;}
+.flt-sep{width:1px;height:20px;background:var(--border2);flex-shrink:0;}
+.flt-btn{padding:6px 13px;border-radius:6px;border:1.5px solid var(--border);background:var(--bg2);color:var(--tx3);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--fd);transition:all .15s;white-space:nowrap;}
+.flt-btn:hover{border-color:var(--blu3);color:var(--blu2);}
+.flt-btn.f-act{background:var(--blul);border-color:var(--blubl);color:var(--blu2);font-weight:600;}
+.flt-btn.f-grn{background:var(--grnl);border-color:var(--grnbl);color:var(--grn);font-weight:600;}
+.flt-btn.f-amb{background:var(--ambl);border-color:var(--ambbl);color:var(--amb);font-weight:600;}
+.flt-btn.f-red{background:var(--redl);border-color:var(--redbl);color:var(--red);font-weight:600;}
+.sort-select{padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--r);font-size:11px;font-family:var(--fd);color:var(--tx2);background:var(--bg2);cursor:pointer;}
+.sort-select:focus{outline:none;border-color:var(--blu2);}
+.sku-vis{font-size:11px;color:var(--tx3);white-space:nowrap;margin-left:auto;}
+.sku-clr{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--tx4);font-size:10px;cursor:pointer;font-family:var(--fd);display:none;}
+.sku-clr.sh{display:block;}
+.sku-hl{background:#fef9c3;border-radius:2px;padding:0 1px;}
+.skuf-no{padding:40px 20px;text-align:center;color:var(--tx4);font-size:13px;}
+.margin-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;}
+.mb-high{background:var(--grnl);color:var(--grn);border:1px solid var(--grnbl);}
+.mb-med{background:var(--ambl);color:var(--amb);border:1px solid var(--ambbl);}
+.mb-low{background:var(--redl);color:var(--red);border:1px solid var(--redbl);}
+@media(max-width:767px){
+  .skuf{padding:10px 12px;gap:6px;}
+  .flt-label,.sku-vis,.sort-select{display:none;}
+}
 </style>
 </head>
 <body>
@@ -934,6 +965,30 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
     </div>
     <div class="sw2" id="sw2"></div>
     <div class="tw">
+<div class="skuf" id="skuf">
+  <div class="sku-search-wrap">
+    <svg class="sku-search-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="sku-search" id="sku-search" type="text" placeholder="Search SKU or product name..." oninput="skuFilter()">
+  </div>
+  <div class="flt-sep"></div>
+  <span class="flt-label">Margin:</span>
+  <button class="flt-btn f-act" id="sf-all" onclick="skuSetF('all')">All</button>
+  <button class="flt-btn" id="sf-high" onclick="skuSetF('high')">✓ Profitable (&gt;20%)</button>
+  <button class="flt-btn" id="sf-med" onclick="skuSetF('med')">⚠ Low Margin (5–20%)</button>
+  <button class="flt-btn" id="sf-low" onclick="skuSetF('low')">✗ Losing (&lt;5%)</button>
+  <div class="flt-sep"></div>
+  <select class="sort-select" id="sf-sort" onchange="skuFilter()">
+    <option value="default">Sort: Default</option>
+    <option value="profit-desc">Profit: High → Low</option>
+    <option value="profit-asc">Profit: Low → High</option>
+    <option value="margin-desc">Margin: High → Low</option>
+    <option value="margin-asc">Margin: Low → High</option>
+    <option value="revenue-desc">Revenue: High → Low</option>
+    <option value="sku-asc">SKU: A → Z</option>
+  </select>
+  <span class="sku-vis" id="sf-vis"></span>
+  <button class="sku-clr" id="sf-clr" onclick="skuClrF()">✕ Clear</button>
+</div>
       <div class="th"><div class="tt">P&L by Product</div><div class="tc" id="sk-cnt">0 SKUs</div></div>
       <div class="ts"><table><thead><tr><th>#</th><th>SKU</th><th>Product</th><th>Units</th><th>Revenue</th><th>COGS ✏️</th><th>Temu Fees</th><th>Temu Ship</th><th>Inbound Ship</th><th>Ad Spend</th><th>Returns</th><th>Net Profit</th><th>Margin</th></tr></thead><tbody id="sk-b"></tbody></table></div>
     </div>
@@ -1574,6 +1629,7 @@ function setF(m,btn){
   else if(m==='custom'){dFrom=document.getElementById('df').value||null;dTo=document.getElementById('dt2').value||null;}
   else{dFrom=null;dTo=null;}
   recalc();
+  skuFilter();
 }
 
 function pDt(v){
@@ -1990,6 +2046,7 @@ function rndSKU(data){
       input.addEventListener('blur',save);
     });
   });
+  skuFilter();
 }
 
 function applyMan(){mAds=parseFloat(document.getElementById('man-ads').value)||0;mOth=parseFloat(document.getElementById('man-oth').value)||0;recalc();notify('Adjustments applied','ok');}
@@ -2259,6 +2316,98 @@ function resetUp(){
   document.getElementById('fi2').value='';
   dbClear('pnl_data').catch(()=>{});
   recalc();notify('Import reset','inf');
+}
+
+/* ══ SKU SEARCH & FILTER ══ */
+var _skuFilter='all';
+function skuSetF(f){
+  _skuFilter=f;
+  var map={all:'sf-all',high:'sf-high',med:'sf-med',low:'sf-low'};
+  var cls={all:'flt-btn f-act',high:'flt-btn f-grn',med:'flt-btn f-amb',low:'flt-btn f-red'};
+  Object.keys(map).forEach(function(k){
+    var el=document.getElementById(map[k]);
+    if(el) el.className=cls[k==='all'?'all':k===f?k:'all'].replace(k===f?'f-act':cls[k],'');
+  });
+  // reset all then apply active
+  ['all','high','med','low'].forEach(function(k){
+    var el=document.getElementById(map[k]);
+    if(el) el.className='flt-btn'+(k===f?' '+(cls[f].replace('flt-btn ','')):'');
+  });
+  skuFilter();
+}
+function skuFilter(){
+  var search=(document.getElementById('sku-search').value||'').trim().toLowerCase();
+  var sort=(document.getElementById('sf-sort')&&document.getElementById('sf-sort').value)||'default';
+  var tbody=document.getElementById('sk-b');
+  var rows=Array.from(document.querySelectorAll('#sk-b tr'));
+  var visible=0;
+  rows.forEach(function(tr){
+    var sku=(tr.querySelector('td:nth-child(2)')||{}).textContent||'';
+    var name=(tr.querySelector('td:nth-child(3)')||{}).textContent||'';
+    var marginTd=tr.querySelector('td:nth-child(13)');
+    var margin=marginTd?parseFloat(marginTd.textContent)||0:0;
+    var matchSearch=!search||(sku.toLowerCase().includes(search)||name.toLowerCase().includes(search));
+    var matchFilter=_skuFilter==='all'||(
+      _skuFilter==='high'&&margin>20||
+      _skuFilter==='med'&&margin>=5&&margin<=20||
+      _skuFilter==='low'&&margin<5
+    );
+    tr.style.display=(matchSearch&&matchFilter)?'':'none';
+    if(matchSearch&&matchFilter) visible++;
+  });
+
+  if(sort!=='default'){
+    var rowArray=rows.filter(tr=>tr.style.display!=='none');
+    rowArray.sort(function(a,b){
+      var vA, vB;
+      if(sort.includes('profit')){
+         vA=parseFloat((a.querySelector('.tp,.tn2')||{}).textContent.replace(/[^0-9.-]+/g,""))||0;
+         vB=parseFloat((b.querySelector('.tp,.tn2')||{}).textContent.replace(/[^0-9.-]+/g,""))||0;
+         return sort==='profit-desc'?vB-vA:vA-vB;
+      }
+      if(sort.includes('margin')){
+         vA=parseFloat((a.querySelector('td:nth-child(13)')||{}).textContent)||0;
+         vB=parseFloat((b.querySelector('td:nth-child(13)')||{}).textContent)||0;
+         return sort==='margin-desc'?vB-vA:vA-vB;
+      }
+      if(sort.includes('revenue')){
+         vA=parseFloat((a.querySelector('td:nth-child(5)')||{}).textContent.replace(/[^0-9.-]+/g,""))||0;
+         vB=parseFloat((b.querySelector('td:nth-child(5)')||{}).textContent.replace(/[^0-9.-]+/g,""))||0;
+         return sort==='revenue-desc'?vB-vA:vA-vB;
+      }
+      if(sort==='sku-asc'){
+         vA=(a.querySelector('td:nth-child(2)')||{}).textContent||'';
+         vB=(b.querySelector('td:nth-child(2)')||{}).textContent||'';
+         return vA.localeCompare(vB);
+      }
+      return 0;
+    });
+    rowArray.forEach(tr=>tbody.appendChild(tr));
+  } else {
+    var rowArray=rows.filter(tr=>tr.style.display!=='none');
+    rowArray.sort(function(a,b){
+      var vA=parseFloat((a.querySelector('.tp,.tn2')||{}).textContent.replace(/[^0-9.-]+/g,""))||0;
+      var vB=parseFloat((b.querySelector('.tp,.tn2')||{}).textContent.replace(/[^0-9.-]+/g,""))||0;
+      return vB-vA;
+    });
+    rowArray.forEach(tr=>tbody.appendChild(tr));
+  }
+
+  var total=rows.length;
+  var vis=document.getElementById('sf-vis');
+  if(vis) vis.textContent='Showing '+visible+' of '+total;
+  var cnt=document.getElementById('sk-cnt');
+  if(cnt) cnt.textContent=visible+' SKUs';
+  var clr=document.getElementById('sf-clr');
+  if(clr) clr.className='sku-clr'+((_skuFilter!=='all'||search)?' sh':'');
+}
+function skuClrF(){
+  _skuFilter='all';
+  var si=document.getElementById('sku-search');
+  if(si) si.value='';
+  var ss=document.getElementById('sf-sort');
+  if(ss) ss.value='default';
+  skuSetF('all');
 }
 </script>
 </body>
