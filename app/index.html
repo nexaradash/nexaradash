@@ -2014,12 +2014,7 @@ function procMap(){
     pnl[sku].fees+=fee+shipTax+prodTax;
     pnl[sku].shipping+=0;
     pnl[sku].taxes+=prodTax;
-    pnl[sku].returns+=ret;
-    pnl[sku].qty+=isRefund?0:qty;
-    if(!isRefund){
-      pnl[sku].orders++;
-      pnl[sku].dates.push({date,rev});
-    }
+    pnl[sku].returns+=ret;pnl[sku].qty+=isRefund?0:qty;if(!isRefund){pnl[sku].orders++;pnl[sku].dates.push({date,rev});}
     rows.push({sku,rev,fee:totalFee,ship:0,ret,qty,date,isRefund});
   });
   if(totalShippingLabelCost>0){
