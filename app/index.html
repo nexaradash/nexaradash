@@ -1469,21 +1469,19 @@ async function showPaywallIfNeeded(){
 }
 
 async function startCheckout(){
-  if(!stripeInstance){notify('Stripe not loaded — refresh and try again','er');return;}
   const btn=document.getElementById('pw-cta-btn');
   const txt=document.getElementById('pw-cta-text');
   const spin=document.getElementById('pw-spin');
   btn.disabled=true;txt.textContent='Redirecting...';spin.style.display='block';
   pwErr('');
-  const{error}=await stripeInstance.redirectToCheckout({
-    lineItems:[{price:STRIPE_PRICE_ID,quantity:1}],
-    mode:'subscription',
-    successUrl:window.location.origin+window.location.pathname+'?session_id={CHECKOUT_SESSION_ID}',
-    cancelUrl:window.location.origin+window.location.pathname+'?stripe_cancel=1',
-    clientReferenceId:tenantId,
-  });
-  if(error){
-    pwErr(error.message);
+  try{
+    const{data,error}=await sb.functions.invoke('create-checkout-session',{
+      body:{priceId:STRIPE_PRICE_ID,tenantId:tenantId}
+    });
+    if(error||!data?.url)throw new Error(error?.message||'No checkout URL returned');
+    window.location.href=data.url;
+  }catch(e){
+    pwErr(e.message);
     btn.disabled=false;txt.textContent='Start 7-Day Free Trial →';spin.style.display='none';
   }
 }
