@@ -562,7 +562,40 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
   .drp-q-item{padding:4px 10px;font-size:11px;}
   .ptiles-wrap{top:calc(var(--hh) + 90px);}
 }
+/* ══ PAYWALL ══ */
+#paywall{position:fixed;inset:0;z-index:9000;background:rgba(15,32,68,0.72);backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:16px;}
+#paywall.show{display:flex;animation:pwIn .3s ease;}
+@keyframes pwIn{from{opacity:0}to{opacity:1}}
+.pw-card{background:#fff;border-radius:20px;width:100%;max-width:460px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.12);overflow:hidden;animation:pwUp .35s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pwUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+.pw-hdr{background:linear-gradient(135deg,#0f2044 0%,#162a56 100%);padding:28px 28px 24px;position:relative;overflow:hidden;}
+.pw-hdr::after{content:'';position:absolute;right:-40px;bottom:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.04);}
+.pw-logo{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.pw-mark{width:38px;height:38px;display:flex;align-items:center;justify-content:center;}
+.pw-brand{font-size:16px;font-weight:800;color:#fff;}
+.pw-sub-lbl{font-size:10px;color:rgba(255,255,255,0.4);margin-top:1px;}
+.pw-headline{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1.25;margin-bottom:8px;}
+.pw-desc{font-size:12.5px;color:rgba(255,255,255,0.65);line-height:1.6;}
+.pw-price-row{display:flex;align-items:center;gap:12px;margin-top:18px;}
+.pw-price-val{font-size:36px;font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1;}
+.pw-price-period{font-size:12px;color:rgba(255,255,255,0.5);font-weight:500;}
+.pw-trial-badge{background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase;}
+.pw-body{padding:24px 28px;}
+.pw-features{list-style:none;margin-bottom:20px;display:flex;flex-direction:column;gap:9px;}
+.pw-features li{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#374365;}
+.pw-features li .pw-ic{width:20px;height:20px;border-radius:50%;background:#ecfdf5;border:1px solid #a7f3d0;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:#059669;}
+.pw-divider{height:1px;background:#e2e7f0;margin:16px 0;}
+.pw-cta{width:100%;padding:14px;background:linear-gradient(135deg,#2563eb,#1a4fcf);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(37,99,235,0.35);}
+.pw-cta:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,0.45);}
+.pw-cta:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.pw-cta-spin{width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;display:none;}
+.pw-stripe-badge{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;font-size:10.5px;color:#94a3b8;}
+.pw-already{text-align:center;font-size:11.5px;color:#64748b;margin-top:10px;}
+.pw-already a{color:#2563eb;cursor:pointer;font-weight:600;text-decoration:none;}
+.pw-err{display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:12px;color:#dc2626;margin-bottom:14px;}
+.pw-err.sh{display:block;}
 </style>
+<script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
 
@@ -574,6 +607,45 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
   </div>
   <div class="ls-spinner"></div>
   <div class="ls-txt">Loading your dashboard...</div>
+</div>
+
+<!-- ══ PAYWALL ══ -->
+<div id="paywall">
+  <div class="pw-card">
+    <div class="pw-hdr">
+      <div class="pw-logo">
+        <div class="pw-mark"><svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:38px;height:38px;"><defs><linearGradient id="pw-g" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#1D9E75"/><stop offset="100%" stop-color="#00C9A7"/></linearGradient></defs><rect x="1" y="19" width="5.5" height="8" rx="1.5" fill="url(#pw-g)"/><rect x="8" y="14" width="5.5" height="13" rx="1.5" fill="url(#pw-g)"/><rect x="15" y="8" width="5.5" height="19" rx="1.5" fill="url(#pw-g)"/><rect x="22" y="2" width="5.5" height="25" rx="1.5" fill="url(#pw-g)"/></svg></div>
+        <div><div class="pw-brand">NexaraDash</div><div class="pw-sub-lbl">nexaradash.com</div></div>
+      </div>
+      <div class="pw-headline">Unlock Your Full P&amp;L Dashboard</div>
+      <div class="pw-desc">Subscribe to track profits, costs, and VAT across all your Temu products.</div>
+      <div class="pw-price-row">
+        <span class="pw-price-val">$19</span><span class="pw-price-period">&nbsp;/ month</span>
+        <span class="pw-trial-badge">7-day free trial</span>
+      </div>
+    </div>
+    <div class="pw-body">
+      <div class="pw-err" id="pw-err"></div>
+      <ul class="pw-features">
+        <li><span class="pw-ic">✓</span>Full P&amp;L — revenue, costs, net profit per SKU</li>
+        <li><span class="pw-ic">✓</span>Unlimited SKUs and settlement imports</li>
+        <li><span class="pw-ic">✓</span>Period tiles — Today, Yesterday, MTD, Last Month</li>
+        <li><span class="pw-ic">✓</span>VAT/Tax filing summary with PDF export</li>
+        <li><span class="pw-ic">✓</span>9 analytics charts + trend sparklines</li>
+        <li><span class="pw-ic">✓</span>Cloud sync — data persists across devices</li>
+      </ul>
+      <div class="pw-divider"></div>
+      <button class="pw-cta" id="pw-cta-btn" onclick="startCheckout()">
+        <span id="pw-cta-text">Start 7-Day Free Trial →</span>
+        <span class="pw-cta-spin" id="pw-spin"></span>
+      </button>
+      <div class="pw-stripe-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Secured by Stripe · Cancel anytime
+      </div>
+      <div class="pw-already">Already subscribed? <a onclick="restoreAccess()">Restore access →</a></div>
+    </div>
+  </div>
 </div>
 
 <!-- ══ AUTH SCREEN ══ -->
@@ -1363,6 +1435,105 @@ function initKPISparklines() {
 }
 let CH={};
 let signingOut=false;
+
+// ══ STRIPE ══
+const STRIPE_PK='pk_test_51TakjmKwfEBR5BnSwgjVdiI79BUR2IeOwcfUwipYtItOrorC6fN7ycdKlalhqOII7HTDXffn0DeD5eiBtGtDTbvg00VgwgQ9Ph';
+const STRIPE_PRICE_ID='price_1Takr3KwfEBR5BnSuHXi2rJ0';
+let stripeInstance=null;
+let hasActiveSub=false;
+
+function initStripe(){
+  try{stripeInstance=Stripe(STRIPE_PK);}
+  catch(e){console.error('Stripe init failed:',e);}
+}
+
+async function checkSubscription(){
+  if(!tenantId)return false;
+  const{data}=await sb.from('subscriptions').select('status,current_period_end').eq('tenant_id',tenantId).order('created_at',{ascending:false}).limit(1);
+  if(data&&data.length){
+    const sub=data[0];
+    const notExpired=sub.current_period_end?new Date(sub.current_period_end)>new Date():true;
+    if((sub.status==='active'||sub.status==='trialing')&&notExpired){
+      hasActiveSub=true;return true;
+    }
+  }
+  hasActiveSub=false;return false;
+}
+
+async function showPaywallIfNeeded(){
+  const active=await checkSubscription();
+  if(!active){
+    initStripe();
+    document.getElementById('paywall').classList.add('show');
+  }
+}
+
+async function startCheckout(){
+  if(!stripeInstance){notify('Stripe not loaded — refresh and try again','er');return;}
+  const btn=document.getElementById('pw-cta-btn');
+  const txt=document.getElementById('pw-cta-text');
+  const spin=document.getElementById('pw-spin');
+  btn.disabled=true;txt.textContent='Redirecting...';spin.style.display='block';
+  pwErr('');
+  const{error}=await stripeInstance.redirectToCheckout({
+    lineItems:[{price:STRIPE_PRICE_ID,quantity:1}],
+    mode:'subscription',
+    successUrl:window.location.origin+window.location.pathname+'?session_id={CHECKOUT_SESSION_ID}',
+    cancelUrl:window.location.origin+window.location.pathname+'?stripe_cancel=1',
+    clientReferenceId:tenantId||'unknown',
+  });
+  if(error){
+    pwErr(error.message);
+    btn.disabled=false;txt.textContent='Start 7-Day Free Trial →';spin.style.display='none';
+  }
+}
+
+async function handleStripeReturn(){
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('session_id')){
+    const sessionId=params.get('session_id');
+    // Record session in Supabase — webhook will update to active
+    if(tenantId){
+      await sb.from('subscriptions').upsert([{
+        tenant_id:tenantId,
+        stripe_session_id:sessionId,
+        status:'trialing',
+        price_id:STRIPE_PRICE_ID,
+        current_period_end:new Date(Date.now()+7*24*60*60*1000).toISOString()
+      }],{onConflict:'tenant_id'});
+    }
+    document.getElementById('paywall').classList.remove('show');
+    hasActiveSub=true;
+    notify('🎉 Subscription active — welcome to NexaraDash Pro!','ok');
+    // Clean URL
+    window.history.replaceState({},'',window.location.pathname);
+    return true;
+  }
+  if(params.get('stripe_cancel')){
+    window.history.replaceState({},'',window.location.pathname);
+    notify('Checkout cancelled','inf');
+  }
+  return false;
+}
+
+async function restoreAccess(){
+  if(!tenantId){notify('Please sign in first','er');return;}
+  const active=await checkSubscription();
+  if(active){
+    document.getElementById('paywall').classList.remove('show');
+    notify('✓ Subscription restored','ok');
+  } else {
+    pwErr('No active subscription found for this account.');
+  }
+}
+
+function pwErr(msg){
+  const el=document.getElementById('pw-err');
+  if(!el)return;
+  if(msg){el.textContent=msg;el.classList.add('sh');}
+  else{el.classList.remove('sh');}
+}
+
 let sessionHandled=false; // top-level — used by signIn() and boot IIFE
 
 // ══ CURRENCY SYSTEM ══
@@ -1495,6 +1666,9 @@ async function getProfile(){
       if(nameEl)nameEl.textContent=companyName;
     }
   }
+    // Check Stripe return first, then subscription gate
+    const returned=await handleStripeReturn();
+    if(!returned)await showPaywallIfNeeded();
 }
 
 function applyCompanyName(){
